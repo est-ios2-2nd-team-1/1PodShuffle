@@ -96,6 +96,32 @@ extension PlayListViewController: UITableViewDelegate {
     }
 }
 
+// MARK: - NSFetchedResultsController Delegate
 extension PlayListViewController: NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        playListTableView.beginUpdates()
+    }
 
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        switch type {
+            case .insert:
+                if let insertIndexPath = newIndexPath {
+                    playListTableView.insertRows(at: [insertIndexPath], with: .automatic)
+                }
+            case .delete:
+                if let deleteIndexPath = indexPath {
+                    playListTableView.deleteRows(at: [deleteIndexPath], with: .automatic)
+                }
+            case .move:
+                if let originalIndexPath = indexPath, let targetIndexPath = newIndexPath {
+                    playListTableView.moveRow(at: originalIndexPath, to: targetIndexPath)
+                }
+            default:
+                break
+        }
+    }
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        playListTableView.endUpdates()
+    }
 }
