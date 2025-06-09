@@ -79,23 +79,21 @@ final class DataManager {
         saveContext()
     }
 
-    // TODO: 알고리즘에 따라서 변경되는 수치는 바뀔 수 있음.
-    /// 장르별 추천 수치를 변경합니다.
+    // TODO: 알고리즘에 따라 수치는 변경될 수 있습니다.
+    /// 장르별 추천 수치를 조정합니다.
     /// - Parameters:
-    ///   - genre: 음악의 장르를 받습니다. (String)
-    ///   - upper: 추천하면 양수, 비추천하면 음수를 받습니다.
-    func recommendGenre(to genre: String, upper: Int) {
+    ///   - genre: 음악 장르를 받습니다. (예: "rock", "ballad")
+    ///   - delta: 추천 시 양수, 비추천 시 음수 값을 받습니다.
+    func adjustGenreScore(for genre: String, by delta: Int) {
         var genreCounts = UserDefaults.standard.dictionary(forKey: "Genre") as? [String: Int] ?? [:]
 
-        if genreCounts[genre, default: 0] + upper < 0 {
-            genreCounts[genre, default: 0] = 1
-        } else {
-            genreCounts[genre, default: 0] += upper
-        }
+        let current = genreCounts[genre] ?? 0
+        let updated = max(current + delta, 1)
+        genreCounts[genre] = updated
 
-        UserDefaults.standard.setValue(genreCounts, forKey: "Genre")
+        UserDefaults.standard.set(genreCounts, forKey: "Genre")
     }
-    
+
     /// 장르별 추천 수치를 모두 반환합니다.
     /// - Returns: 장르별 추천 수치를 배열로 반환합니다.
     func fetchAllGenre() -> [(genre: String, count: Int)] {
