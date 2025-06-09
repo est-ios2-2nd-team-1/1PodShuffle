@@ -1,16 +1,6 @@
 import Foundation
 import CoreData
 
-struct SongEntity {
-    let title: String
-    let album: String
-    let artist: String
-    let genre: String
-    let id: Int
-    let streamUrl: String
-    let thumbnail: Data?
-}
-
 final class DataManager {
     static let shared = DataManager()
 
