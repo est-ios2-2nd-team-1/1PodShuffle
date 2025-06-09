@@ -1,7 +1,7 @@
 import Foundation
 import CoreData
 
-struct SongDTO {
+struct SongEntity {
     let title: String
     let album: String
     let artist: String
@@ -51,7 +51,7 @@ final class DataManager {
     
     /// 음악 데이터를 영구적으로 저장합니다.
     /// - Parameter song: 저장할 음악 데이터를 받습니다.
-    func insertSongData(from song: SongDTO) {
+    func insertSongData(from song: SongEntity) {
         let newSong = Song(context: mainContext)
         newSong.title = song.title
         newSong.album = song.album
@@ -77,6 +77,33 @@ final class DataManager {
         deleteImageFile(name: deletedSong.thumbnail)
         mainContext.delete(deletedSong)
         saveContext()
+    }
+
+    // TODO: 알고리즘에 따라서 변경되는 수치는 바뀔 수 있음.
+    /// 장르별 추천 수치를 변경합니다.
+    /// - Parameters:
+    ///   - genre: 음악의 장르를 받습니다. (String)
+    ///   - upper: 추천하면 양수, 비추천하면 음수를 받습니다.
+    func recommendGenre(to genre: String, upper: Int) {
+        var genreCounts = UserDefaults.standard.dictionary(forKey: "Genre") as? [String: Int] ?? [:]
+
+        if genreCounts[genre, default: 0] + upper < 0 {
+            genreCounts[genre, default: 0] = 1
+        } else {
+            genreCounts[genre, default: 0] += upper
+        }
+
+        UserDefaults.standard.setValue(genreCounts, forKey: "Genre")
+    }
+    
+    /// 장르별 추천 수치를 모두 반환합니다.
+    /// - Returns: 장르별 추천 수치를 배열로 반환합니다.
+    func fetchAllGenre() -> [(genre: String, count: Int)] {
+        if let genreCounts = UserDefaults.standard.dictionary(forKey: "Genre") as? [String: Int] {
+			return Array(genreCounts).sorted { $0.value > $1.value }.map { (genre: $0.key, count: $0.value) }
+        }
+
+        return []
     }
 
     /// Context에서 변경된 데이터를 영구적으로 저장합니다.
