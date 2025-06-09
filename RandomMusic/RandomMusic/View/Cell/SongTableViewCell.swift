@@ -8,11 +8,18 @@ class SongTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        
+        /// UI Setting
+        setUI()
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
+    }
+    
+    func setUI() {
+        thumbnailImageView.clipsToBounds = true
+        thumbnailImageView.layer.cornerRadius = thumbnailImageView.bounds.width / 3
     }
 
 }
