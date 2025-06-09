@@ -22,6 +22,7 @@ class MainViewController: UIViewController {
     @IBOutlet weak var forwardButton: UIButton!
     @IBOutlet weak var speedButton: UIButton!
 
+<<<<<<< Updated upstream
     // TODO: UI 체크용 임시 로컬 변수 -> 추후 제거
     var isPlaying = false
     var isDisliked = false
@@ -49,6 +50,11 @@ class MainViewController: UIViewController {
    let name = Bundle.main.object(forInfoDictionaryKey: "NAME") as? String ?? ""
    let token = Bundle.main.object(forInfoDictionaryKey: "TOKEN") as? String ?? ""
 
+=======
+   let name = Bundle.main.object(forInfoDictionaryKey: "NAME") as? String ?? ""
+   let token = Bundle.main.object(forInfoDictionaryKey: "TOKEN") as? String ?? ""
+
+>>>>>>> Stashed changes
 
    override func viewDidLoad() {
        super.viewDidLoad()
@@ -57,5 +63,8 @@ class MainViewController: UIViewController {
        print("Name: \(name)")  // "aaa"
        print("Token: \(token)") // "bbb"
    }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }

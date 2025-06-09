@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="oUJ-Ad-HvN">
+=======
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+>>>>>>> Stashed changes
 =======
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
 >>>>>>> Stashed changes
@@ -9,7 +13,10 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <capability name="Named colors" minToolsVersion="9.0"/>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -21,7 +28,11 @@
         <scene sceneID="tne-QT-ifu">
             <objects>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+=======
+                <viewController id="BYZ-38-t0r" customClass="MainViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
+>>>>>>> Stashed changes
 =======
                 <viewController id="BYZ-38-t0r" customClass="MainViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
 >>>>>>> Stashed changes
@@ -34,6 +45,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
             <point key="canvasLocation" x="138.1679389312977" y="18.30985915492958"/>
         </scene>
@@ -214,6 +226,12 @@
         <namedColor name="AccentColor">
             <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+=======
+            <point key="canvasLocation" x="48" y="-2"/>
+        </scene>
+    </scenes>
+    <resources>
+>>>>>>> Stashed changes
 =======
             <point key="canvasLocation" x="48" y="-2"/>
         </scene>
