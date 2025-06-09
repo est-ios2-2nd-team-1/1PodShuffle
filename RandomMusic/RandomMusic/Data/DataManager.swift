@@ -7,7 +7,7 @@ final class DataManager {
     let mainContext: NSManagedObjectContext
     let persistentContainer: NSPersistentContainer
     let fetchedResults: NSFetchedResultsController<Song>
-    
+
     /// 코어 데이터 초기화 및 데이터를 가져옵니다.
     private init() {
         let container = NSPersistentContainer(name: "RandomMusic")

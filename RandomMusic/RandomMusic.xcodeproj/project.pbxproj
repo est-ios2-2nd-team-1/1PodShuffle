@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A18DE7A42DF67C6F0047FE78 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A18DE7A32DF67C6F0047FE78 /* Secrets.xcconfig */; };
+		26C6C8BE2DF6C7DA000B2DEA /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 26C6C8BD2DF6C7DA000B2DEA /* Secrets.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		26BBC5842DF460B900699799 /* RandomMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RandomMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A18DE7A32DF67C6F0047FE78 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		26C6C8BD2DF6C7DA000B2DEA /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -50,7 +50,7 @@
 		26BBC57B2DF460B900699799 = {
 			isa = PBXGroup;
 			children = (
-				A18DE7A32DF67C6F0047FE78 /* Secrets.xcconfig */,
+				26C6C8BD2DF6C7DA000B2DEA /* Secrets.xcconfig */,
 				26BBC5862DF460B900699799 /* RandomMusic */,
 				26BBC5852DF460B900699799 /* Products */,
 			);
@@ -128,7 +128,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A18DE7A42DF67C6F0047FE78 /* Secrets.xcconfig in Resources */,
+				26C6C8BE2DF6C7DA000B2DEA /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,7 +152,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YQW8MK78PZ;
+				DEVELOPMENT_TEAM = W35T2QAC67;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RandomMusic/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -185,7 +185,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YQW8MK78PZ;
+				DEVELOPMENT_TEAM = W35T2QAC67;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RandomMusic/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
