@@ -16,9 +16,9 @@ final class DataManager {
 
     let mainContext: NSManagedObjectContext
     let persistentContainer: NSPersistentContainer
-
     let fetchedResults: NSFetchedResultsController<Song>
-
+    
+    /// 코어 데이터 초기화 및 데이터를 가져옵니다.
     private init() {
         let container = NSPersistentContainer(name: "RandomMusic")
 
@@ -61,20 +61,25 @@ final class DataManager {
         newSong.streamUrl = song.streamUrl
         newSong.insertDate = .now
 
-        // 이미지 데이터는 용량이 크기 때문에 디렉토리에 따로 저장해두고 해당 디렉토리를 가르키는 URL만 따로 CoreData에 저장합니다.
         let thumbnailFileName = String(newSong.id) + ".png"
-        if let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(thumbnailFileName) {
-            do {
-                try song.thumbnail?.write(to: url)
-                newSong.thumbnail = thumbnailFileName
-                saveContext()
-            } catch {
-                print(error)
-            }
-        }
+        newSong.thumbnail = thumbnailFileName
+
+        insertImageFile(name: newSong.thumbnail, data: song.thumbnail)
+        saveContext()
     }
 
-    /// Context에 임시 저장된 데이터를 영구적으로 저장합니다.
+    // TODO: 오버로딩이 필요할 수도 있음. (다른 파라미터를 받는 Delete 메소드)
+    /// 음악 데이터를 영구적으로 삭제합니다.
+    /// - Parameter indexPath: 삭제할 음악 데이터의 IndexPath를 받습니다.
+    func deleteSongData(at indexPath: IndexPath) {
+        let deletedSong = fetchedResults.object(at: indexPath)
+
+        deleteImageFile(name: deletedSong.thumbnail)
+        mainContext.delete(deletedSong)
+        saveContext()
+    }
+
+    /// Context에서 변경된 데이터를 영구적으로 저장합니다.
     func saveContext() {
         let context = persistentContainer.viewContext
 
@@ -84,6 +89,40 @@ final class DataManager {
             } catch {
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }
+    }
+}
+
+private extension DataManager {
+    /// 디렉토리에 이미지 데이터를 저장합니다.
+    /// - Parameters:
+    ///   - name: 이미지 파일의 이름을 받습니다.
+    ///   - data: 저장될 바이너리 데이터를 받습니다.
+    func insertImageFile(name: String?, data: Data?) {
+        if let fileName = name, let data = data {
+            if let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) {
+                do {
+                    try data.write(to: url)
+                } catch {
+                    print(error)
+                }
+            }
+        }
+    }
+
+    /// 디렉토리에 존재하는 이미지를 삭제합니다.
+    /// - Parameter name: 디렉토리에 저장된 파일 이름을 받습니다.
+    func deleteImageFile(name: String?) {
+        if let fileName = name {
+            if let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) {
+                if FileManager.default.fileExists(atPath: fileName) {
+                    do {
+                        try FileManager.default.removeItem(at: url)
+                    } catch {
+                        print(error)
+                    }
+                }
             }
         }
     }
