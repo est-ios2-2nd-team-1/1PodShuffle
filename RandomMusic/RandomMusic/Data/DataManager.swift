@@ -41,7 +41,7 @@ final class DataManager {
     
     /// 음악 데이터를 영구적으로 저장합니다.
     /// - Parameter song: 저장할 음악 데이터를 받습니다.
-    func insertSongData(from song: SongEntity) {
+    func insertSongData(from song: SongModel) {
         let newSong = Song(context: mainContext)
         newSong.title = song.title
         newSong.album = song.album
@@ -51,10 +51,10 @@ final class DataManager {
         newSong.streamUrl = song.streamUrl
         newSong.insertDate = .now
 
-        let thumbnailFileName = String(newSong.id) + ".png"
+        let thumbnailFileName = String(newSong.id) + ".jpg"
         newSong.thumbnail = thumbnailFileName
 
-        insertImageFile(name: newSong.thumbnail, data: song.thumbnail)
+        insertImageFile(name: newSong.thumbnail, data: song.thumbnailData)
         saveContext()
     }
 
