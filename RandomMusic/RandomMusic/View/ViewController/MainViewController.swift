@@ -1,3 +1,13 @@
+//import UIKit
+//
+//class MainViewController: UIViewController {
+//
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//    }
+//}
+
+
 import UIKit
 
 class MainViewController: UIViewController {
@@ -17,6 +27,7 @@ class MainViewController: UIViewController {
     var isDisliked = false
     var isLiked = false
 
+<<<<<<< Updated upstream
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -34,4 +45,17 @@ class MainViewController: UIViewController {
         titleLabel.text = "Willow"
         singerLabel.text = "Taylor Swift"
     }
+=======
+   let name = Bundle.main.object(forInfoDictionaryKey: "NAME") as? String ?? ""
+   let token = Bundle.main.object(forInfoDictionaryKey: "TOKEN") as? String ?? ""
+
+
+   override func viewDidLoad() {
+       super.viewDidLoad()
+
+
+       print("Name: \(name)")  // "aaa"
+       print("Token: \(token)") // "bbb"
+   }
+>>>>>>> Stashed changes
 }
