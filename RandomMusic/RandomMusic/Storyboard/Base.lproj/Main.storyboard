@@ -13,7 +13,7 @@
         <!--Main View Controller-->
         <scene sceneID="O4Q-Cx-Ami">
             <objects>
-                <viewController id="oUJ-Ad-HvN" customClass="MainViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MainVC" id="oUJ-Ad-HvN" customClass="MainViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="KHS-me-IdP">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -162,6 +162,7 @@
                             <constraint firstAttribute="trailing" secondItem="csQ-jE-PJx" secondAttribute="trailing" id="hl8-qb-Bbt"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="Y2J-Hm-K2a"/>
                     <connections>
                         <outlet property="backwardButton" destination="Yxe-Hu-wav" id="OUf-uy-0Ve"/>
                         <outlet property="currentTimeLabel" destination="yTE-gk-zc6" id="QMN-8K-KSt"/>
@@ -180,7 +181,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cLW-Kc-rBY" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="977.86259541984725" y="17.605633802816904"/>
+            <point key="canvasLocation" x="1904.5801526717557" y="17.605633802816904"/>
         </scene>
         <!--PlayListView-->
         <scene sceneID="dUg-a0-S37">
@@ -188,7 +189,7 @@
                 <viewControllerPlaceholder storyboardIdentifier="PlayListView" storyboardName="PlayListView" referencedIdentifier="PlayListView" id="8wS-cc-rHn" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZMz-Mx-vTZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1829" y="18"/>
+            <point key="canvasLocation" x="2754.1984732824426" y="17.605633802816904"/>
         </scene>
     </scenes>
     <resources>
