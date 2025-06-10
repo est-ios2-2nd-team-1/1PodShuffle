@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="eLK-HM-NZt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="eLK-HM-NZt">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -110,7 +110,7 @@
                                 </constraints>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="ad3-hD-kng">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="752"/>
+                                <rect key="frame" x="0.0" y="214" width="393" height="538"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SongTableViewCell" rowHeight="120" id="ntD-lu-3Gm" customClass="SongTableViewCell" customModule="RandomMusic" customModuleProvider="target">
@@ -176,7 +176,7 @@
                             <constraint firstItem="uxS-el-Qhh" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="KDD-Y1-OhS"/>
                             <constraint firstItem="ad3-hD-kng" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="OTB-vg-rRo"/>
                             <constraint firstAttribute="bottom" secondItem="uxS-el-Qhh" secondAttribute="bottom" id="XGO-QG-YZ6"/>
-                            <constraint firstItem="ad3-hD-kng" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="qbu-ib-nH2"/>
+                            <constraint firstItem="ad3-hD-kng" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" id="qbu-ib-nH2"/>
                             <constraint firstItem="uxS-el-Qhh" firstAttribute="top" secondItem="ad3-hD-kng" secondAttribute="bottom" id="wrA-Od-cGe"/>
                         </constraints>
                     </view>
@@ -191,24 +191,23 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1990.0763358778624" y="4.9295774647887329"/>
+            <point key="canvasLocation" x="2127" y="5"/>
         </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="C5T-bD-ync">
+        <!--PlayListView-->
+        <scene sceneID="guP-bJ-AmR">
             <objects>
-                <navigationController storyboardIdentifier="PlayListView" automaticallyAdjustsScrollViewInsets="NO" id="eLK-HM-NZt" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="PlayListView" title="PlayListView" automaticallyAdjustsScrollViewInsets="NO" id="eLK-HM-NZt" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="j5f-by-1bS">
-                        <rect key="frame" x="0.0" y="59" width="393" height="96"/>
+                        <rect key="frame" x="0.0" y="118" width="393" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <navigationBarAppearance key="standardAppearance"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="Y6W-OH-hqX" kind="relationship" relationship="rootViewController" id="r3i-gs-jPx"/>
+                        <segue destination="Y6W-OH-hqX" kind="relationship" relationship="rootViewController" id="3vC-XB-BKL"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="j2W-KI-jn7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="n2V-XP-UMz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1181" y="5"/>
         </scene>
@@ -221,7 +220,7 @@
             <color red="0.78799998760223389" green="0.9100000262260437" blue="0.31000000238418579" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
