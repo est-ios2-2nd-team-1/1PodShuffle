@@ -1,65 +1,113 @@
 import AVFoundation
 
 /// AVPlayer 기반의 오디오 재생을 관리하는 클래스입니다.
-///
-/// 이 클래스는 AVURLAsset을 통해 스트리밍 오디오를 재생하고,
-/// 재생 시간 갱신 및 재생 종료에 대한 콜백을 제공합니다.
 final class PlayerManager {
     static let shared = PlayerManager()
 
+    private(set) var playlist: [SongModel] = []
+    private(set) var currentIndex: Int = 0
+    private(set) var isPlaying = false
+    private var player: AVPlayer?
+    private var timeObserverToken: Any?
+
     /// 한 곡 반복 재생 여부를 설정합니다.
     var isRepeatEnabled = false
+
+    var currentSong: SongModel? {
+        guard !playlist.isEmpty && currentIndex >= 0 && currentIndex < playlist.count else { return nil }
+        return playlist[currentIndex]
+    }
 
     /// 플레이어가 초기화되었는지 여부를 나타냅니다.
     var isPlayerReady: Bool {
         return player != nil
     }
 
-    /// 재생 시간이 주기적으로 업데이트될 때 호출되는 클로저입니다.
+    // MARK: - Callbacks
+
     var onTimeUpdate: ((Double) -> Void)?
-
-    /// 현재 재생 항목이 끝까지 재생되었을 때 호출되는 클로저입니다.
     var onPlaybackFinished: (() -> Void)?
+    var onPlayStateChanged: ((Bool) -> Void)?
+    var onSongChanged: (() -> Void)?
+    var onNeedNewSong: (() -> Void)?
 
-    private var player: AVPlayer?
-    private var timeObserverToken: Any?
+    private init() {}
 
-    /// 지정된 AVURLAsset을 사용하여 오디오를 재생합니다.
-    ///
-    /// 이전 재생 상태는 모두 초기화되며,
-    /// AVPlayerItemDidPlayToEndTime 알림을 통해 재생 완료 이벤트를 수신합니다.
-    /// - Parameter asset: 재생할 AVURLAsset입니다.
-    func play(asset: AVURLAsset) {
-        let item = AVPlayerItem(asset: asset)
-        player = AVPlayer(playerItem: item)
+    // MARK: - Playlist Management
 
-        NotificationCenter.default.addObserver(
-            forName: .AVPlayerItemDidPlayToEndTime,
-            object: item,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self else { return }
+    func setPlaylist(_ value: [SongModel]) {
+        playlist = value
+    }
 
-            if self.isRepeatEnabled {
-                self.seek(to: 0)
-                self.player?.play()
-            } else {
-                self.onPlaybackFinished?()
-            }
+    func setCurrentIndex(_ value: Int) {
+        currentIndex = value
+    }
+
+    // MARK: - Playback Controls
+
+    func play() {
+        guard let currentSong = currentSong else {
+            print("No current song available")
+            return
         }
 
-        addPeriodicTimeObserver()
+        guard let asset = NetworkManager.shared.createAssetWithHeaders(url: currentSong.streamUrl) else {
+            print("Invalid asset")
+            return
+        }
+
+        setupPlayer(with: asset)
         player?.play()
+        updatePlayingState(true)
     }
 
     /// 현재 오디오 재생을 일시정지합니다.
     func pause() {
         player?.pause()
+        updatePlayingState(false)
     }
 
     /// 일시정지된 오디오 재생을 다시 시작합니다.
     func resume() {
         player?.play()
+        updatePlayingState(true)
+    }
+
+    func togglePlayPause() {
+        if isPlaying {
+            pause()
+        } else {
+            if isPlayerReady {
+                resume()
+            } else {
+                play()
+            }
+        }
+    }
+
+    func toggleRepeat() {
+        isRepeatEnabled.toggle()
+    }
+
+    func moveBackward() {
+        guard currentIndex > 0 else {
+            print("첫번째 곡입니다.")
+            return
+        }
+
+        setCurrentIndex(currentIndex - 1)
+        onSongChanged?()
+        play()
+    }
+
+    func moveForward() {
+        if currentIndex < playlist.count - 1 {
+            setCurrentIndex(currentIndex + 1)
+            onSongChanged?()
+            play()
+        } else {
+            onNeedNewSong?()
+        }
     }
 
     /// 재생 위치를 지정한 시간으로 이동합니다.
@@ -70,44 +118,106 @@ final class PlayerManager {
         player?.seek(to: time)
     }
 
-    /// AVURLAsset의 전체 재생 시간을 비동기적으로 로드합니다.
-    ///
-    /// - Parameters:
-    ///   - asset: 재생 시간 정보를 가져올 AVURLAsset입니다.
-    ///   - completion: 재생 시간이 성공적으로 로드되면 호출되는 클로저입니다. 실패 시 nil이 전달됩니다.
-    func loadDuration(with asset: AVURLAsset, completion: @escaping (Double?) -> Void) {
+    // MARK: - Duration Loading
+
+    func loadDuration(completion: @escaping (Double?) -> Void) {
+        guard let currentSong = currentSong else {
+            print("No current song available")
+            completion(nil)
+            return
+        }
+
+        guard let asset = NetworkManager.shared.createAssetWithHeaders(url: currentSong.streamUrl) else {
+            print("Invalid asset")
+            completion(nil)
+            return
+        }
+
         Task {
             do {
                 let duration = try await asset.load(.duration)
                 let seconds = CMTimeGetSeconds(duration)
 
-                DispatchQueue.main.async {
+                await MainActor.run {
                     completion(seconds.isFinite ? seconds : nil)
                 }
             } catch {
                 print("Duration load error: ", error)
-
-                DispatchQueue.main.async {
+                await MainActor.run {
                     completion(nil)
                 }
             }
         }
     }
 
+    // MARK: - Private Methods
+
+    private func setupPlayer(with asset: AVURLAsset) {
+        cleanupPlayer()
+
+        let item = AVPlayerItem(asset: asset)
+        player = AVPlayer(playerItem: item)
+
+        setupNotifications(for: item)
+        addPeriodicTimeObserver()
+    }
+
+    private func setupNotifications(for item: AVPlayerItem) {
+        // 재생 완료 알림
+        NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handlePlaybackEnd()
+        }
+
+        // 재생 실패 알림
+        NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemFailedToPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updatePlayingState(false)
+        }
+    }
+
+    private func handlePlaybackEnd() {
+        if self.isRepeatEnabled {
+            self.seek(to: 0)
+            self.player?.play()
+        } else {
+            self.updatePlayingState(false)
+            self.moveForward()
+        }
+    }
+
+    private func updatePlayingState(_ playing: Bool) {
+        isPlaying = playing
+        onPlayStateChanged?(playing)
+    }
+
     /// 재생 시간 정보를 주기적으로 업데이트합니다.
     private func addPeriodicTimeObserver() {
-        timeObserverToken = player?.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 1), queue: .main) { [weak self] time in
+        timeObserverToken = player?.addPeriodicTimeObserver(
+            forInterval: CMTime(seconds: 1, preferredTimescale: 1),
+            queue: .main
+        ) { [weak self] time in
             let seconds = CMTimeGetSeconds(time)
-
             self?.onTimeUpdate?(seconds)
         }
     }
 
-    deinit {
+    private func cleanupPlayer() {
         if let token = timeObserverToken {
             player?.removeTimeObserver(token)
+            timeObserverToken = nil
         }
 
         NotificationCenter.default.removeObserver(self)
+    }
+
+    deinit {
+        cleanupPlayer()
     }
 }

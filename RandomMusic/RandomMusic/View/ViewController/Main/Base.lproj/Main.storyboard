@@ -108,6 +108,9 @@
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <state key="normal" title="Button"/>
                                                         <buttonConfiguration key="configuration" style="plain" image="backward.frame.fill" catalog="system" title=""/>
+                                                        <connections>
+                                                            <action selector="backwardTapped:" destination="oUJ-Ad-HvN" eventType="touchUpInside" id="ZWy-qN-G96"/>
+                                                        </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kfD-3U-Pv5">
                                                         <rect key="frame" x="141.66666666666666" y="0.0" width="49.666666666666657" height="34.333333333333336"/>
@@ -121,6 +124,9 @@
                                                         <rect key="frame" x="211.33333333333334" y="0.0" width="52.000000000000028" height="34.333333333333336"/>
                                                         <state key="normal" title="Button"/>
                                                         <buttonConfiguration key="configuration" style="plain" image="forward.frame.fill" catalog="system"/>
+                                                        <connections>
+                                                            <action selector="forwardTapped:" destination="oUJ-Ad-HvN" eventType="touchUpInside" id="ecc-bd-prP"/>
+                                                        </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YDU-yv-gk2">
                                                         <rect key="frame" x="283.33333333333331" y="0.0" width="49.666666666666686" height="34.333333333333336"/>
