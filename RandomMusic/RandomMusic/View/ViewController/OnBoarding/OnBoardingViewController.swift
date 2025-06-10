@@ -1,6 +1,6 @@
 import UIKit
 
-struct Genre {
+struct OnboardingGenre {
     let name: String
     let iconName: String
 }
@@ -13,16 +13,16 @@ class OnBoardingViewController: UIViewController, UICollectionViewDataSource, UI
     @IBOutlet weak var confirmButton: UIButton!
     @IBOutlet weak var collectionView: UICollectionView!
 
-    var genres: [Genre] = [
-        Genre(name: "Rock", iconName: "rock"),
-        Genre(name: "HipHop", iconName: "hiphop"),
-        Genre(name: "Jazz", iconName: "jazz"),
-        Genre(name: "Pop", iconName: "pop"),
-        Genre(name: "R&B", iconName: "rb"),
-        Genre(name: "Classic", iconName: "classic"),
-        Genre(name: "Dance", iconName: "dance"),
-        Genre(name: "Ballad", iconName: "ballad"),
-        Genre(name: "EDM", iconName: "edm")
+    var genres: [OnboardingGenre] = [
+        OnboardingGenre(name: "Rock", iconName: "rock"),
+        OnboardingGenre(name: "HipHop", iconName: "hiphop"),
+        OnboardingGenre(name: "Jazz", iconName: "jazz"),
+        OnboardingGenre(name: "Pop", iconName: "pop"),
+        OnboardingGenre(name: "R&B", iconName: "rb"),
+        OnboardingGenre(name: "Classic", iconName: "classic"),
+        OnboardingGenre(name: "Dance", iconName: "dance"),
+        OnboardingGenre(name: "Ballad", iconName: "ballad"),
+        OnboardingGenre(name: "EDM", iconName: "edm")
     ]
 
     var selectedGenres: Set<String> = []

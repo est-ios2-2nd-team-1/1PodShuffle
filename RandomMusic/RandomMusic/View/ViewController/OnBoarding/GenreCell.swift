@@ -18,7 +18,7 @@ class GenreCell: UICollectionViewCell {
         genreButton.clipsToBounds = true
     }
 
-    func configure(with genre: Genre, selected: Bool) {
+    func configure(with genre: OnboardingGenre, selected: Bool) {
         genreButton.setImage(UIImage(named: genre.iconName), for: .normal)
         genreLabel.text = genre.name
         genreButton.isSelected = selected
