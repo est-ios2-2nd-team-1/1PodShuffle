@@ -52,9 +52,9 @@ final class PlayerManager {
         player?.play()
     }
 
-	/// 재생 위치를 지정한 시간으로 이동합니다.
-	///
-	/// - Parameter seconds: 이동할 시간(초)입니다.
+    /// 재생 위치를 지정한 시간으로 이동합니다.
+    ///
+    /// - Parameter seconds: 이동할 시간(초)입니다.
     func seek(to seconds: Float64) {
         let time = CMTime(seconds: seconds, preferredTimescale: 1)
         player?.seek(to: time)
@@ -65,7 +65,7 @@ final class PlayerManager {
     /// - Parameters:
     ///   - asset: 재생 시간 정보를 가져올 AVURLAsset입니다.
     ///   - completion: 재생 시간이 성공적으로 로드되면 호출되는 클로저입니다. 실패 시 nil이 전달됩니다.
-    func loadDuration(with asset: AVURLAsset,completion: @escaping (Double?) -> Void) {
+    func loadDuration(with asset: AVURLAsset, completion: @escaping (Double?) -> Void) {
         Task {
             do {
                 let duration = try await asset.load(.duration)

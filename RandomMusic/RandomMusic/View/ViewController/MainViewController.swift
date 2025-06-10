@@ -31,7 +31,7 @@ class MainViewController: UIViewController {
 
     /// 초기 UI 상태를 설정합니다.
     private func setupUI() {
-    	thumbnailImageView.layer.cornerRadius = thumbnailImageView.frame.width / 2
+        thumbnailImageView.layer.cornerRadius = thumbnailImageView.frame.width / 2
         thumbnailImageView.clipsToBounds = true
         progressSlider.value = 0
     }
@@ -68,10 +68,10 @@ class MainViewController: UIViewController {
         }
 
         PlayerManager.shared.loadDuration(with: asset) { [weak self] seconds in
-                guard let self, let duration = seconds else { return }
+            guard let self, let duration = seconds else { return }
 
-                self.progressSlider.maximumValue = Float(duration)
-                self.totalTimeLabel.text = formatTime(duration)
+            self.progressSlider.maximumValue = Float(duration)
+            self.totalTimeLabel.text = formatTime(duration)
         }
     }
 
