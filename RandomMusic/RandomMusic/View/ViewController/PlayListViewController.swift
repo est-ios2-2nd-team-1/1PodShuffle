@@ -1,5 +1,6 @@
 import UIKit
 import CoreData
+import AVKit
 
 class PlayListViewController: UIViewController {
     @IBOutlet weak var playListTableView: UITableView!
@@ -9,25 +10,36 @@ class PlayListViewController: UIViewController {
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var forButton: UIButton!
     
-    /// 재생버튼 토글 Bool 변수
-    var isPlay = true
+    /// 재생중인지 확인
+    var isPlaying = true
     
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
     let playConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .regular, scale: .large)
     let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
+    
+    var playImage: UIImage? {
+        isPlaying ? UIImage(systemName: "play.circle.fill", withConfiguration: playConfig) : UIImage(systemName: "pause.circle", withConfiguration: playConfig)
+    }
+    
+    // AVPlayer
+    var player: AVPlayer?
+    var playerItem: AVPlayerItem?
+
+    var song: SongEntity?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         /// 재생, 뒤로, 앞으로 버튼 UI Setting
         setButtonUI()
+        
+        /// NSFetchedResultsControllerDelegate Delegate
         DataManager.shared.fetchedResults.delegate = self
     }
     
     /// 재생, 이전곡, 다음곡 버튼 UI Setting
     func setButtonUI() {
         let backImage = UIImage(systemName: "backward.frame.fill", withConfiguration: backforConfig)
-        let playImage = UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
         let forImage = UIImage(systemName: "forward.frame.fill", withConfiguration: backforConfig)
         
         backButton.setImage(backImage, for: .normal)
@@ -37,21 +49,65 @@ class PlayListViewController: UIViewController {
     
     /// 이전곡 버튼 터치
     @IBAction func backwardButton(_ sender: Any) {
-        print("backward button")
+        
     }
     
     /// 재생 버튼 터치
     @IBAction func playButton(_ sender: Any) {
-        print("play button")
+        isPlaying.toggle()
+        playButton.setImage(playImage, for: .normal)
         
-        isPlay.toggle()
-        let image = isPlay ? UIImage(systemName: "play.circle.fill", withConfiguration: playConfig) : UIImage(systemName: "pause.circle", withConfiguration: playConfig)
-        playButton.setImage(image, for: .normal)
+        isPlaying ? player?.pause() : player?.play()
     }
     
     /// 다음곡 버튼 터치
     @IBAction func forwardButton(_ sender: Any) {
-        print("forward button")
+        Task {
+            let musicResponse =  await NetworkManager.shared.getMusic()
+            guard let  musicResponse else { return }
+            
+            let thumbnailImage = await NetworkManager.shared.fetchThumnail(from: musicResponse.streamUrl)
+            let music = SongModel(from: musicResponse, thumbnailData: thumbnailImage)
+            
+            /// 음악 play
+            playSong(streamUrl: music.streamUrl)
+            
+            /// CoreData Insert
+            song = SongEntity(from: music)
+            guard let song else { return }
+            DataManager.shared.insertSongData(from: song)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                self?.playListTableView.refreshControl?.endRefreshing()
+                
+                /// tableView 맨밑으로 이동
+                //let section = 0
+                //let rowCount = self?.playListTableView.numberOfRows(inSection: section) ?? 0
+                //if rowCount > 0 {
+                //    let indexPath = IndexPath(row: rowCount - 1, section: section)
+                //    self?.playListTableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+                //}
+                
+            }
+            
+            playButton.setImage(playImage, for: .normal)
+        }
+    }
+    
+    // MARK: - 스트리밍 시작
+    func playSong(streamUrl: String) {
+        player?.pause()
+        player = nil
+        
+        let avUrlAsset = NetworkManager.shared.createAssetWithHeaders(url: streamUrl)
+        guard let asset = avUrlAsset else { return }
+        
+        playerItem = AVPlayerItem(asset: asset)
+        player = AVPlayer(playerItem: playerItem)
+        
+        // 재생 시작
+        player?.play()
+        isPlaying = false
     }
 }
 
@@ -84,7 +140,7 @@ extension PlayListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            
+            DataManager.shared.deleteSongData(at: indexPath)
         }
     }
 }
@@ -93,6 +149,17 @@ extension PlayListViewController: UITableViewDataSource {
 extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        print(#function)
+        
+        let song = DataManager.shared.fetchedResults.object(at: indexPath)
+
+        Task {
+            guard let streamUrl = song.streamUrl else { return }
+            playSong(streamUrl: streamUrl)
+
+            playButton.setImage(playImage, for: .normal)
+        }
     }
 }
 
