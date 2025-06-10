@@ -138,15 +138,7 @@ class MainViewController: UIViewController {
 
     /// 재생/일시정지 버튼을 탭했을 때 호출됩니다.
     @IBAction func playPauseTapped(_ sender: UIButton) {
-        if PlayerManager.shared.isPlaying {
-            PlayerManager.shared.pause()
-        } else {
-            if PlayerManager.shared.isPlayerReady {
-                PlayerManager.shared.resume()
-            } else {
-                PlayerManager.shared.play()
-            }
-        }
+        PlayerManager.shared.togglePlayPause()
     }
 
     /// 이전 곡 버튼을 탭했을 때 호출됩니다.
