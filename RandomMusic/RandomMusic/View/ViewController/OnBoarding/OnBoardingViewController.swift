@@ -76,20 +76,28 @@ class OnBoardingViewController: UIViewController, UICollectionViewDataSource, UI
 
     @IBAction func skipButtonTapped(_ sender: UIButton) {
         // 건너뛰기 버튼을 눌렀을 때
-        let mainVC = storyboard?.instantiateViewController(withIdentifier: "MainViewController") as! MainViewController
         //        mainVC.selectedGenres = []
-        present(mainVC, animated: true)
-
-        UserDefaults.standard.set(true, forKey: "isOnboardingCompleted")
+        toMainVC()
     }
 
     @IBAction func confirmButtonTapped(_ sender: UIButton) {
         // 확인 버튼을 눌렀을 때
-        let mainVC = storyboard?.instantiateViewController(withIdentifier: "mainViewController") as! MainViewController
         //        mainVC.selectedGenres = selectedGenres
-        present(mainVC, animated: true)
+        toMainVC()
+    }
+
+    private func toMainVC() {
+        let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        if let mainVC = mainStoryboard.instantiateInitialViewController() {
+            if let windowScene = view.window?.windowScene,
+               let sceneDelegate = windowScene.delegate as? SceneDelegate,
+               let window = sceneDelegate.window {
+
+                window.rootViewController = mainVC
+                UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: nil)
+            }
+        }
 
         UserDefaults.standard.set(true, forKey: "isOnboardingCompleted")
     }
-
 }
