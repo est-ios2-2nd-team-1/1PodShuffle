@@ -1,3 +1,13 @@
+//import UIKit
+//
+//class MainViewController: UIViewController {
+//
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//    }
+//}
+
+
 import UIKit
 import AVFoundation
 
@@ -173,4 +183,19 @@ class MainViewController: UIViewController {
 
         return String(format: "%02d:%02d", minutes, seconds)
     }
+   let name = Bundle.main.object(forInfoDictionaryKey: "NAME") as? String ?? ""
+   let token = Bundle.main.object(forInfoDictionaryKey: "TOKEN") as? String ?? ""
+
+   let name = Bundle.main.object(forInfoDictionaryKey: "NAME") as? String ?? ""
+   let token = Bundle.main.object(forInfoDictionaryKey: "TOKEN") as? String ?? ""
+
+
+   override func viewDidLoad() {
+       super.viewDidLoad()
+
+
+       print("Name: \(name)")  // "aaa"
+       print("Token: \(token)") // "bbb"
+   }
+
 }
