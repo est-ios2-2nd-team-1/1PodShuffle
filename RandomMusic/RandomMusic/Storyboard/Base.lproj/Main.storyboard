@@ -87,7 +87,7 @@
                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="uqY-cv-jzx">
                                                 <rect key="frame" x="20" y="437.66666666666663" width="353" height="30"/>
                                                 <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1:46" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yTE-gk-zc6">
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yTE-gk-zc6">
                                                         <rect key="frame" x="0.0" y="0.0" width="0.0" height="30"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                         <nil key="textColor"/>
@@ -95,8 +95,11 @@
                                                     </label>
                                                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="8fY-R8-EKh">
                                                         <rect key="frame" x="8" y="0.0" width="337" height="31"/>
+                                                        <connections>
+                                                            <action selector="sliderValueChanged:" destination="oUJ-Ad-HvN" eventType="valueChanged" id="eAK-6P-OpG"/>
+                                                        </connections>
                                                     </slider>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3:40" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fEQ-TE-RTd">
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fEQ-TE-RTd">
                                                         <rect key="frame" x="353" y="0.0" width="0.0" height="30"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                         <nil key="textColor"/>
@@ -175,15 +178,18 @@
                     </view>
                     <connections>
                         <outlet property="backwardButton" destination="Yxe-Hu-wav" id="OUf-uy-0Ve"/>
-                        <outlet property="coverImageView" destination="zyz-oi-m8T" id="z9V-rv-AHD"/>
+                        <outlet property="currentTimeLabel" destination="yTE-gk-zc6" id="QMN-8K-KSt"/>
                         <outlet property="dislikeButton" destination="c3c-t7-BjU" id="Qae-fQ-gkM"/>
                         <outlet property="forwardButton" destination="WTT-0Q-gbM" id="rkw-hg-97j"/>
                         <outlet property="likeButton" destination="9BL-K8-pry" id="vC3-ei-O3i"/>
                         <outlet property="playPauseButton" destination="kfD-3U-Pv5" id="QD6-Fd-437"/>
+                        <outlet property="progressSlider" destination="8fY-R8-EKh" id="6TG-Q0-fCv"/>
                         <outlet property="repeatButton" destination="IGc-Tg-0S2" id="CDu-uP-CBt"/>
                         <outlet property="singerLabel" destination="i0s-Ti-8Zv" id="0nd-rj-IR9"/>
                         <outlet property="speedButton" destination="YDU-yv-gk2" id="men-X3-rol"/>
+                        <outlet property="thumbnailImageView" destination="zyz-oi-m8T" id="z9V-rv-AHD"/>
                         <outlet property="titleLabel" destination="2ip-Z0-yWx" id="iFa-OT-nZg"/>
+                        <outlet property="totalTimeLabel" destination="fEQ-TE-RTd" id="Oeg-lg-m2E"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cLW-Kc-rBY" sceneMemberID="firstResponder"/>
