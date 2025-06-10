@@ -14,7 +14,7 @@ final class RemoteManager {
     func configure() {
         commandCenter.playCommand.addTarget { [weak self] _ in
             // TODO: PlayerManager에게 재생을 요청해야 한다 어떻게?
-            // self?.playerManager?.play(asset: )
+            // self?.playerManager?.play()
             return .success
         }
 
@@ -26,11 +26,13 @@ final class RemoteManager {
 
         commandCenter.nextTrackCommand.addTarget { _ in
             // TODO: PlayManager에 이전 곡을 요청해야 한다.
+            //self?.playerManager?.before()
             return .success
         }
 
         commandCenter.previousTrackCommand.addTarget { _ in
 			// TODO: PlayManager에 다음 곡을 요청해야 한다.
+            // self?.playerManager?.next()
             return .success
         }
     }
