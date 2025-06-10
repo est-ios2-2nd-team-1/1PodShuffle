@@ -144,6 +144,9 @@ class MainViewController: UIViewController {
     /// 재생속도 버튼을 탭했을 때 호출됩니다.
     @IBAction func speedTapped(_ sender: UIButton) {
         // TODO: 재생속도 버튼 클릭 로직 추가
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "PlayListView") {
+            present(vc, animated: true)
+        }
     }
 
     /// 재생/일시정지 버튼의 아이콘을 상태에 따라 갱신합니다.
