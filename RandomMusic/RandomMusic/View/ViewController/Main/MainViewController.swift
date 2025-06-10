@@ -21,6 +21,9 @@ class MainViewController: UIViewController {
     var isPlaying = false
     var currentSong: SongModel?
 
+    /// 재생된 곡들을 저장하는 히스토리 배열입니다.
+    var playedSongs: [SongModel] = []
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -36,16 +39,22 @@ class MainViewController: UIViewController {
         progressSlider.value = 0
     }
 
-    /// NetworkManager를 통해 랜덤 곡을 비동기적으로 가져옵니다.
+    /// 네트워크로부터 랜덤 곡을 비동기적으로 가져옵니다.
     ///
-    /// 이 메서드는 async/await 기반으로 `SongModel`을 요청하며,
-    /// 썸네일 이미지까지 포함된 모델을 반환받습니다.
-    private func fetchRandomSongFromNetwork() {
+    /// `shouldPlay`가 true인 경우, 곡 정보를 구성한 뒤 자동으로 재생을 시작합니다.
+    ///
+    /// - Parameter shouldPlay: 곡을 가져온 후 즉시 재생할지 여부입니다.
+    private func fetchRandomSongFromNetwork(shouldPlay: Bool = false) {
         Task {
             do {
                 let song = try await NetworkManager.shared.getMusic()
                 await MainActor.run {
+                    playedSongs.append(song)
                     configure(with: song)
+
+                    if shouldPlay {
+                        playCurrentSongIfAvailable()
+                    }
                 }
             } catch {
                 print(error)
@@ -53,9 +62,12 @@ class MainViewController: UIViewController {
         }
     }
 
-    /// 곡 정보를 UI와 AVPlayer에 반영합니다.
+    /// 곡 정보를 UI와 슬라이더에 구성합니다.
     ///
-    /// - Parameter song: 썸네일이 포함된 `SongModel`입니다.
+    /// 썸네일 이미지, 제목, 아티스트, 슬라이더의 최대값 및 총 시간 라벨을 설정합니다.
+    /// 이 메서드는 재생을 수행하지 않으며, UI 세팅만 담당합니다.
+    ///
+    /// - Parameter song: 구성할 `SongModel` 객체입니다.
     private func configure(with song: SongModel) {
         currentSong = song
         titleLabel.text = song.title
@@ -75,7 +87,26 @@ class MainViewController: UIViewController {
         }
     }
 
-    /// AVPlayer 콜백을 바인딩합니다.
+    /// 현재 곡이 유효할 경우 재생을 시작합니다.
+    ///
+    /// `currentSong`이 존재하고 스트리밍 URL이 유효한 경우 AVPlayer로 재생을 시작합니다.
+    /// 버튼 상태도 재생 중으로 갱신합니다.
+    private func playCurrentSongIfAvailable() {
+        guard let song = currentSong,
+              let asset = NetworkManager.shared.createAssetWithHeaders(url: song.streamUrl) else {
+            return
+        }
+
+        PlayerManager.shared.play(asset: asset)
+        isPlaying = true
+        updatePlayPauseButton()
+    }
+
+
+    /// AVPlayer의 콜백을 바인딩합니다.
+    ///
+    /// 재생 시간 갱신과 재생 완료 시 동작을 정의합니다.
+    /// 재생 완료 시에는 반복 모드 상태에 따라 다음 곡을 자동으로 재생할 수 있습니다.
     private func bindPlayerCallbacks() {
         PlayerManager.shared.onTimeUpdate = { [weak self] seconds in
             self?.progressSlider.value = Float(seconds)
@@ -83,8 +114,15 @@ class MainViewController: UIViewController {
         }
 
         PlayerManager.shared.onPlaybackFinished = { [weak self] in
-            self?.isPlaying = false
-            self?.updatePlayPauseButton()
+            guard let self else { return }
+
+            self.isPlaying = false
+            self.updatePlayPauseButton()
+
+            // 한 곡 반복이 아닐 때 랜덤 곡 재생
+            if !PlayerManager.shared.isRepeatEnabled {
+                self.fetchRandomSongFromNetwork(shouldPlay: true)
+            }
         }
     }
 
@@ -140,7 +178,7 @@ class MainViewController: UIViewController {
     @IBAction func repeatTapped(_ sender: UIButton) {
         PlayerManager.shared.isRepeatEnabled.toggle()
         let icon = PlayerManager.shared.isRepeatEnabled ? "repeat.1.circle.fill" : "repeat.1.circle"
-    	repeatButton.setImage(UIImage(systemName: icon), for: .normal)
+        repeatButton.setImage(UIImage(systemName: icon), for: .normal)
     }
 
     /// 재생속도 버튼을 탭했을 때 호출됩니다.
