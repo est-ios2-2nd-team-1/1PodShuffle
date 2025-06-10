@@ -25,7 +25,7 @@ class PlayListViewController: UIViewController {
     var player: AVPlayer?
     var playerItem: AVPlayerItem?
 
-    var song: SongEntity?
+    //var song: SongModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,25 +57,16 @@ class PlayListViewController: UIViewController {
         isPlaying.toggle()
         playButton.setImage(playImage, for: .normal)
         
-        isPlaying ? player?.pause() : player?.play()
+        isPlaying ? PlayerManager.shared.pause() : PlayerManager.shared.resume()
     }
     
     /// 다음곡 버튼 터치
     @IBAction func forwardButton(_ sender: Any) {
         Task {
-            let musicResponse =  await NetworkManager.shared.getMusic()
-            guard let  musicResponse else { return }
-            
-            let thumbnailImage = await NetworkManager.shared.fetchThumnail(from: musicResponse.streamUrl)
-            let music = SongModel(from: musicResponse, thumbnailData: thumbnailImage)
+            let song =  try await NetworkManager.shared.getMusic()
             
             /// 음악 play
-            playSong(streamUrl: music.streamUrl)
-            
-            /// CoreData Insert
-            song = SongEntity(from: music)
-            guard let song else { return }
-            DataManager.shared.insertSongData(from: song)
+            playSong(streamUrl: song.streamUrl)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                 self?.playListTableView.refreshControl?.endRefreshing()
@@ -87,7 +78,6 @@ class PlayListViewController: UIViewController {
                 //    let indexPath = IndexPath(row: rowCount - 1, section: section)
                 //    self?.playListTableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
                 //}
-                
             }
             
             playButton.setImage(playImage, for: .normal)
@@ -102,11 +92,8 @@ class PlayListViewController: UIViewController {
         let avUrlAsset = NetworkManager.shared.createAssetWithHeaders(url: streamUrl)
         guard let asset = avUrlAsset else { return }
         
-        playerItem = AVPlayerItem(asset: asset)
-        player = AVPlayer(playerItem: playerItem)
-        
-        // 재생 시작
-        player?.play()
+        PlayerManager.shared.play(asset: asset)
+       
         isPlaying = false
     }
 }
@@ -141,6 +128,11 @@ extension PlayListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             DataManager.shared.deleteSongData(at: indexPath)
+            
+            PlayerManager.shared.pause()
+            
+            isPlaying = true
+            playButton.setImage(playImage, for: .normal)
         }
     }
 }
@@ -149,8 +141,6 @@ extension PlayListViewController: UITableViewDataSource {
 extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
-        print(#function)
         
         let song = DataManager.shared.fetchedResults.object(at: indexPath)
 
