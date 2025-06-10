@@ -138,7 +138,9 @@ class MainViewController: UIViewController {
 
     /// 반복 버튼을 탭했을 때 호출됩니다.
     @IBAction func repeatTapped(_ sender: UIButton) {
-        // TODO: 한곡반복 버튼 클릭 로직 추가
+        PlayerManager.shared.isRepeatEnabled.toggle()
+        let icon = PlayerManager.shared.isRepeatEnabled ? "repeat.1.circle.fill" : "repeat.1.circle"
+    	repeatButton.setImage(UIImage(systemName: icon), for: .normal)
     }
 
     /// 재생속도 버튼을 탭했을 때 호출됩니다.
