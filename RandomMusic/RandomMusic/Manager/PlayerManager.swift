@@ -7,6 +7,9 @@ import AVFoundation
 final class PlayerManager {
     static let shared = PlayerManager()
 
+    /// 한 곡 반복 재생 여부를 설정합니다.
+    var isRepeatEnabled = false
+
     /// 플레이어가 초기화되었는지 여부를 나타냅니다.
     var isPlayerReady: Bool {
         return player != nil
@@ -35,7 +38,14 @@ final class PlayerManager {
             object: item,
             queue: .main
         ) { [weak self] _ in
-            self?.onPlaybackFinished?()
+            guard let self else { return }
+
+            if self.isRepeatEnabled {
+                self.seek(to: 0)
+                self.player?.play()
+            } else {
+                self.onPlaybackFinished?()
+            }
         }
 
         addPeriodicTimeObserver()
