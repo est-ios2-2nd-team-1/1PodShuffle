@@ -105,7 +105,6 @@
                                 </buttonConfiguration>
                                 <connections>
                                     <action selector="confirmButtonTapped:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="uCn-vE-OLK"/>
-                                    <segue destination="1V8-Vb-8lp" kind="show" id="8m3-AW-uDN"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -141,16 +140,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-16.030534351145036" y="3.5211267605633805"/>
-        </scene>
-        <!--MainVC-->
-        <scene sceneID="mls-Lf-eOo">
-            <objects>
-                <viewControllerPlaceholder storyboardIdentifier="MainVC" storyboardName="Main" referencedIdentifier="MainVC" id="1V8-Vb-8lp" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" id="GfB-ea-2S4"/>
-                </viewControllerPlaceholder>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="5Mc-2z-X7b" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="721" y="4"/>
         </scene>
     </scenes>
     <resources>

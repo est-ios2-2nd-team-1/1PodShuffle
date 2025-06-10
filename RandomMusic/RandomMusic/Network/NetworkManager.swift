@@ -58,11 +58,6 @@ class NetworkManager {
         return asset
     }
 
-
-
-
-
-
     // 랜덤 음악 가져오기
     private func fetchRandomMusic(genre: Genre? = nil) async throws -> SongResponse {
         var urlString = "\(baseURL)/api/music/random"

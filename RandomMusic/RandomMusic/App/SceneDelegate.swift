@@ -7,14 +7,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let _ = (scene as? UIWindowScene) else { return }
 
-        let isFirstLaunch = !UserDefaults.standard.bool(forKey: "HasLaunchedBefore")
-
-        showOnboardingScreen()
+        let isFirstLaunch = !UserDefaults.standard.bool(forKey: "isOnboardingCompleted")
 
         if isFirstLaunch {
-            UserDefaults.standard.set(true, forKey: "HasLaunchedBefore")
+            showOnboardingScreen()
         } else {
-            //showMainScreen()
+            showMainScreen()
         }
     }
 
@@ -52,12 +50,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func showOnboardingScreen() {
         let storyboard = UIStoryboard(name: "Onboarding", bundle: nil)
 
-        guard let onboardingVC = storyboard.instantiateInitialViewController() else {
+        guard let vc = storyboard.instantiateInitialViewController() else {
             return
         }
 
         if let window = UIApplication.shared.windows.first {
-            window.rootViewController = onboardingVC
+            window.rootViewController = vc
+            window.makeKeyAndVisible()
+        }
+    }
+
+    private func showMainScreen() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+
+        guard let vc = storyboard.instantiateInitialViewController() else {
+            return
+        }
+
+        if let window = UIApplication.shared.windows.first {
+            window.rootViewController = vc
             window.makeKeyAndVisible()
         }
     }
