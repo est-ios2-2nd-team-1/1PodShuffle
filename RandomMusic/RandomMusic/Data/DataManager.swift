@@ -54,7 +54,7 @@ final class DataManager {
         let thumbnailFileName = String(newSong.id) + ".jpg"
         newSong.thumbnail = thumbnailFileName
 
-        insertImageFile(name: newSong.thumbnail, data: song.thumbnailData)
+        insertImageFile(fileName: thumbnailFileName, data: song.thumbnailData)
         saveContext()
     }
 
@@ -64,7 +64,7 @@ final class DataManager {
     func deleteSongData(at indexPath: IndexPath) {
         let deletedSong = fetchedResults.object(at: indexPath)
 
-        deleteImageFile(name: deletedSong.thumbnail)
+        deleteImageFile(fileName: deletedSong.thumbnail)
         mainContext.delete(deletedSong)
         saveContext()
     }
@@ -114,30 +114,28 @@ private extension DataManager {
     /// - Parameters:
     ///   - name: 이미지 파일의 이름을 받습니다.
     ///   - data: 저장될 바이너리 데이터를 받습니다.
-    func insertImageFile(name: String?, data: Data?) {
-        if let fileName = name, let data = data {
-            if let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) {
-                do {
-                    try data.write(to: url)
-                } catch {
-                    print(error)
-                }
-            }
+    func insertImageFile(fileName: String, data: Data?) {
+        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let pathUrl = documentDirectory.appending(path: fileName)
+
+        do {
+            try data?.write(to: pathUrl)
+        } catch {
+            print(error.localizedDescription)
         }
     }
 
     /// 디렉토리에 존재하는 이미지를 삭제합니다.
-    /// - Parameter name: 디렉토리에 저장된 파일 이름을 받습니다.
-    func deleteImageFile(name: String?) {
-        if let fileName = name {
-            if let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) {
-                if FileManager.default.fileExists(atPath: fileName) {
-                    do {
-                        try FileManager.default.removeItem(at: url)
-                    } catch {
-                        print(error)
-                    }
-                }
+    /// - Parameter fileName: 디렉토리에 저장된 파일 이름을 받습니다.
+    func deleteImageFile(fileName: String?) {
+        if let fileName {
+            let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let pathUrl = documentDirectory.appending(path: fileName)
+
+            do {
+                try FileManager.default.removeItem(at: pathUrl)
+            } catch {
+                print(error.localizedDescription)
             }
         }
     }
