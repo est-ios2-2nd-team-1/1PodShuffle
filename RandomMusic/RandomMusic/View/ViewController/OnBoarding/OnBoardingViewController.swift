@@ -29,10 +29,33 @@ class OnBoardingViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupCollectionView()
+        setupTitleLabel()
+    }
+
+    private func setupCollectionView() {
         collectionView.dataSource = self
         collectionView.delegate = self
     }
+
+    private func setupTitleLabel() {
+        let fullText = "선호하는 장르를 선택해주세요 (최대 3개 선택 가능)"
+        let targetText = "(최대 3개 선택 가능)"
+
+        let attributedString = NSMutableAttributedString(string: fullText)
+
+        let titleFont = UIFont.systemFont(ofSize: 19)
+        attributedString.addAttribute(.font, value: titleFont, range: (fullText as NSString).range(of: "선호하는 장르를 선택해주세요"))
+
+        // 폰트 부분변경
+        let subFont = UIFont.systemFont(ofSize: 13)
+        attributedString.addAttribute(.font, value: subFont, range: (fullText as NSString).range(of: targetText))
+
+        titleLabel.attributedText = attributedString
+    }
 }
+
+
 extension OnBoardingViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -72,6 +95,7 @@ extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
 
 extension OnBoardingViewController {
 
+    // 장르 선택 제한: 3개 이하
     @objc func genreButtonTapped(_ sender: UIButton) {
         let genre = genres[sender.tag]
         if selectedGenres.contains(genre.name) {
