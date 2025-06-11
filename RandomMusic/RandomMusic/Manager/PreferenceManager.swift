@@ -52,6 +52,10 @@ class PreferenceManager {
     func selectRandomGenre() -> Genre {
         var weights: [Genre: Double] = [:]
 
+        print("")
+        print("=============")
+        print("장르별 현재 점수")
+        print("=============")
         for genre in Genre.allCases {
             weights[genre] = calculateScore(for: genre)
         }
@@ -100,6 +104,8 @@ class PreferenceManager {
 
 
     // MARK: - Private 함수들
+    /// 선호도 데이터 임시 생성.
+    /// - warning: 저장은 따로 해야 함
     private func savePreferenceData(genre: Genre, songId: Int, score: Double, isImmutable: Bool) {
         let data = PreferenceData(context: context)
         data.id = UUID()
@@ -110,6 +116,7 @@ class PreferenceManager {
         data.songId = Int64(songId)
     }
 
+    /// 각 장르의 선호도 점수 계산
     private func calculateScore(for genre: Genre) -> Double {
         let request: NSFetchRequest<PreferenceData> = PreferenceData.fetchRequest()
         request.predicate = NSPredicate(format: "genre == %@", genre.rawValue)
@@ -127,9 +134,14 @@ class PreferenceManager {
             totalScore += data.score * timeDecay
         }
 
-        return max(1.0, min(totalScore, 50.0))
+        let finalScore = max(1.0, min(totalScore, 50.0))
+        print("\(genre.rawValue): \(String(format: "%.2f", finalScore)) (데이터 \(allData.count)개)")
+
+        return finalScore
     }
 
+
+    /// 시간감쇠 적용
     private func getTimeDecay(daysPassed: Int) -> Double {
         switch daysPassed {
         case 0...7: return 1.0
@@ -139,21 +151,37 @@ class PreferenceManager {
         }
     }
 
+    /// 선호도 기반으로 랜덤장르 추출
     private func selectByWeight(weights: [Genre: Double]) -> Genre {
         let totalWeight = weights.values.reduce(0, +)
+
+        // 각 장르별 선택 확률 로그 출력
+        print("=============")
+        print("장르별 선택 확률")
+        print("=============")
+        for (genre, weight) in weights {
+            let probability = totalWeight > 0 ? (weight / totalWeight) * 100 : 0
+            print("\(genre.rawValue): \(String(format: "%.2f", probability))%")
+        }
+
         let random = Double.random(in: 0...totalWeight)
+        print("랜덤값: \(String(format: "%.2f", random)) / \(String(format: "%.2f", totalWeight))")
 
         var currentWeight: Double = 0
         for (genre, weight) in weights {
             currentWeight += weight
+            print("\(genre.rawValue) 누적: \(String(format: "%.2f", currentWeight))")
             if random <= currentWeight {
+                print("✅ \(genre.rawValue) 선택됨!")
                 return genre
             }
         }
 
-        return .pop // 아무장르도 선택되지 않았을 때의 기본값으로 Pop을 반환. 그런데 이론적으로는 실행될일 없음. 컴파일러가 걱정해서 명시적으로 넣어준 것일 뿐
+        print("⚠️ 기본값 Pop 선택됨")
+        return .pop
     }
 
+    /// 컨텍스트에 실제 저장
     private func saveContext() {
         try? context.save()
     }
@@ -226,6 +254,7 @@ class PreferenceManager {
     }
 
     func printGenreScores() {
+
         print("=== 현재 장르별 점수 ===")
         for genre in Genre.allCases {
             let score = calculateScore(for: genre)
