@@ -15,6 +15,13 @@ class MainViewController: UIViewController {
     @IBOutlet weak var playPauseButton: UIButton!
     @IBOutlet weak var forwardButton: UIButton!
     @IBOutlet weak var speedButton: UIButton!
+    @IBOutlet weak var playlistContent: UIView!
+    @IBOutlet weak var playlistBackground: UIView!
+    @IBOutlet weak var playlistThumbnail: UIImageView!
+    @IBOutlet weak var playlistTitleLabel: UILabel!
+    @IBOutlet weak var playlistSingerLabel: UILabel!
+    
+    @IBOutlet weak var playlistBackgroundHeightConstraint: NSLayoutConstraint!
 
     var isDisliked = false
     var isLiked = false
@@ -25,6 +32,15 @@ class MainViewController: UIViewController {
         setupUI()
         fetchRandomSong()
         bindPlayerCallbacks()
+        setupTapGestureForPlaylist()
+    }
+
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+
+        let bottomInset = view.safeAreaInsets.bottom
+        let playlistHeight = 80
+        playlistBackgroundHeightConstraint.constant = bottomInset + CGFloat(playlistHeight)
     }
 
     /// 썸네일과 슬라이더의 초기 UI 상태를 설정합니다.
@@ -101,15 +117,33 @@ class MainViewController: UIViewController {
             return
         }
 
+        // 메인 재생 뷰 UI 갱신
         titleLabel.text = currentSong.title
         singerLabel.text = currentSong.artist
         thumbnailImageView.image = currentSong.thumbnailData.flatMap { UIImage(data: $0) }
+
+        // 재생목록 뷰 UI 갱신
+        playlistTitleLabel.text = currentSong.title
+        playlistSingerLabel.text = currentSong.artist
+        playlistThumbnail.image = currentSong.thumbnailData.flatMap { UIImage(data: $0) }
 
         PlayerManager.shared.loadDuration() { [weak self] seconds in
             guard let self, let duration = seconds else { return }
 
             self.progressSlider.maximumValue = Float(duration)
             self.totalTimeLabel.text = TimeFormatter.formatTime(duration)
+        }
+    }
+
+    private func setupTapGestureForPlaylist() {
+        playlistContent.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(playlistTapped))
+        playlistContent.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func playlistTapped() {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "PlayListView") {
+            present(vc, animated: true)
         }
     }
 
@@ -165,8 +199,6 @@ class MainViewController: UIViewController {
 
     /// 재생속도 버튼을 탭했을 때 호출됩니다.
     @IBAction func speedTapped(_ sender: UIButton) {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "PlayListView") {
-            present(vc, animated: true)
-        }
+        // TODO: 재생속도 클릭 로직 구현
     }
 }
