@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Y6W-OH-hqX">
-    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <device id="retina6_3" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
@@ -16,14 +16,14 @@
             <objects>
                 <viewController id="Y6W-OH-hqX" customClass="OnBoardingViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <rect key="frame" x="0.0" y="0.0" width="402" height="874"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r6K-9O-ZPP">
-                                <rect key="frame" x="290" y="103" width="83" height="35"/>
+                                <rect key="frame" x="299" y="139" width="83" height="35"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="35" id="92w-sA-NFw"/>
-                                    <constraint firstAttribute="width" constant="83" id="cUZ-qz-Ukk"/>
+                                    <constraint firstAttribute="height" constant="35" id="W5o-ki-yxx"/>
+                                    <constraint firstAttribute="width" constant="83" id="fPE-gf-mlf"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="건너뛰기"/>
@@ -32,13 +32,13 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="선호하는 장르를 선택해주세요" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EZp-oy-bQC">
-                                <rect key="frame" x="20" y="188" width="353" height="23"/>
+                                <rect key="frame" x="89.333333333333329" y="194" width="223.33333333333337" height="23"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="19"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="LqK-CZ-59o">
-                                <rect key="frame" x="20" y="225" width="353" height="402"/>
+                                <rect key="frame" x="20" y="225" width="362" height="424"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="apc-LM-Ite">
                                     <size key="itemSize" width="128" height="128"/>
@@ -96,7 +96,7 @@
                                 </connections>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lif-Wb-wUa">
-                                <rect key="frame" x="0.0" y="777" width="393" height="75"/>
+                                <rect key="frame" x="0.0" y="799" width="402" height="75"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="75" id="4Ll-B8-SWk"/>
                                 </constraints>
@@ -113,22 +113,19 @@
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="EZp-oy-bQC" firstAttribute="top" secondItem="r6K-9O-ZPP" secondAttribute="bottom" constant="50" id="1Yg-5m-EAl"/>
-                            <constraint firstItem="EZp-oy-bQC" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="70" id="8h5-xw-YRU"/>
                             <constraint firstItem="LqK-CZ-59o" firstAttribute="centerY" secondItem="5EZ-qb-Rvc" secondAttribute="centerY" id="BR3-ex-Ny1"/>
-                            <constraint firstItem="r6K-9O-ZPP" firstAttribute="leading" secondItem="5EZ-qb-Rvc" secondAttribute="leading" constant="290" id="EoD-NY-U70"/>
                             <constraint firstItem="Lif-Wb-wUa" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="FV7-nC-Njd"/>
+                            <constraint firstItem="EZp-oy-bQC" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="Kan-Pl-SyV"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="LqK-CZ-59o" secondAttribute="trailing" constant="20" id="Sww-rs-ph3"/>
                             <constraint firstItem="Lif-Wb-wUa" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="Utn-8i-GfO"/>
-                            <constraint firstItem="EZp-oy-bQC" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="Xmw-XR-Ce3"/>
                             <constraint firstItem="Lif-Wb-wUa" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="bpB-nB-Blp"/>
                             <constraint firstItem="LqK-CZ-59o" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="cjR-EA-ABd"/>
-                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="EZp-oy-bQC" secondAttribute="trailing" constant="20" id="dFc-1k-1MG"/>
                             <constraint firstItem="Lif-Wb-wUa" firstAttribute="top" secondItem="LqK-CZ-59o" secondAttribute="bottom" constant="150" id="drN-35-f0S"/>
-                            <constraint firstItem="EZp-oy-bQC" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="eFh-Sa-7xW"/>
-                            <constraint firstItem="r6K-9O-ZPP" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" constant="60" id="l5M-eB-D8h"/>
+                            <constraint firstItem="r6K-9O-ZPP" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="15" id="lRB-EC-3ZH"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="r6K-9O-ZPP" secondAttribute="trailing" constant="20" id="pES-03-PG8"/>
                             <constraint firstAttribute="bottom" secondItem="Lif-Wb-wUa" secondAttribute="bottom" id="pq8-eL-40W"/>
                             <constraint firstItem="LqK-CZ-59o" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="tIu-dX-mqE"/>
+                            <constraint firstItem="EZp-oy-bQC" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="70" id="wXR-ji-hKZ"/>
                         </constraints>
                     </view>
                     <connections>
