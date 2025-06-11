@@ -89,10 +89,7 @@ class PlayListViewController: UIViewController {
         player?.pause()
         player = nil
         
-        let avUrlAsset = NetworkManager.shared.createAssetWithHeaders(url: streamUrl)
-        guard let asset = avUrlAsset else { return }
-        
-        PlayerManager.shared.play(asset: asset)
+        PlayerManager.shared.play()
        
         isPlaying = false
     }
