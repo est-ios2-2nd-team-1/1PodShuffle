@@ -18,6 +18,8 @@ class NetworkManager {
     /// - Parameter genre: 장르.
     /// - Returns: 바로 쓸 수 있는 SongModel. 썸네일 Data 와 곡정보가 모두 들어있다.
     func getMusic(genre: Genre? = nil) async throws -> SongModel {
+        let currentSongIdArr = PlayerManager.shared.playlist.map {$0.id} // 현재 플레이리스트에 있는 곡들의 id 배열
+
         var realGenre: Genre // 장르가 없으면 장르를 랜덤으로 뽑아서 넣어주기 위해서 새로 선언
 
         if let genre { // 장르 입력값이 있으면 그대로 사용
@@ -27,8 +29,19 @@ class NetworkManager {
             realGenre = pm.selectRandomGenre()
         }
 
-        // 음악 정보 호출
-        let response = try await fetchRandomMusic(genre: realGenre)
+        // 음악 정보 호출. playList 에 이미 있는 곡이라면 재요청.
+        var response: SongResponse
+        var tryCount = 0
+        let maxTryCount = 5
+        repeat {
+            response = try await fetchRandomMusic(genre: realGenre)
+            tryCount += 1
+
+            if tryCount >= maxTryCount {
+                print("5번 연속 리스트에 있는 곡 호출. 무한루프 방지를 위해 루프 종료")
+                break
+            }
+        } while currentSongIdArr.contains(response.id)
 
         // 썸네일 호출
         var thumbnailData: Data? = nil
