@@ -7,10 +7,22 @@
 import Foundation
 import CoreData
 
+/// 선호도 매니저
+/// - 선호도 점수 범위 : min 1.0 ~  max 50.0
+/// - 좋아요: +2.0 / 싫어요: -1.0
+/// - 각 행동마다 preferenceData에 저장이 되고, 저장 시점에 각 장르별 총점을 계산해 preferenceCache 에 저장함.
+/// - 장르별 총점이 필요할 경우는 preferenceCache 만 조회해서 사용하면 됨
+/// - 오래된 액션은 영향도가 감소(시간감쇠)
+///	- 현재~7일전 : 100% 영향도
+///	- 7일전~14일전 : 80% 영향도
+/// - 14일전~28일전 : 50% 영향도
+/// - 28일전~... : 30% 영향도
 class PreferenceManager {
     let context = DataManager.shared.mainContext
 
-    // MARK: - 초기화. 앱 설치 후 최초 실행시 동작함
+    /// 초기화. 온보딩에서 선호장르 체크 완료 누를 경우만 동작.
+    /// - Parameter initialPreferredGenres: 모든 장르 순회
+    /// - Note: 모든 장르가 기본 선호도 10을 가짐. 선택된 선호장르는 10을 더 받음
     func initializePreferences(initialPreferredGenres: [Genre] = []) {
         for genre in Genre.allCases {
             // 기본값 10.0 , songId = 0 은 곡에 상관없는 데이터
@@ -21,18 +33,22 @@ class PreferenceManager {
                 savePreferenceData(genre: genre, songId: 0, score: 10.0, isImmutable: true)
             }
         }
-
         saveContext()
     }
 
-    // MARK: - 좋아요/싫어요 누를때 DB에 저장
+    /// 좋아요/싫어요 누를 때 DB에 저장하는 함수
+    /// - Parameters:
+    ///   - genre: 곡의 장르
+    ///   - songId: 곡 id
+    ///   - isLike: 좋아요면 true 싫어요면 false
     func recordAction(genre: Genre, songId: Int, isLike: Bool) {
         let score = isLike ? 2.0 : -1.0
         savePreferenceData(genre: genre, songId:songId, score: score, isImmutable: false)
         saveContext()
     }
 
-    // MARK: - 추천 장르 선택. 다음곡 누를때 장르 가져오는 함수
+    /// 추천 장르 랜덤뽑기
+    /// - Returns: 선호도 기반 확률로 장르가 뿅 하고 나옵니다
     func selectRandomGenre() -> Genre {
         var weights: [Genre: Double] = [:]
 
@@ -43,7 +59,9 @@ class PreferenceManager {
         return selectByWeight(weights: weights)
     }
 
-    // MARK: - 곡별 선호도 기록 조회. 곡을 재생할 때 좋아요나 싫어요를 눌렀던 기록이 있는지
+    /// 곡별 선호도 기록 조회. 곡을 재생할 때 좋아요나 싫어요를 눌렀던 기록이 있는지 확인합니다.
+    /// - Parameter songId: 곡 id
+    /// - Returns: 좋아요, 싫어요, 기록없음
     func getUserFeedback(for songId: Int) -> FeedbackType {
         let request: NSFetchRequest<PreferenceData> = PreferenceData.fetchRequest()
         request.predicate = NSPredicate(format: "songId == %lld AND isImmutable == false", Int64(songId))
@@ -57,8 +75,9 @@ class PreferenceManager {
         return latestFeedback.score > 0 ? .like : .dislike
     }
 
-
-    // MARK: - 피드백 취소 (해당 곡의 좋아요나 싫어요 기록 삭제)
+    /// 피드백 취소 (해당 곡의 좋아요나 싫어요 기록 삭제)
+    /// - Parameter songId: 곡id
+    /// - Returns: true 면 성공
     func cancelFeedback(for songId: Int) -> Bool {
         let request: NSFetchRequest<PreferenceData> = PreferenceData.fetchRequest()
         request.predicate = NSPredicate(format: "songId == %lld AND isImmutable == false", Int64(songId))
