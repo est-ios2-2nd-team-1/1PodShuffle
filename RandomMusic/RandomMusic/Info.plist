@@ -6,6 +6,10 @@
 	<string>$(NAME)</string>
 	<key>TOKEN</key>
 	<string>$(TOKEN)</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>audio</string>
+    </array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

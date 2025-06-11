@@ -7,7 +7,7 @@ final class PlayerManager {
     private(set) var playlist: [SongModel] = []
     private(set) var currentIndex: Int = 0
     private(set) var isPlaying = false
-    private var player: AVPlayer?
+    private(set) var player: AVPlayer?
     private var timeObserverToken: Any?
 
     /// 한 곡 반복 재생 여부를 설정합니다.
@@ -30,6 +30,7 @@ final class PlayerManager {
     var onPlayStateChanged: ((Bool) -> Void)?
     var onSongChanged: (() -> Void)?
     var onNeedNewSong: (() -> Void)?
+    var onRemote: ((SongModel?) -> Void)?
 
     private init() {}
 
@@ -205,6 +206,7 @@ final class PlayerManager {
         ) { [weak self] time in
             let seconds = CMTimeGetSeconds(time)
             self?.onTimeUpdate?(seconds)
+            self?.onRemote?(self?.currentSong)
         }
     }
 

@@ -1,10 +1,3 @@
-//
-//  SongModel.swift
-//  RandomMusic
-//
-//  Created by drfranken on 6/9/25.
-//
-
 import Foundation
 
 
