@@ -67,13 +67,15 @@ final class RemoteManager {
             nowPlayingInfo[MPMediaItemPropertyTitle] = model.title
             nowPlayingInfo[MPMediaItemPropertyArtist] = model.artist
 
-            if let duration = playerManager.player?.currentItem?.duration {
-
+            if let durationSeconds = playerManager.player?.currentItem?.duration.seconds {
+                nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = durationSeconds.isNaN ? 0.0 : durationSeconds
             }
-            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = playerManager.player.currentItem.duration.seconds.isNaN ? playerManager.player?.currentItem?.duration.seconds ?? 0.0 : 0.0
-            nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playerManager.player?.currentTime().seconds ?? 0
-            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
 
+            if let durationSeconds = playerManager.player?.currentTime().seconds {
+                nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = durationSeconds.isNaN ? 0.0 : durationSeconds
+            }
+
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = playerManager.player?.rate ?? 1.0
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
         }
     }
