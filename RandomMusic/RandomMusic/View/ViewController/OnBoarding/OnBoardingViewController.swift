@@ -15,10 +15,10 @@ class OnBoardingViewController: UIViewController {
 
     var genres: [OnboardingGenre] = [
         OnboardingGenre(name: "Rock", iconName: "rock"),
-        OnboardingGenre(name: "HipHop", iconName: "hiphop"),
+        OnboardingGenre(name: "Hiphop", iconName: "hiphop"),
         OnboardingGenre(name: "Jazz", iconName: "jazz"),
         OnboardingGenre(name: "Pop", iconName: "pop"),
-        OnboardingGenre(name: "R&B", iconName: "rb"),
+        OnboardingGenre(name: "RnB", iconName: "rb"),
         OnboardingGenre(name: "Classic", iconName: "classic"),
         OnboardingGenre(name: "Dance", iconName: "dance"),
         OnboardingGenre(name: "Ballad", iconName: "ballad"),
@@ -26,6 +26,7 @@ class OnBoardingViewController: UIViewController {
     ]
 
     var selectedGenres: Set<String> = []
+    private let preferenceManager = PreferenceManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,12 +109,20 @@ extension OnBoardingViewController {
 
 
     @IBAction func skipButtonTapped(_ sender: UIButton) {
-        // 건너뛰기 버튼을 눌렀을 때
+        // 건너뛰기: 전체 장르에 기본 점수 부여
+        preferenceManager.initializePreferences(initialPreferredGenres: Genre.allCases)
+
         toMainVC()
     }
 
     @IBAction func confirmButtonTapped(_ sender: UIButton) {
-        // 확인 버튼을 눌렀을 때
+        // 확인: 선택된 장르만 저장
+        let selectedGenres: [Genre] = selectedGenres.compactMap { genreName in
+            Genre(rawValue: genreName)
+        }
+
+        preferenceManager.initializePreferences(initialPreferredGenres: selectedGenres)
+
         toMainVC()
     }
 
