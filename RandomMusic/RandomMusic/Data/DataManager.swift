@@ -69,31 +69,6 @@ final class DataManager {
         saveContext()
     }
 
-    // TODO: 알고리즘에 따라 수치는 변경될 수 있습니다.
-    /// 장르별 추천 수치를 조정합니다.
-    /// - Parameters:
-    ///   - genre: 음악 장르를 받습니다. (예: "rock", "ballad")
-    ///   - delta: 추천 시 양수, 비추천 시 음수 값을 받습니다.
-    func adjustGenreScore(for genre: String, by delta: Int) {
-        var genreCounts = UserDefaults.standard.dictionary(forKey: "Genre") as? [String: Int] ?? [:]
-
-        let current = genreCounts[genre] ?? 0
-        let updated = max(current + delta, 1)
-        genreCounts[genre] = updated
-
-        UserDefaults.standard.set(genreCounts, forKey: "Genre")
-    }
-
-    /// 장르별 추천 수치를 모두 반환합니다.
-    /// - Returns: 장르별 추천 수치를 배열로 반환합니다.
-    func fetchAllGenre() -> [(genre: String, count: Int)] {
-        if let genreCounts = UserDefaults.standard.dictionary(forKey: "Genre") as? [String: Int] {
-			return Array(genreCounts).sorted { $0.value > $1.value }.map { (genre: $0.key, count: $0.value) }
-        }
-
-        return []
-    }
-
     /// Context에서 변경된 데이터를 영구적으로 저장합니다.
     func saveContext() {
         let context = persistentContainer.viewContext
