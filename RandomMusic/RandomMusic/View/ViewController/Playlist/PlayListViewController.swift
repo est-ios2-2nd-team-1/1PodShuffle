@@ -10,31 +10,62 @@ class PlayListViewController: UIViewController {
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var forButton: UIButton!
     
-    /// 재생중인지 확인
-    var isPlaying = true
-    
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
     let playConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .regular, scale: .large)
     let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
     
-    var playImage: UIImage? {
-        isPlaying ? UIImage(systemName: "play.circle.fill", withConfiguration: playConfig) : UIImage(systemName: "pause.circle", withConfiguration: playConfig)
-    }
+    var playImage: UIImage?
     
-    // AVPlayer
-    var player: AVPlayer?
-    var playerItem: AVPlayerItem?
+    var duration: Double?
 
-    //var song: SongModel?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         /// 재생, 뒤로, 앞으로 버튼 UI Setting
         setButtonUI()
         
+        playProgressView.progress = 0
+        updateProgressView()
+        collbakcFunc()
+        
         /// NSFetchedResultsControllerDelegate Delegate
         DataManager.shared.fetchedResults.delegate = self
+        
+    }
+    
+    /// 이전곡 버튼 터치
+    @IBAction func backwardButton(_ sender: Any) {
+        PlayerManager.shared.moveBackward()
+    }
+    
+    /// 재생 버튼 터치
+    @IBAction func playButton(_ sender: Any) {
+        PlayerManager.shared.togglePlayPause()
+        setPlayPauseButton()
+    }
+    
+    /// 다음곡 버튼 터치
+    @IBAction func forwardButton(_ sender: Any) {
+       let section = 0
+       let totalRows = playListTableView.numberOfRows(inSection: section)
+       
+       if totalRows == 0 {
+           fetchPlaySong()
+       } else {
+           PlayerManager.shared.moveForward()
+           //fetchPlaySong(totalRows: totalRows)
+           collbakcFunc()
+       }
+        setPlayPauseButton()
+    }
+    
+    /// 재생/일시정지 버튼 UI
+    //func setPlayPauseButton(isPlay: Bool) {
+    func setPlayPauseButton() {
+        playImage = PlayerManager.shared.isPlaying ?
+                        UIImage(systemName: "pause.circle", withConfiguration: playConfig) :
+                        UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
+        playButton.setImage(playImage, for: .normal)
     }
     
     /// 재생, 이전곡, 다음곡 버튼 UI Setting
@@ -43,27 +74,29 @@ class PlayListViewController: UIViewController {
         let forImage = UIImage(systemName: "forward.frame.fill", withConfiguration: backforConfig)
         
         backButton.setImage(backImage, for: .normal)
-        playButton.setImage(playImage, for: .normal)
         forButton.setImage(forImage, for: .normal)
-    }
-    
-    /// 이전곡 버튼 터치
-    @IBAction func backwardButton(_ sender: Any) {
         
+        setPlayPauseButton()
     }
     
-    /// 재생 버튼 터치
-    @IBAction func playButton(_ sender: Any) {
-        isPlaying.toggle()
-        playButton.setImage(playImage, for: .normal)
+    /// 재생/일시정지 버튼
+    func playSong(streamUrl: String) {
+        PlayerManager.shared.play()
         
-        isPlaying ? PlayerManager.shared.pause() : PlayerManager.shared.resume()
+        collbakcFunc()
     }
     
-    /// 다음곡 버튼 터치
-    @IBAction func forwardButton(_ sender: Any) {
+    // 랜덤으로 노래 재생
+    func fetchPlaySong(totalRows: Int? = nil) {
         Task {
             let song =  try await NetworkManager.shared.getMusic()
+            
+            let currentPlaylist = PlayerManager.shared.playlist
+            let newPlaylist = currentPlaylist + [song]
+            let newIndex = currentPlaylist.count
+
+            PlayerManager.shared.setPlaylist(newPlaylist)
+            PlayerManager.shared.setCurrentIndex(newIndex)
             
             /// 음악 play
             playSong(streamUrl: song.streamUrl)
@@ -71,27 +104,33 @@ class PlayListViewController: UIViewController {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                 self?.playListTableView.refreshControl?.endRefreshing()
                 
-                /// tableView 맨밑으로 이동
-                //let section = 0
-                //let rowCount = self?.playListTableView.numberOfRows(inSection: section) ?? 0
-                //if rowCount > 0 {
-                //    let indexPath = IndexPath(row: rowCount - 1, section: section)
-                //    self?.playListTableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
-                //}
+                guard let row = totalRows else { return }
+                let indexPath = IndexPath(row: 0, section: 0)
+                self?.playListTableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
             }
-            
-            playButton.setImage(playImage, for: .normal)
         }
     }
     
-    // MARK: - 스트리밍 시작
-    func playSong(streamUrl: String) {
-        player?.pause()
-        player = nil
+    /// ProgressView Update
+    private func updateProgressView() {
+        PlayerManager.shared.onTimeUpdate = { [weak self] seconds in
+            guard let self = self, let duration = self.duration, duration > 0 else { return }
+            let progress = Float(seconds / duration)
+            DispatchQueue.main.async {
+                self.playProgressView.progress = progress
+            }
+        }
+    }
+    
+    private func collbakcFunc() {
+        PlayerManager.shared.onPlayStateChanged = { [weak self] isPlaying in
+            self?.setPlayPauseButton()
+        }
         
-        PlayerManager.shared.play()
-       
-        isPlaying = false
+        PlayerManager.shared.loadDuration { [weak self] seconds in
+            self?.duration = seconds
+            self?.updateProgressView()
+        }
     }
 }
 
@@ -118,7 +157,7 @@ extension PlayListViewController: UITableViewDataSource {
         cell.thumbnailImageView.image = model.thumbnailImage
         cell.artistLabel.text = model.artist
         cell.titleLabel.text = model.title
-
+        
         return cell
     }
     
@@ -127,9 +166,7 @@ extension PlayListViewController: UITableViewDataSource {
             DataManager.shared.deleteSongData(at: indexPath)
             
             PlayerManager.shared.pause()
-            
-            isPlaying = true
-            playButton.setImage(playImage, for: .normal)
+            setPlayPauseButton()
         }
     }
 }
@@ -137,16 +174,17 @@ extension PlayListViewController: UITableViewDataSource {
 // MARK: - TableView Delegate
 extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        
         let song = DataManager.shared.fetchedResults.object(at: indexPath)
 
         Task {
             guard let streamUrl = song.streamUrl else { return }
             playSong(streamUrl: streamUrl)
-
-            playButton.setImage(playImage, for: .normal)
+            
+            PlayerManager.shared.setCurrentIndex(indexPath.row)
+            setPlayPauseButton()
         }
+        
+        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
     }
 }
 
