@@ -128,7 +128,7 @@ class PreferenceManager {
 
         for data in allData {
             let daysPassed = Calendar.current.dateComponents([.day],
-                from: data.insertDate ?? now, to: now).day ?? 0
+                                                             from: data.insertDate ?? now, to: now).day ?? 0
 
             let timeDecay = getTimeDecay(daysPassed: daysPassed)
             totalScore += data.score * timeDecay
@@ -185,95 +185,4 @@ class PreferenceManager {
     private func saveContext() {
         try? context.save()
     }
-
-
-
-
-
-
-
-
-
-    // MARK: ------------------ 아래는 디버깅, 테스트용 함수
-
-    // 테스트용 함수
-    func runTestScenario() {
-        print("🧪 테스트 시작!")
-
-        // 1. 초기화 테스트
-        print("\n1️⃣ 초기화 테스트")
-//        initializePreferences(initialPreferredGenres: [.jazz, .rock])
-        printGenreScores()
-
-        // 2. 좋아요/싫어요 테스트
-        print("\n2️⃣ 액션 기록 테스트")
-        recordAction(genre: .jazz, songId: 123, isLike: true)
-        recordAction(genre: .jazz, songId: 212, isLike: true)
-        recordAction(genre: .classic, songId: 789, isLike: false)
-        printGenreScores()
-
-        // 3. 피드백 조회 테스트
-        print("\n3️⃣ 피드백 조회 테스트")
-        print("곡 123: \(getUserFeedback(for: 123))")
-        print("곡 212: \(getUserFeedback(for: 212))")
-        print("곡 789: \(getUserFeedback(for: 789))")
-        print("곡 1: \(getUserFeedback(for: 1))")
-
-        // 4. 추천 테스트
-        print("\n4️⃣ 추천 테스트")
-        testRecommendations(count: 20)
-
-        // 5. 취소 테스트
-        print("\n5️⃣ 취소 테스트")
-        print("곡 123 취소 전: \(getUserFeedback(for: 123))")
-        let cancelResult = cancelFeedback(for: 123)
-        print("취소 결과: \(cancelResult)")
-        print("곡 123 취소 후: \(getUserFeedback(for: 123))")
-
-        printGenreScores()
-
-        print("\n✅ 테스트 완료!")
-    }
-
-
-
-
-    func printAllData() {
-        let request: NSFetchRequest<PreferenceData> = PreferenceData.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \PreferenceData.insertDate, ascending: false)]
-
-        guard let allData = try? context.fetch(request) else {
-            print("데이터 조회 실패")
-            return
-        }
-
-        print("=== 전체 PreferenceData ===")
-        for data in allData {
-            print("장르: \(data.genre ?? ""), 점수: \(data.score), 곡ID: \(data.songId), 불변: \(data.isImmutable), 날짜: \(data.insertDate ?? Date())")
-        }
-    }
-
-    func printGenreScores() {
-
-        print("=== 현재 장르별 점수 ===")
-        for genre in Genre.allCases {
-            let score = calculateScore(for: genre)
-            print("\(genre.rawValue): \(score)")
-        }
-    }
-
-    func testRecommendations(count: Int = 10) {
-        print("=== 추천 테스트 (\(count)회) ===")
-        var results: [Genre: Int] = [:]
-
-        for _ in 0..<count {
-            let recommended = selectRandomGenre()
-            results[recommended, default: 0] += 1
-        }
-
-        for (genre, count) in results.sorted(by: { $0.value > $1.value }) {
-            print("\(genre.rawValue): \(count)회")
-        }
-    }
-
 }
