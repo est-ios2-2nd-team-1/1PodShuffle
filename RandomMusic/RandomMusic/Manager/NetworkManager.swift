@@ -18,8 +18,17 @@ class NetworkManager {
     /// - Parameter genre: 장르.
     /// - Returns: 바로 쓸 수 있는 SongModel. 썸네일 Data 와 곡정보가 모두 들어있다.
     func getMusic(genre: Genre? = nil) async throws -> SongModel {
+        var realGenre: Genre // 장르가 없으면 장르를 랜덤으로 뽑아서 넣어주기 위해서 새로 선언
+
+        if let genre { // 장르 입력값이 있으면 그대로 사용
+            realGenre = genre
+        } else { // 장르 입력값이 없으면 선호도 기반으로 랜덤으로 추출
+            let pm = PreferenceManager()
+            realGenre = pm.selectRandomGenre()
+        }
+
         // 음악 정보 호출
-        let response = try await fetchRandomMusic(genre: genre)
+        let response = try await fetchRandomMusic(genre: realGenre)
 
         // 썸네일 호출
         var thumbnailData: Data? = nil
