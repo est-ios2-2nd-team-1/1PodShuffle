@@ -206,7 +206,7 @@ final class PlayerManager {
         ) { [weak self] time in
             let seconds = CMTimeGetSeconds(time)
             self?.onTimeUpdate?(seconds)
-            self?.onRemote?(self?.currentSong) // TODO: 임시 조치
+            self?.onRemote?(self?.currentSong)
         }
     }
 

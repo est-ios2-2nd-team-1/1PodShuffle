@@ -5,26 +5,23 @@ final class RemoteManager {
     static let shared = RemoteManager()
 
     let commandCenter = MPRemoteCommandCenter.shared()
-    var playerManager: PlayerManager
+    let playerManager: PlayerManager
 
     private init() {
         playerManager = .shared
     }
-
+    
+    /// MPRemoteCommandCenter의 초기 세팅입니다.
     func configure() {
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
         try? AVAudioSession.sharedInstance().setActive(true)
 
-        commandCenter.playCommand.isEnabled = true
         commandCenter.playCommand.addTarget { [weak self] _ in
             guard let self = self else { return .noActionableNowPlayingItem }
             guard let player = playerManager.player else { return .noActionableNowPlayingItem }
 
             switch player.timeControlStatus {
-            case .paused:
-                player.play()
-                return .success
-            case .waitingToPlayAtSpecifiedRate:
+            case .paused, .waitingToPlayAtSpecifiedRate:
                 player.play()
                 return .success
             case .playing:
@@ -34,25 +31,30 @@ final class RemoteManager {
             }
         }
 
-        commandCenter.pauseCommand.isEnabled = true
         commandCenter.pauseCommand.addTarget { [weak self] _ in
             self?.playerManager.pause()
             return .success
         }
 
-        commandCenter.nextTrackCommand.isEnabled = true
         commandCenter.nextTrackCommand.addTarget { [weak self] _ in
             self?.playerManager.moveForward()
             return .success
         }
 
-        commandCenter.previousTrackCommand.isEnabled = true
         commandCenter.previousTrackCommand.addTarget { [weak self] _ in
             self?.playerManager.moveBackward()
             return .success
         }
 
-        
+        commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+            guard let self = self, let player = playerManager.player else { return .noActionableNowPlayingItem }
+            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+
+            let seekTime = CMTime(seconds: event.positionTime, preferredTimescale: 1)
+            player.seek(to: seekTime)
+
+            return .success
+        }
 
         playerManager.onRemote = { [weak self] model in
             guard let self = self, let model = model else { return }

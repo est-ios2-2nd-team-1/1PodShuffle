@@ -8,7 +8,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let _ = (scene as? UIWindowScene) else { return }
 
         RemoteManager.shared.configure()
-        
+
         let isFirstLaunch = !UserDefaults.standard.bool(forKey: "isOnboardingCompleted")
 
         if isFirstLaunch {
