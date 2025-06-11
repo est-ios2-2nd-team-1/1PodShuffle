@@ -6,7 +6,7 @@ struct OnboardingGenre {
 }
 
 
-class OnBoardingViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class OnBoardingViewController: UIViewController {
 
     @IBOutlet weak var skipButton: UIButton!
     @IBOutlet weak var titleLabel: UILabel!
@@ -32,6 +32,8 @@ class OnBoardingViewController: UIViewController, UICollectionViewDataSource, UI
         collectionView.dataSource = self
         collectionView.delegate = self
     }
+}
+extension OnBoardingViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return genres.count
@@ -47,17 +49,12 @@ class OnBoardingViewController: UIViewController, UICollectionViewDataSource, UI
         cell.genreButton.addTarget(self, action: #selector(genreButtonTapped(_:)), for: .touchUpInside)
         return cell
     }
+}
 
-    @objc func genreButtonTapped(_ sender: UIButton) {
-        let genre = genres[sender.tag]
-        if selectedGenres.contains(genre.name) {
-            selectedGenres.remove(genre.name)
-        } else if selectedGenres.count < 3 {
-            selectedGenres.insert(genre.name)
-        }
-        collectionView.reloadItems(at: [IndexPath(item: sender.tag, section: 0)])
-    }
+extension OnBoardingViewController: UICollectionViewDelegate {
+}
 
+extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = (collectionView.bounds.width - 40) / 3
         let height = width + 20
@@ -71,7 +68,19 @@ class OnBoardingViewController: UIViewController, UICollectionViewDataSource, UI
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 20
     }
+}
 
+extension OnBoardingViewController {
+
+    @objc func genreButtonTapped(_ sender: UIButton) {
+        let genre = genres[sender.tag]
+        if selectedGenres.contains(genre.name) {
+            selectedGenres.remove(genre.name)
+        } else if selectedGenres.count < 3 {
+            selectedGenres.insert(genre.name)
+        }
+        collectionView.reloadItems(at: [IndexPath(item: sender.tag, section: 0)])
+    }
 
 
     @IBAction func skipButtonTapped(_ sender: UIButton) {
