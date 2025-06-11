@@ -1,21 +1,24 @@
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let _ = (scene as? UIWindowScene) else { return }
-
         RemoteManager.shared.configure()
 
         let isFirstLaunch = !UserDefaults.standard.bool(forKey: "isOnboardingCompleted")
+        isFirstLaunch ? showScreen(to: "Onboarding") : showScreen(to: "Main")
+    }
 
-        if isFirstLaunch {
-            showOnboardingScreen()
-        } else {
-            showMainScreen()
+    private func showScreen(to name: String) {
+        let storyboard = UIStoryboard(name: name, bundle: nil)
+
+        guard let vc = storyboard.instantiateInitialViewController() else {
+            return
         }
+
+        window?.rootViewController = vc
+        window?.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -46,33 +49,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
 
         // Save changes in the application's managed object context when the application transitions to the background.
-    }
-
-
-    private func showOnboardingScreen() {
-        let storyboard = UIStoryboard(name: "Onboarding", bundle: nil)
-
-        guard let vc = storyboard.instantiateInitialViewController() else {
-            return
-        }
-
-        if let window = UIApplication.shared.windows.first {
-            window.rootViewController = vc
-            window.makeKeyAndVisible()
-        }
-    }
-
-    private func showMainScreen() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-
-        guard let vc = storyboard.instantiateInitialViewController() else {
-            return
-        }
-
-        if let window = UIApplication.shared.windows.first {
-            window.rootViewController = vc
-            window.makeKeyAndVisible()
-        }
     }
 }
 
