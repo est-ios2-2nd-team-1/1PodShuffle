@@ -11,7 +11,7 @@ class PlayListViewController: UIViewController {
     @IBOutlet weak var forButton: UIButton!
     
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
-    let playConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .regular, scale: .large)
+    let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
     let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
     
     var playImage: UIImage?
@@ -26,11 +26,7 @@ class PlayListViewController: UIViewController {
         
         playProgressView.progress = 0
         updateProgressView()
-        collbakcFunc()
-        
-        /// NSFetchedResultsControllerDelegate Delegate
-        DataManager.shared.fetchedResults.delegate = self
-        
+        callbackFunc()
     }
     
     /// 이전곡 버튼 터치
@@ -54,7 +50,7 @@ class PlayListViewController: UIViewController {
        } else {
            PlayerManager.shared.moveForward()
            //fetchPlaySong(totalRows: totalRows)
-           collbakcFunc()
+           callbackFunc()
        }
         setPlayPauseButton()
     }
@@ -83,7 +79,7 @@ class PlayListViewController: UIViewController {
     func playSong(streamUrl: String) {
         PlayerManager.shared.play()
         
-        collbakcFunc()
+        callbackFunc()
     }
     
     // 랜덤으로 노래 재생
@@ -104,9 +100,6 @@ class PlayListViewController: UIViewController {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                 self?.playListTableView.refreshControl?.endRefreshing()
                 
-                guard let row = totalRows else { return }
-                let indexPath = IndexPath(row: 0, section: 0)
-                self?.playListTableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
             }
         }
     }
@@ -122,7 +115,7 @@ class PlayListViewController: UIViewController {
         }
     }
     
-    private func collbakcFunc() {
+    private func callbackFunc() {
         PlayerManager.shared.onPlayStateChanged = { [weak self] isPlaying in
             self?.setPlayPauseButton()
         }
@@ -131,30 +124,28 @@ class PlayListViewController: UIViewController {
             self?.duration = seconds
             self?.updateProgressView()
         }
+        
+        //PlayerManager.shared.onPlayList = { [weak self] in
+        //    self?.playListTableView.reloadData()
+        //}
     }
 }
 
 // MARK: - TabelView DataSource
 extension PlayListViewController: UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return DataManager.shared.fetchedResults.sections?.count ?? 0
-    }
-
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let sections = DataManager.shared.fetchedResults.sections else {
-            return 0
-        }
-
-        let sectionInfo = sections[section]
-        return sectionInfo.numberOfObjects
+        return PlayerManager.shared.playlist.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: SongTableViewCell.self), for: indexPath) as! SongTableViewCell
         
-        let model = DataManager.shared.fetchedResults.object(at: indexPath)
+        let model = PlayerManager.shared.playlist[indexPath.row]
 
-        cell.thumbnailImageView.image = model.thumbnailImage
+        if let thumbnailImage = model.thumbnailData {
+            cell.thumbnailImageView.image = UIImage(data: thumbnailImage)
+        }
+        
         cell.artistLabel.text = model.artist
         cell.titleLabel.text = model.title
         
@@ -174,46 +165,15 @@ extension PlayListViewController: UITableViewDataSource {
 // MARK: - TableView Delegate
 extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let song = DataManager.shared.fetchedResults.object(at: indexPath)
+        let song = PlayerManager.shared.playlist[indexPath.row]
 
-        Task {
-            guard let streamUrl = song.streamUrl else { return }
-            playSong(streamUrl: streamUrl)
-            
-            PlayerManager.shared.setCurrentIndex(indexPath.row)
-            setPlayPauseButton()
-        }
+        PlayerManager.shared.setCurrentIndex(indexPath.row)
         
+        let streamUrl = song.streamUrl
+        playSong(streamUrl: streamUrl)
+        
+        setPlayPauseButton()
+    
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
-    }
-}
-
-// MARK: - NSFetchedResultsController Delegate
-extension PlayListViewController: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        playListTableView.beginUpdates()
-    }
-
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-            case .insert:
-                if let insertIndexPath = newIndexPath {
-                    playListTableView.insertRows(at: [insertIndexPath], with: .automatic)
-                }
-            case .delete:
-                if let deleteIndexPath = indexPath {
-                    playListTableView.deleteRows(at: [deleteIndexPath], with: .automatic)
-                }
-            case .move:
-                if let originalIndexPath = indexPath, let targetIndexPath = newIndexPath {
-                    playListTableView.moveRow(at: originalIndexPath, to: targetIndexPath)
-                }
-            default:
-                break
-        }
-    }
-
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        playListTableView.endUpdates()
     }
 }
