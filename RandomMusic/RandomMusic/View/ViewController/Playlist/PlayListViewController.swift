@@ -9,7 +9,10 @@ class PlayListViewController: UIViewController {
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var forButton: UIButton!
-    
+
+    // 의존성 주입
+    private lazy var songService = SongService()
+
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
     let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
     let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
@@ -85,8 +88,8 @@ class PlayListViewController: UIViewController {
     // 랜덤으로 노래 재생
     func fetchPlaySong(totalRows: Int? = nil) {
         Task {
-            let song =  try await NetworkManager.shared.getMusic()
-            
+            let song =  try await songService.getMusic()
+
             let currentPlaylist = PlayerManager.shared.playlist
             let newPlaylist = currentPlaylist + [song]
             let newIndex = currentPlaylist.count

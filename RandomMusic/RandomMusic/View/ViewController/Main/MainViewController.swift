@@ -23,6 +23,11 @@ class MainViewController: UIViewController {
     
     @IBOutlet weak var playlistBackgroundHeightConstraint: NSLayoutConstraint!
 
+
+    // 의존성 주입
+	private lazy var songService = SongService()
+
+
     // 현재 곡의 피드백 상태를 나타내는 변수
     private var currentFeedbackType: FeedbackType = .none
 
@@ -95,7 +100,7 @@ class MainViewController: UIViewController {
     private func fetchRandomSong(shouldPlay: Bool = false) {
         Task {
             do {
-                let song = try await NetworkManager.shared.getMusic()
+                let song = try await songService.getMusic()
                 await MainActor.run {
                     let currentPlaylist = PlayerManager.shared.playlist
                     let newPlaylist = currentPlaylist + [song]

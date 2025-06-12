@@ -4,6 +4,9 @@ import AVFoundation
 final class PlayerManager {
     static let shared = PlayerManager()
 
+    // SongService 의존성주입
+    private lazy var songService = SongService()
+
     private(set) var playlist: [SongModel] = []
     private(set) var currentIndex: Int = 0
     private(set) var isPlaying = false
@@ -72,7 +75,7 @@ final class PlayerManager {
             return
         }
 
-        guard let asset = NetworkManager.shared.createAssetWithHeaders(url: currentSong.streamUrl) else {
+        guard let asset = try? songService.createAssetWithHeaders(url: currentSong.streamUrl) else {
             print("Invalid asset")
             return
         }
@@ -148,7 +151,7 @@ final class PlayerManager {
             return
         }
 
-        guard let asset = NetworkManager.shared.createAssetWithHeaders(url: currentSong.streamUrl) else {
+        guard let asset = try? songService.createAssetWithHeaders(url: currentSong.streamUrl) else {
             print("Invalid asset")
             completion(nil)
             return
