@@ -23,6 +23,11 @@ class MainViewController: UIViewController {
     
     @IBOutlet weak var playlistBackgroundHeightConstraint: NSLayoutConstraint!
 
+
+    // 의존성 주입
+	private lazy var songService = SongService()
+
+
     // 현재 곡의 피드백 상태를 나타내는 변수
     private var currentFeedbackType: FeedbackType = .none
 
@@ -30,7 +35,7 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
 
         setupUI()
-        fetchRandomSong()
+        updateSongUI()
         bindPlayerCallbacks()
         setupTapGestureForPlaylist()
     }
@@ -77,10 +82,6 @@ class MainViewController: UIViewController {
             self?.updateSongUI()
         }
 
-        PlayerManager.shared.onNeedNewSong = { [weak self] in
-            self?.fetchRandomSong(shouldPlay: true)
-        }
-
         PlayerManager.shared.onFeedbackChanged = { [weak self] feedbackType in
             self?.currentFeedbackType = feedbackType
             self?.updateLikeDislikeButtons()
@@ -90,30 +91,6 @@ class MainViewController: UIViewController {
     private func updateProgressUI(seconds: Double) {
         progressSlider.value = Float(seconds)
         currentTimeLabel.text = TimeFormatter.formatTime(seconds)
-    }
-
-    private func fetchRandomSong(shouldPlay: Bool = false) {
-        Task {
-            do {
-                let song = try await NetworkManager.shared.getMusic()
-                await MainActor.run {
-                    let currentPlaylist = PlayerManager.shared.playlist
-                    let newPlaylist = currentPlaylist + [song]
-                    let newIndex = currentPlaylist.count
-
-                    PlayerManager.shared.setPlaylist(newPlaylist)
-                    PlayerManager.shared.setCurrentIndex(newIndex)
-
-                    updateSongUI()
-
-                    if shouldPlay {
-                        PlayerManager.shared.play()
-                    }
-                }
-            } catch {
-                print(error)
-            }
-        }
     }
 
     private func updateSongUI() {
@@ -178,7 +155,9 @@ class MainViewController: UIViewController {
 
     /// 다음 곡 버튼을 탭했을 때 호출됩니다.
     @IBAction func forwardTapped(_ sender: UIButton) {
-        PlayerManager.shared.moveForward()
+        Task {
+            await PlayerManager.shared.moveForward()
+        }
     }
 
     /// 슬라이더를 변경하여 재생 위치를 이동합니다.

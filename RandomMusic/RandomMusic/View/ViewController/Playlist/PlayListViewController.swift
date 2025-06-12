@@ -9,7 +9,10 @@ class PlayListViewController: UIViewController {
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var forButton: UIButton!
 
-    /// 재생, 뒤로, 앞으로 버튼 UI Setting
+    // 의존성 주입
+    private lazy var songService = SongService()
+
+    /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
     let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
     let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
     var playImage: UIImage?
@@ -44,7 +47,6 @@ class PlayListViewController: UIViewController {
     /// 재생/일시정지 버튼
     func playSong(streamUrl: String) {
         PlayerManager.shared.play()
-
         callbackFunc()
     }
 
@@ -66,9 +68,9 @@ class PlayListViewController: UIViewController {
             }
         }
 
-//        PlayerManager.shared.onPlayList = { [weak self] in
-//            self?.playListTableView.reloadData()
-//        }
+        PlayerManager.shared.onPlayList = { [weak self] in
+            self?.playListTableView.reloadData()
+        }
     }
 
     /// 이전곡 버튼 터치
@@ -84,17 +86,10 @@ class PlayListViewController: UIViewController {
     
     /// 다음곡 버튼 터치
     @IBAction func forwardButton(_ sender: Any) {
-//       let section = 0
-//       let totalRows = playListTableView.numberOfRows(inSection: section)
-//       
-//       if totalRows == 0 {
-//           fetchPlaySong()
-//       } else {
-//           PlayerManager.shared.moveForward()
-//           fetchPlaySong(totalRows: totalRows)
-//           callbackFunc()
-//       }
-//        setPlayPauseButton()
+        Task {
+            await PlayerManager.shared.moveForward()
+        }
+        setPlayPauseButton()
     }
 
     deinit {
@@ -125,7 +120,6 @@ extension PlayListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            
             PlayerManager.shared.pause()
             setPlayPauseButton()
         }
@@ -136,14 +130,12 @@ extension PlayListViewController: UITableViewDataSource {
 extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let song = PlayerManager.shared.playlist[indexPath.row]
-
         PlayerManager.shared.setCurrentIndex(indexPath.row)
         
         let streamUrl = song.streamUrl
         playSong(streamUrl: streamUrl)
-        
         setPlayPauseButton()
-    
+
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
     }
 }

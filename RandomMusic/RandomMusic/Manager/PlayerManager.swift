@@ -5,7 +5,14 @@ import AVFoundation
 final class PlayerManager {
     static let shared = PlayerManager()
 
-    private(set) var playlist: [SongModel] = []
+    // SongService 의존성주입
+    private lazy var songService = SongService()
+
+    private(set) var playlist: [SongModel] = [] {
+        didSet {
+            onPlayList?()
+        }
+    }
     private(set) var currentIndex: Int = 0
     private(set) var isPlaying = false
     private(set) var player: AVPlayer?
@@ -32,12 +39,35 @@ final class PlayerManager {
     var onTimeUpdateToPlaylistView: ((Double) -> Void)?
     var onPlayStateChangedToMainView: ((Bool) -> Void)?
     var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
+    var onPlaylistChanged: (([SongModel]) -> Void)?
     var onSongChanged: (() -> Void)? // Main에서만 사용 중
-    var onNeedNewSong: (() -> Void)? // Main에서만 사용 중
     var onFeedbackChanged: ((FeedbackType) -> Void)? // Main에서만 사용 중
     var onRemote: ((SongModel?) -> Void)?
+    var onPlayList: (() -> Void)?
 
-    private init() {}
+    private init() {
+        loadPlaylistFromDB()
+    }
+
+    // MARK: - Database Synchronization
+
+    /// DB 로딩 중임을 나타내는 플래그
+    private var isLoadingFromDB = false
+
+    /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
+    private func loadPlaylistFromDB() {
+        let savedSongs = DataManager.shared.fetchSongData()
+        playlist = savedSongs
+
+        dump(savedSongs)
+
+        print("DB에서 \(savedSongs.count)곡 로드됨")
+
+        // 첫 번째 곡으로 인덱스 설정 (곡이 있는 경우)
+        if !savedSongs.isEmpty {
+            currentIndex = 0
+        }
+    }
 
     // MARK: - Playlist Management
     func setPlaylist(_ value: [SongModel]) {
@@ -46,6 +76,75 @@ final class PlayerManager {
 
     func setCurrentIndex(_ value: Int) {
         currentIndex = value
+    }
+
+    // MARK: - Playlist Operations
+
+    /// 랜덤 곡을 가져와서 플레이리스트에 추가합니다.
+    func addRandomSong() async {
+        do {
+            let song = try await songService.getMusic()
+
+            await MainActor.run {
+                let newIndex = playlist.count
+                addSong(song)
+                setCurrentIndex(newIndex)
+                play()
+            }
+        } catch {
+            print("랜덤 곡 추가 실패: \(error)")
+        }
+    }
+
+    /// 플레이리스트에 새로운 곡을 추가합니다.
+    func addSong(_ song: SongModel) {
+        playlist.append(song)
+        onSongChanged?()
+    }
+
+    /// 플레이리스트에서 곡을 제거합니다.
+    func removeSong(at index: Int) {
+        guard index >= 0 && index < playlist.count else { return }
+
+        // 현재 재생 중인 곡이 삭제되는 경우
+        if index == currentIndex {
+            pause()
+            if playlist.count > 1 {
+                // 다음 곡으로 이동 (마지막 곡이면 이전 곡으로)
+                if index == playlist.count - 1 {
+                    currentIndex = max(0, currentIndex - 1)
+                }
+            } else {
+                currentIndex = 0
+            }
+        } else if index < currentIndex {
+            // 현재 곡보다 앞의 곡이 삭제되면 인덱스 조정
+            currentIndex -= 1
+        }
+
+        DataManager.shared.deleteSongData(to: playlist[index])
+        playlist.remove(at: index)
+
+        if playlist.isEmpty {
+            pause()
+            cleanupPlayer()
+        } else if index == currentIndex {
+            // 현재 곡이 삭제되었으면 새로운 곡을 현재 곡으로 변경
+            onSongChanged?()
+        }
+    }
+
+    /// 플레이리스트를 초기화합니다.
+    func clearPlaylist() {
+        pause()
+        cleanupPlayer()
+
+        for song in playlist {
+            DataManager.shared.deleteSongData(to: song)
+        }
+        playlist.removeAll()
+
+        currentIndex = 0
     }
 
     // MARK: - Feedback Management
@@ -73,7 +172,7 @@ final class PlayerManager {
             return
         }
 
-        guard let asset = NetworkManager.shared.createAssetWithHeaders(url: currentSong.streamUrl) else {
+        guard let asset = try? songService.createAssetWithHeaders(url: currentSong.streamUrl) else {
             print("Invalid asset")
             return
         }
@@ -122,13 +221,13 @@ final class PlayerManager {
         play()
     }
 
-    func moveForward() {
+    func moveForward() async {
         if currentIndex < playlist.count - 1 {
             setCurrentIndex(currentIndex + 1)
             onSongChanged?()
             play()
         } else {
-            onNeedNewSong?()
+        	await addRandomSong()
         }
     }
 
@@ -149,7 +248,7 @@ final class PlayerManager {
             return
         }
 
-        guard let asset = NetworkManager.shared.createAssetWithHeaders(url: currentSong.streamUrl) else {
+        guard let asset = try? songService.createAssetWithHeaders(url: currentSong.streamUrl) else {
             print("Invalid asset")
             completion(nil)
             return
@@ -239,7 +338,9 @@ final class PlayerManager {
             self.player?.play()
         } else {
             self.updatePlayingState(false)
-            self.moveForward()
+            Task {
+                await self.moveForward()
+            }
         }
     }
 

@@ -37,7 +37,9 @@ final class RemoteManager {
         }
 
         commandCenter.nextTrackCommand.addTarget { [weak self] _ in
-            self?.playerManager.moveForward()
+            Task {
+                await self?.playerManager.moveForward()
+            }
             return .success
         }
 
