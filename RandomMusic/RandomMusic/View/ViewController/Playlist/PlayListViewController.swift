@@ -109,7 +109,7 @@ class PlayListViewController: UIViewController {
     
     /// ProgressView Update
     private func updateProgressView() {
-        PlayerManager.shared.onTimeUpdate = { [weak self] seconds in
+        PlayerManager.shared.onTimeUpdateToPlaylistView = { [weak self] seconds in
             guard let self = self, let duration = self.duration, duration > 0 else { return }
             let progress = Float(seconds / duration)
             DispatchQueue.main.async {
@@ -119,7 +119,7 @@ class PlayListViewController: UIViewController {
     }
     
     private func collbakcFunc() {
-        PlayerManager.shared.onPlayStateChanged = { [weak self] isPlaying in
+        PlayerManager.shared.onPlayStateChangedToPlaylistView = { [weak self] isPlaying in
             self?.setPlayPauseButton()
         }
         
@@ -127,6 +127,11 @@ class PlayListViewController: UIViewController {
             self?.duration = seconds
             self?.updateProgressView()
         }
+    }
+
+    deinit {
+        PlayerManager.shared.onTimeUpdateToPlaylistView = nil
+        PlayerManager.shared.onPlayStateChangedToPlaylistView = nil
     }
 }
 

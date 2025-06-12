@@ -27,18 +27,18 @@ final class PlayerManager {
 
     // MARK: - Callbacks
 
-    var onTimeUpdate: ((Double) -> Void)?
-    var onPlaybackFinished: (() -> Void)?
-    var onPlayStateChanged: ((Bool) -> Void)?
-    var onSongChanged: (() -> Void)?
-    var onNeedNewSong: (() -> Void)?
+    var onTimeUpdateToMainView: ((Double) -> Void)?
+    var onTimeUpdateToPlaylistView: ((Double) -> Void)?
+    var onPlayStateChangedToMainView: ((Bool) -> Void)?
+    var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
+    var onSongChanged: (() -> Void)? // Main에서만 사용 중
+    var onNeedNewSong: (() -> Void)? // Main에서만 사용 중
+    var onFeedbackChanged: ((FeedbackType) -> Void)? // Main에서만 사용 중
     var onRemote: ((SongModel?) -> Void)?
-    var onFeedbackChanged: ((FeedbackType) -> Void)?
 
     private init() {}
 
     // MARK: - Playlist Management
-
     func setPlaylist(_ value: [SongModel]) {
         playlist = value
     }
@@ -48,7 +48,6 @@ final class PlayerManager {
     }
 
     // MARK: - Feedback Management
-
     /// 현재 곡의 피드백 상태를 가져옵니다.
     func getCurrentSongFeedback() -> FeedbackType {
         guard let currentSong = currentSong else { return .none }
@@ -245,7 +244,8 @@ final class PlayerManager {
 
     private func updatePlayingState(_ playing: Bool) {
         isPlaying = playing
-        onPlayStateChanged?(playing)
+        onPlayStateChangedToMainView?(playing)
+        onPlayStateChangedToPlaylistView?(playing)
     }
 
     /// 재생 시간 정보를 주기적으로 업데이트합니다.
@@ -254,9 +254,11 @@ final class PlayerManager {
             forInterval: CMTime(seconds: 1, preferredTimescale: 1),
             queue: .main
         ) { [weak self] time in
+            guard let self = self else { return }
             let seconds = CMTimeGetSeconds(time)
-            self?.onTimeUpdate?(seconds)
-            self?.onRemote?(self?.currentSong)
+            onTimeUpdateToMainView?(seconds)
+            onTimeUpdateToPlaylistView?(seconds)
+            onRemote?(currentSong)
         }
     }
 
