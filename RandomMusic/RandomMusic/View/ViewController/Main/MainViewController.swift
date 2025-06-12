@@ -2,6 +2,8 @@ import UIKit
 import AVFoundation
 
 class MainViewController: UIViewController {
+    // MARK: - IBOutlets
+
     @IBOutlet weak var dislikeButton: UIButton!
     @IBOutlet weak var likeButton: UIButton!
     @IBOutlet weak var titleLabel: UILabel!
@@ -20,17 +22,26 @@ class MainViewController: UIViewController {
     @IBOutlet weak var playlistThumbnail: UIImageView!
     @IBOutlet weak var playlistTitleLabel: UILabel!
     @IBOutlet weak var playlistSingerLabel: UILabel!
-    
     @IBOutlet weak var playlistBackgroundHeightConstraint: NSLayoutConstraint!
 
+    // MARK: - Properties
 
-    // 의존성 주입
-	private lazy var songService = SongService()
+    /// 곡 관련 서비스를 제공하는 객체
+    private lazy var songService = SongService()
 
-
-    // 현재 곡의 피드백 상태를 나타내는 변수
+    /// 현재 곡의 피드백 상태 (좋아요/싫어요/없음)
     private var currentFeedbackType: FeedbackType = .none
 
+    /// 사용자가 슬라이더를 드래그 중인지 나타내는 플래그
+    ///
+    /// 이 플래그는 사용자가 슬라이더를 조작하는 동안 자동 시간 업데이트와의 충돌을 방지합니다.
+    private var isSliderDragging = false
+
+    // MARK: - Lifecycle
+
+    /// 뷰가 메모리에 로드된 후 호출됩니다.
+    ///
+	/// 이 메서드에서는 UI 초기화, 콜백 바인딩, 제스처 설정 등의 초기 설정 작업을 수행합니다.
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -40,6 +51,9 @@ class MainViewController: UIViewController {
         setupTapGestureForPlaylist()
     }
 
+    /// 뷰가 나타나기 직전에 호출됩니다.
+    ///
+    /// 재생목록 초기화를 비동기적으로 수행합니다.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
@@ -48,6 +62,9 @@ class MainViewController: UIViewController {
         }
     }
 
+    /// Safe Area Insets가 변경되었을 때 호출됩니다.
+    ///
+    /// 재생목록 영역의 높이를 Safe Area에 맞춰 조정합니다.
     override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
 
@@ -56,29 +73,52 @@ class MainViewController: UIViewController {
         playlistBackgroundHeightConstraint.constant = bottomInset + CGFloat(playlistHeight)
     }
 
-    /// 썸네일과 슬라이더의 초기 UI 상태를 설정합니다.
+    // MARK: - Setup Methods
+
+    /// UI 컴포넌트들의 초기 설정을 수행합니다.
+    ///
+    /// 썸네일 이미지 뷰와 진행률 슬라이더의 초기 상태를 설정합니다.
     private func setupUI() {
+        setupThumbnailImageView()
+        setupSlider()
+    }
+
+    /// 썸네일 이미지 뷰의 스타일을 설정합니다.
+    ///
+    /// 원형 모양으로 만들고 이미지 비율을 맞춰 표시하도록 설정합니다.
+    private func setupThumbnailImageView() {
         thumbnailImageView.layer.cornerRadius = thumbnailImageView.frame.width / 2
         thumbnailImageView.clipsToBounds = true
+        thumbnailImageView.contentMode = .scaleAspectFill
+    }
+
+    /// 진행률 슬라이더의 초기 설정을 수행합니다.
+    ///
+    /// 드래그 시작/종료 이벤트 핸들러를 등록하여 자동 업데이트와의 충돌을 방지합니다.
+    private func setupSlider() {
         progressSlider.value = 0
+
+        // 드래그 시작/종료만 감지
+        progressSlider.addTarget(self, action: #selector(sliderDidBeginDragging), for: .touchDown)
+        progressSlider.addTarget(self, action: #selector(sliderDidEndDragging), for: [.touchUpInside, .touchUpOutside, .touchCancel])
+
+        // 드래그 중 값 변경 감지 (UI 업데이트용)
+        progressSlider.addTarget(self, action: #selector(sliderValueChangedDuringDrag), for: .valueChanged)
     }
 
-    /// 재생/일시정지 버튼의 아이콘을 상태에 따라 갱신합니다.
-    private func updatePlayPauseButton() {
-        let icon = PlayerManager.shared.isPlaying ? "pause.circle.fill" : "play.circle.fill"
-        playPauseButton.setImage(UIImage(systemName: icon), for: .normal)
+    /// 재생목록 영역에 탭 제스처를 설정합니다.
+    ///
+    /// 사용자가 재생목록 영역을 탭하면 재생목록 화면으로 전환됩니다.
+    private func setupTapGestureForPlaylist() {
+        playlistContent.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(playlistTapped))
+        playlistContent.addGestureRecognizer(tapGesture)
     }
 
-    /// 좋아요/싫어요 버튼의 아이콘을 상태에 따라 갱신합니다.
-    private func updateLikeDislikeButtons() {
-        let likeIcon = currentFeedbackType == .like ? "hand.thumbsup.fill" : "hand.thumbsup"
-        let dislikeIcon = currentFeedbackType == .dislike ? "hand.thumbsdown.fill" : "hand.thumbsdown"
-
-        likeButton.setImage(UIImage(systemName: likeIcon), for: .normal)
-        dislikeButton.setImage(UIImage(systemName: dislikeIcon), for: .normal)
-    }
-
-    /// AVPlayer의 시간 업데이트 및 재생 완료 콜백을 바인딩합니다.
+    /// PlayerManager의 콜백 이벤트들을 바인딩합니다.
+    ///
+    /// 시간 업데이트, 재생 상태 변경, 곡 변경, 피드백 변경 이벤트를 처리합니다.
+    /// 모든 UI 업데이트는 메인 스레드에서 실행되도록 보장됩니다.
     private func bindPlayerCallbacks() {
         PlayerManager.shared.onTimeUpdateToMainView = { [weak self] seconds in
             Task { @MainActor in
@@ -106,86 +146,197 @@ class MainViewController: UIViewController {
         }
     }
 
+    // MARK: - UI Update Methods
+
+    /// 재생/일시정지 버튼의 아이콘을 현재 재생 상태에 따라 업데이트합니다.
+    ///
+    /// 재생 중일 때는 일시정지 아이콘을, 일시정지 상태일 때는 재생 아이콘을 표시합니다.
+    private func updatePlayPauseButton() {
+        let icon = PlayerManager.shared.isPlaying ? "pause.circle.fill" : "play.circle.fill"
+        playPauseButton.setImage(UIImage(systemName: icon), for: .normal)
+    }
+
+    /// 좋아요/싫어요 버튼의 아이콘을 현재 피드백 상태에 따라 업데이트합니다.
+    ///
+    /// 활성화된 피드백은 채워진 아이콘으로, 비활성화된 피드백은 빈 아이콘으로 표시됩니다.
+    private func updateLikeDislikeButtons() {
+        let likeIcon = currentFeedbackType == .like ? "hand.thumbsup.fill" : "hand.thumbsup"
+        let dislikeIcon = currentFeedbackType == .dislike ? "hand.thumbsdown.fill" : "hand.thumbsdown"
+
+        likeButton.setImage(UIImage(systemName: likeIcon), for: .normal)
+        dislikeButton.setImage(UIImage(systemName: dislikeIcon), for: .normal)
+    }
+
+    /// 재생 진행률 UI를 업데이트합니다.
+    ///
+    /// 사용자가 슬라이더를 드래그 중일 때는 업데이트를 건너뛰어 충돌을 방지합니다.
+    ///
+    /// - Parameter seconds: 현재 재생 시간 (초 단위)
     private func updateProgressUI(seconds: Double) {
+        guard !isSliderDragging else { return }
+
         progressSlider.value = Float(seconds)
         currentTimeLabel.text = TimeFormatter.formatTime(seconds)
     }
-  
+
+    /// 현재 곡 정보에 따라 전체 UI를 업데이트합니다.
+    ///
+    /// 곡이 없는 경우 로그를 출력하고 함수를 종료합니다.
     private func updateSongUI() {
         guard let currentSong = PlayerManager.shared.currentSong else {
             print("No current song available")
             return
         }
 
-        // 메인 재생 뷰 UI 갱신
-        titleLabel.text = currentSong.title
-        singerLabel.text = currentSong.artist
-        thumbnailImageView.image = currentSong.thumbnailData.flatMap { UIImage(data: $0) }
+        updateMainViewUI(with: currentSong)
+        updatePlaylistViewUI(with: currentSong)
+		updateFeedbackState()
+        loadAndUpdateDuration()
+    }
 
-        // 재생목록 뷰 UI 갱신
-        playlistTitleLabel.text = currentSong.title
-        playlistSingerLabel.text = currentSong.artist
-        playlistThumbnail.image = currentSong.thumbnailData.flatMap { UIImage(data: $0) }
+    /// 메인 재생 화면의 UI를 업데이트합니다.
+    ///
+    /// 곡 제목, 아티스트, 썸네일 이미지를 설정합니다.
+	///
+    /// - Parameter song: 표시할 곡 정보
+    private func updateMainViewUI(with song: SongModel) {
+        titleLabel.text = song.title
+        singerLabel.text = song.artist
 
-        // 현재 곡의 피드백 상태 조회
+        guard let thumbnailData = song.thumbnailData,
+              let image = UIImage(data: thumbnailData) else { return }
+
+        thumbnailImageView.image = image
+    }
+
+    /// 재생목록 영역의 UI를 업데이트합니다.
+    ///
+    /// 곡 제목, 아티스트, 썸네일 이미지를 설정합니다.
+	///
+    /// - Parameter song: 표시할 곡 정보
+    private func updatePlaylistViewUI(with song: SongModel) {
+        playlistTitleLabel.text = song.title
+        playlistSingerLabel.text = song.artist
+
+        guard let thumbnailData = song.thumbnailData,
+              let image = UIImage(data: thumbnailData) else { return }
+
+        playlistThumbnail.image = image
+    }
+
+    /// 현재 곡의 피드백 상태를 업데이트합니다.
+    ///
+    /// PlayerManager에서 현재 곡의 피드백 정보를 가져와 UI에 반영합니다.
+    private func updateFeedbackState() {
         currentFeedbackType = PlayerManager.shared.getCurrentSongFeedback()
         updateLikeDislikeButtons()
+    }
 
+    /// 현재 곡의 총 재생 시간을 로드하고 UI를 업데이트합니다.
+    ///
+    /// 비동기적으로 곡의 길이를 가져와 슬라이더의 최대값과 총 시간 레이블을 설정합니다.
+    private func loadAndUpdateDuration() {
         PlayerManager.shared.loadDuration() { [weak self] seconds in
-            guard let self, let duration = seconds else { return }
+            Task { @MainActor in
+                guard let self, let duration = seconds else { return }
 
-            self.progressSlider.maximumValue = Float(duration)
-            self.totalTimeLabel.text = TimeFormatter.formatTime(duration)
+                self.progressSlider.maximumValue = Float(duration)
+                self.totalTimeLabel.text = TimeFormatter.formatTime(duration)
+            }
         }
     }
 
-    private func setupTapGestureForPlaylist() {
-        playlistContent.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(playlistTapped))
-        playlistContent.addGestureRecognizer(tapGesture)
-    }
+    // MARK: - Action Methods
 
+    /// 재생목록 영역이 탭되었을 때 호출됩니다.
+    ///
+    /// 재생목록 화면을 모달로 표시합니다.
     @objc private func playlistTapped() {
-        if let vc = storyboard?.instantiateViewController(withIdentifier: "PlayListView") {
-            present(vc, animated: true)
+        guard let vc = storyboard?.instantiateViewController(withIdentifier: "PlayListView") else {
+            print("PlayListView를 찾을 수 없습니다.")
+            return
         }
+        present(vc, animated: true)
     }
 
-    /// 좋아요 버튼을 탭했을 때 호출됩니다.
+	/// 슬라이더 드래그가 시작되었을 때 호출됩니다.
+    ///
+    /// 자동 시간 업데이트와의 충돌을 방지하기 위해 플래그를 설정합니다.
+    @objc private func sliderDidBeginDragging() {
+        isSliderDragging = true
+    }
+
+    /// 슬라이더 드래그가 종료되었을 때 호출됩니다.
+    ///
+    /// 최종 위치로 seek하고 자동 시간 업데이트를 재개합니다.
+    @objc private func sliderDidEndDragging() {
+        isSliderDragging = false
+
+        // 드래그 종료 시에만 실제 seek 수행
+        let targetTime = Double(progressSlider.value)
+        PlayerManager.shared.seek(to: targetTime)
+    }
+
+    /// 드래그 중 슬라이더 값이 변경될 때 호출됩니다.
+	///
+    /// 실제 seek는 수행하지 않고 시간 레이블만 업데이트합니다.
+    @objc private func sliderValueChangedDuringDrag() {
+        guard isSliderDragging else { return }
+
+        // 드래그 중에는 시간 레이블만 업데이트 (seek 없음)
+        let targetTime = Double(progressSlider.value)
+        currentTimeLabel.text = TimeFormatter.formatTime(targetTime)
+    }
+
+    /// 좋아요 버튼이 탭되었을 때 호출됩니다.
+    ///
+    /// 현재 곡에 대한 좋아요 피드백을 PlayerManager에 전달합니다.
     @IBAction func likeTapped(_ sender: UIButton) {
         PlayerManager.shared.likeSong()
     }
 
-    /// 싫어요 버튼을 탭했을 때 호출됩니다.
+    /// 싫어요 버튼이 탭되었을 때 호출됩니다.
+    ///
+    /// 현재 곡에 대한 싫어요 피드백을 PlayerManager에 전달합니다.
     @IBAction func dislikeTapped(_ sender: UIButton) {
         PlayerManager.shared.dislikeSong()
     }
 
-    /// 재생/일시정지 버튼을 탭했을 때 호출됩니다.
+    /// 재생/일시정지 버튼이 탭되었을 때 호출됩니다.
+    ///
+    /// 현재 재생 상태를 토글합니다.
     @IBAction func playPauseTapped(_ sender: UIButton) {
         PlayerManager.shared.togglePlayPause()
     }
 
-    /// 이전 곡 버튼을 탭했을 때 호출됩니다.
+    /// 이전 곡 버튼이 탭되었을 때 호출됩니다.
+    ///
+    /// 재생목록에서 이전 곡으로 이동합니다.
     @IBAction func backwardTapped(_ sender: UIButton) {
         PlayerManager.shared.moveBackward()
     }
 
-    /// 다음 곡 버튼을 탭했을 때 호출됩니다.
+    /// 다음 곡 버튼이 탭되었을 때 호출됩니다.
+    ///
+    /// 재생목록에서 다음 곡으로 이동합니다. 비동기적으로 처리됩니다.
     @IBAction func forwardTapped(_ sender: UIButton) {
         Task {
             await PlayerManager.shared.moveForward()
         }
     }
 
-    /// 슬라이더를 변경하여 재생 위치를 이동합니다.
-    @IBAction func sliderValueChanged(_ sender: UISlider) {
-        PlayerManager.shared.seek(to: Double(sender.value))
-    }
-
     /// 반복 버튼을 탭했을 때 반복 모드를 토글합니다.
+    ///
+    /// 반복 재생 모드를 토글하고 버튼 아이콘을 업데이트합니다.
     @IBAction func repeatTapped(_ sender: UIButton) {
         PlayerManager.shared.toggleRepeat()
+        updateRepeatButton()
+    }
+
+    /// 반복 재생 버튼의 아이콘을 현재 설정에 따라 업데이트합니다.
+    ///
+    /// 반복 모드가 활성화되면 채워진 아이콘을, 비활성화되면 빈 아이콘을 표시합니다.
+    private func updateRepeatButton() {
         let icon = PlayerManager.shared.isRepeatEnabled ? "repeat.1.circle.fill" : "repeat.1.circle"
         repeatButton.setImage(UIImage(systemName: icon), for: .normal)
     }
