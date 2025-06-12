@@ -13,17 +13,19 @@ class PlayListViewController: UIViewController {
     let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
     let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
     var playImage: UIImage?
-    var duration: Double?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        playProgressView.progress = 0.0
+    }
+
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         setButtonUI()
         bindPlayerCallbacks()
-        playProgressView.progress = 0
     }
 
     /// 재생, 이전곡, 다음곡 버튼 UI Setting
-    @MainActor
     private func setButtonUI() {
         let backImage = UIImage(systemName: "backward.frame.fill", withConfiguration: backforConfig)
         let forImage = UIImage(systemName: "forward.frame.fill", withConfiguration: backforConfig)
@@ -48,13 +50,11 @@ class PlayListViewController: UIViewController {
             self?.setPlayPauseButton()
         }
 
-        PlayerManager.shared.loadDuration { [weak self] seconds in
-            self?.duration = seconds
-        }
-
         PlayerManager.shared.onTimeUpdateToPlaylistView = { [weak self] seconds in
-            guard let self = self, let duration = self.duration, duration > 0 else { return }
+            guard let self = self else { return }
+            guard let duration = PlayerManager.shared.player?.currentItem?.duration.seconds else { return }
             let progress = Float(seconds / duration)
+            print(progress)
             DispatchQueue.main.async {
                 self.playProgressView.progress = progress
             }

@@ -10,15 +10,13 @@ final class PlayerManager {
     private let preferenceManager = PreferenceManager()
 
     private(set) var playlist: [SongModel] = [] {
-        didSet {
-            onPlayList?()
-        }
+        didSet { onPlayList?() }
     }
     private(set) var currentIndex: Int = 0
     private(set) var isPlaying = false
     private(set) var player: AVPlayer?
     private var timeObserverToken: Any?
-
+    private(set) var playBackTime: Double?
 
     /// 한 곡 반복 재생 여부를 설정합니다.
     var isRepeatEnabled = false
@@ -34,9 +32,10 @@ final class PlayerManager {
     }
 
     // MARK: - Callbacks
-
+    var onTimeUpdateToPlaylistView: ((Double) -> Void)? {
+        didSet { onTimeUpdateToPlaylistView?(playBackTime ?? 0.0) }
+    }
     var onTimeUpdateToMainView: ((Double) -> Void)?
-    var onTimeUpdateToPlaylistView: ((Double) -> Void)?
     var onPlayStateChangedToMainView: ((Bool) -> Void)?
     var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
     var onSongChanged: (() -> Void)? // Main에서만 사용 중
@@ -220,8 +219,11 @@ final class PlayerManager {
         } else {
             await addRandomSong()
         }
-        onSongChanged?()
-        play()
+
+        Task { @MainActor in
+            onSongChanged?()
+            play()
+        }
     }
 
     /// 재생 위치를 지정한 시간으로 이동합니다.
@@ -351,6 +353,7 @@ final class PlayerManager {
         ) { [weak self] time in
             guard let self = self else { return }
             let seconds = CMTimeGetSeconds(time)
+            playBackTime = Double(seconds)
             onTimeUpdateToMainView?(seconds)
             onTimeUpdateToPlaylistView?(seconds)
             onRemote?(currentSong)
