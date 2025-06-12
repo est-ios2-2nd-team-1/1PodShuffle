@@ -72,19 +72,29 @@ class MainViewController: UIViewController {
 
     /// AVPlayer의 시간 업데이트 및 재생 완료 콜백을 바인딩합니다.
     private func bindPlayerCallbacks() {
-        PlayerManager.shared.onTimeUpdateToMainView = updateProgressUI
+        PlayerManager.shared.onTimeUpdateToMainView = { [weak self] seconds in
+            Task { @MainActor in
+                self?.updateProgressUI(seconds: seconds)
+            }
+        }
 
         PlayerManager.shared.onPlayStateChangedToMainView = { [weak self] isPlaying in
-            self?.updatePlayPauseButton()
+            Task { @MainActor in
+                self?.updatePlayPauseButton()
+            }
         }
 
         PlayerManager.shared.onSongChanged = { [weak self] in
-            self?.updateSongUI()
+            Task { @MainActor in
+                self?.updateSongUI()
+            }
         }
 
         PlayerManager.shared.onFeedbackChanged = { [weak self] feedbackType in
-            self?.currentFeedbackType = feedbackType
-            self?.updateLikeDislikeButtons()
+            Task { @MainActor in
+                self?.currentFeedbackType = feedbackType
+                self?.updateLikeDislikeButtons()
+            }
         }
     }
 
@@ -92,7 +102,7 @@ class MainViewController: UIViewController {
         progressSlider.value = Float(seconds)
         currentTimeLabel.text = TimeFormatter.formatTime(seconds)
     }
-
+    
     private func updateSongUI() {
         guard let currentSong = PlayerManager.shared.currentSong else {
             print("No current song available")

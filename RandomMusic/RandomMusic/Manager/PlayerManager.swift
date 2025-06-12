@@ -87,19 +87,13 @@ final class PlayerManager {
 
             await MainActor.run {
                 let newIndex = playlist.count
-                addSong(song)
+                playlist.append(song)
                 setCurrentIndex(newIndex)
                 play()
             }
         } catch {
             print("랜덤 곡 추가 실패: \(error)")
         }
-    }
-
-    /// 플레이리스트에 새로운 곡을 추가합니다.
-    func addSong(_ song: SongModel) {
-        playlist.append(song)
-        onSongChanged?()
     }
 
     /// 플레이리스트에서 곡을 제거합니다.
@@ -228,6 +222,9 @@ final class PlayerManager {
             play()
         } else {
         	await addRandomSong()
+            await MainActor.run {
+                onSongChanged?()
+            }
         }
     }
 
@@ -338,7 +335,7 @@ final class PlayerManager {
             self.player?.play()
         } else {
             self.updatePlayingState(false)
-            Task {
+            Task { @MainActor in
                 await self.moveForward()
             }
         }
