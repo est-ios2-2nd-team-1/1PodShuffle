@@ -29,7 +29,7 @@ struct SongModel {
         self.title = entity.title ?? ""
         self.album = entity.album ?? ""
         self.artist = entity.artist ?? ""
-        self.genre = entity.genre ?? ""
+        self.genre = Genre(rawValue: entity.genre ?? "")
         self.id = Int(entity.id)
         self.streamUrl = entity.streamUrl ?? ""
         self.thumbnailData = entity.thumbnailData
