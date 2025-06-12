@@ -24,11 +24,12 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="1uq-HC-Gcy">
                                         <rect key="frame" x="0.0" y="0.0" width="393" height="714"/>
                                         <subviews>
-                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="KkE-tO-Z9x">
+                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="KkE-tO-Z9x">
                                                 <rect key="frame" x="20" y="0.0" width="353" height="50.666666666666664"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c3c-t7-BjU">
                                                         <rect key="frame" x="0.0" y="0.0" width="49.333333333333336" height="50.666666666666664"/>
+                                                        <color key="tintColor" systemColor="secondaryLabelColor"/>
                                                         <state key="normal" title="Button"/>
                                                         <buttonConfiguration key="configuration" style="plain" image="hand.thumbsdown" catalog="system"/>
                                                         <connections>
@@ -36,16 +37,16 @@
                                                         </connections>
                                                     </button>
                                                     <stackView opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="250" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="I4Y-Df-CdZ">
-                                                        <rect key="frame" x="69.333333333333329" y="0.0" width="214.33333333333337" height="50.666666666666664"/>
+                                                        <rect key="frame" x="59.333333333333329" y="0.0" width="234.33333333333337" height="50.666666666666664"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2ip-Z0-yWx">
-                                                                <rect key="frame" x="0.0" y="0.0" width="214.33333333333334" height="20.333333333333332"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="234.33333333333334" height="20.333333333333332"/>
                                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                                 <nil key="textColor"/>
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Singer" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i0s-Ti-8Zv">
-                                                                <rect key="frame" x="0.0" y="30.333333333333343" width="214.33333333333334" height="20.333333333333329"/>
+                                                                <rect key="frame" x="0.0" y="30.333333333333343" width="234.33333333333334" height="20.333333333333329"/>
                                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                                 <nil key="textColor"/>
                                                                 <nil key="highlightedColor"/>
@@ -54,6 +55,7 @@
                                                     </stackView>
                                                     <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" horizontalCompressionResistancePriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9BL-K8-pry">
                                                         <rect key="frame" x="303.66666666666669" y="0.0" width="49.333333333333314" height="50.666666666666664"/>
+                                                        <color key="tintColor" systemColor="secondaryLabelColor"/>
                                                         <state key="normal" title="Button"/>
                                                         <buttonConfiguration key="configuration" style="plain" image="hand.thumbsup" catalog="system"/>
                                                         <connections>
@@ -63,13 +65,13 @@
                                                 </subviews>
                                             </stackView>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zyz-oi-m8T">
-                                                <rect key="frame" x="60" y="93.333333333333343" width="273" height="273"/>
+                                                <rect key="frame" x="60" y="83" width="273" height="273"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="zyz-oi-m8T" secondAttribute="height" multiplier="1:1" id="mbS-4V-ZHA"/>
                                                 </constraints>
                                             </imageView>
                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="uqY-cv-jzx">
-                                                <rect key="frame" x="20" y="408.66666666666663" width="353" height="30"/>
+                                                <rect key="frame" x="20" y="388.33333333333337" width="353" height="30"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalCompressionResistancePriority="1000" text="00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yTE-gk-zc6">
                                                         <rect key="frame" x="0.0" y="0.0" width="46" height="30"/>
@@ -79,6 +81,7 @@
                                                     </label>
                                                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="8fY-R8-EKh">
                                                         <rect key="frame" x="54" y="0.0" width="245" height="31"/>
+                                                        <color key="tintColor" name="MainColor"/>
                                                     </slider>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalCompressionResistancePriority="1000" text="00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fEQ-TE-RTd">
                                                         <rect key="frame" x="307" y="0.0" width="46" height="30"/>
@@ -88,45 +91,60 @@
                                                     </label>
                                                 </subviews>
                                             </stackView>
-                                            <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="idR-k5-etR">
-                                                <rect key="frame" x="20" y="481.33333333333337" width="353" height="34.333333333333371"/>
+                                            <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="idR-k5-etR">
+                                                <rect key="frame" x="20" y="450.66666666666663" width="353" height="75"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IGc-Tg-0S2">
-                                                        <rect key="frame" x="0.0" y="0.0" width="49.666666666666664" height="34.333333333333336"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="54.333333333333336" height="75"/>
+                                                        <color key="tintColor" systemColor="secondaryLabelColor"/>
                                                         <state key="normal" title="Button"/>
-                                                        <buttonConfiguration key="configuration" style="plain" image="repeat.1.circle" catalog="system"/>
+                                                        <buttonConfiguration key="configuration" style="plain" image="repeat.1.circle" catalog="system">
+                                                            <preferredSymbolConfiguration key="preferredSymbolConfigurationForImage" configurationType="pointSize" pointSize="20"/>
+                                                        </buttonConfiguration>
                                                         <connections>
                                                             <action selector="repeatTapped:" destination="oUJ-Ad-HvN" eventType="touchUpInside" id="dAb-pB-OSP"/>
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yxe-Hu-wav">
-                                                        <rect key="frame" x="74.666666666666671" y="0.0" width="52" height="34.333333333333336"/>
+                                                        <rect key="frame" x="62.333333333333329" y="0.0" width="57" height="75"/>
+                                                        <color key="tintColor" systemColor="secondaryLabelColor"/>
                                                         <state key="normal" title="Button"/>
-                                                        <buttonConfiguration key="configuration" style="plain" image="backward.frame.fill" catalog="system" title=""/>
+                                                        <buttonConfiguration key="configuration" style="plain" image="backward.frame.fill" catalog="system" title="">
+                                                            <preferredSymbolConfiguration key="preferredSymbolConfigurationForImage" configurationType="pointSize" pointSize="20"/>
+                                                        </buttonConfiguration>
                                                         <connections>
                                                             <action selector="backwardTapped:" destination="oUJ-Ad-HvN" eventType="touchUpInside" id="ZWy-qN-G96"/>
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kfD-3U-Pv5">
-                                                        <rect key="frame" x="151.66666666666666" y="0.0" width="49.666666666666657" height="34.333333333333336"/>
+                                                        <rect key="frame" x="127" y="0.0" width="99" height="75"/>
+                                                        <color key="tintColor" name="MainColor"/>
                                                         <state key="normal" title="Button"/>
-                                                        <buttonConfiguration key="configuration" style="plain" image="play.circle.fill" catalog="system"/>
+                                                        <buttonConfiguration key="configuration" style="plain" image="play.circle.fill" catalog="system">
+                                                            <preferredSymbolConfiguration key="preferredSymbolConfigurationForImage" configurationType="pointSize" pointSize="50"/>
+                                                        </buttonConfiguration>
                                                         <connections>
                                                             <action selector="playPauseTapped:" destination="oUJ-Ad-HvN" eventType="touchUpInside" id="Y50-qB-lV5"/>
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WTT-0Q-gbM">
-                                                        <rect key="frame" x="226.33333333333334" y="0.0" width="52.000000000000028" height="34.333333333333336"/>
+                                                        <rect key="frame" x="234" y="0.0" width="57" height="75"/>
+                                                        <color key="tintColor" systemColor="secondaryLabelColor"/>
                                                         <state key="normal" title="Button"/>
-                                                        <buttonConfiguration key="configuration" style="plain" image="forward.frame.fill" catalog="system"/>
+                                                        <buttonConfiguration key="configuration" style="plain" image="forward.frame.fill" catalog="system">
+                                                            <preferredSymbolConfiguration key="preferredSymbolConfigurationForImage" configurationType="pointSize" pointSize="20"/>
+                                                        </buttonConfiguration>
                                                         <connections>
                                                             <action selector="forwardTapped:" destination="oUJ-Ad-HvN" eventType="touchUpInside" id="ecc-bd-prP"/>
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YDU-yv-gk2">
-                                                        <rect key="frame" x="303.33333333333331" y="0.0" width="49.666666666666686" height="34.333333333333336"/>
+                                                        <rect key="frame" x="298.66666666666669" y="0.0" width="54.333333333333314" height="75"/>
+                                                        <color key="tintColor" systemColor="secondaryLabelColor"/>
                                                         <state key="normal" title="Button"/>
-                                                        <buttonConfiguration key="configuration" style="plain" image="speedometer" catalog="system"/>
+                                                        <buttonConfiguration key="configuration" style="plain" image="speedometer" catalog="system">
+                                                            <preferredSymbolConfiguration key="preferredSymbolConfigurationForImage" configurationType="pointSize" pointSize="20"/>
+                                                        </buttonConfiguration>
                                                         <connections>
                                                             <action selector="speedTapped:" destination="oUJ-Ad-HvN" eventType="touchUpInside" id="eTa-fw-2sC"/>
                                                             <segue destination="8wS-cc-rHn" kind="presentation" id="1Hl-QS-Y5D"/>
