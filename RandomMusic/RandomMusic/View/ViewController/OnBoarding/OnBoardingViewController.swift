@@ -78,9 +78,24 @@ extension OnBoardingViewController: UICollectionViewDataSource {
 extension OnBoardingViewController: UICollectionViewDelegate {
 }
 
+
 extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (collectionView.bounds.width - 40) / 3
+        let isPad = UIDevice.current.userInterfaceIdiom == .pad
+        let isLandscape = view.frame.width > view.frame.height
+
+        let numberOfColumns: CGFloat = {
+            if isPad {
+                return isLandscape ? 5 : 4
+            } else {
+                return 3
+            }
+        }()
+
+        let spacing: CGFloat = 10
+        let totalSpacing = spacing * (numberOfColumns + 1)
+
+        let width = (collectionView.bounds.width - totalSpacing) / numberOfColumns
         let height = width + 20
         return CGSize(width: width, height: height)
     }
