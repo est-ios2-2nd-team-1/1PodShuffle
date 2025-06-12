@@ -49,23 +49,23 @@ final class PlayerManager {
         loadPlaylistFromDB()
     }
 
-    // MARK: - Database Synchronization
-
-    /// DB 로딩 중임을 나타내는 플래그
-    private var isLoadingFromDB = false
-
     /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
     private func loadPlaylistFromDB() {
         let savedSongs = DataManager.shared.fetchSongData()
         playlist = savedSongs
-
-        dump(savedSongs)
-
         print("DB에서 \(savedSongs.count)곡 로드됨")
 
-        // 첫 번째 곡으로 인덱스 설정 (곡이 있는 경우)
         if !savedSongs.isEmpty {
-            currentIndex = 0
+          currentIndex = 0
+      	}
+    }
+
+    /// 플레이리스트 초기화를 완료합니다. UI가 준비된 후 호출해야 합니다.
+    func initializePlaylistIfNeeded() async {
+        if playlist.isEmpty {
+            print("플레이리스트가 비어있어서 랜덤곡을 추가합니다.")
+            await addRandomSong()
+            onSongChanged?()
         }
     }
 
@@ -87,9 +87,9 @@ final class PlayerManager {
 
             await MainActor.run {
                 let newIndex = playlist.count
+                DataManager.shared.insertSongData(from: song)
                 playlist.append(song)
                 setCurrentIndex(newIndex)
-                play()
             }
         } catch {
             print("랜덤 곡 추가 실패: \(error)")
@@ -218,14 +218,11 @@ final class PlayerManager {
     func moveForward() async {
         if currentIndex < playlist.count - 1 {
             setCurrentIndex(currentIndex + 1)
-            onSongChanged?()
-            play()
         } else {
-        	await addRandomSong()
-            await MainActor.run {
-                onSongChanged?()
-            }
+            await addRandomSong()
         }
+        onSongChanged?()
+        play()
     }
 
     /// 재생 위치를 지정한 시간으로 이동합니다.

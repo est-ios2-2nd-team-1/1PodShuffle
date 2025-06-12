@@ -40,6 +40,14 @@ class MainViewController: UIViewController {
         setupTapGestureForPlaylist()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        Task {
+            await PlayerManager.shared.initializePlaylistIfNeeded()
+        }
+    }
+
     override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
 
@@ -102,7 +110,7 @@ class MainViewController: UIViewController {
         progressSlider.value = Float(seconds)
         currentTimeLabel.text = TimeFormatter.formatTime(seconds)
     }
-    
+  
     private func updateSongUI() {
         guard let currentSong = PlayerManager.shared.currentSong else {
             print("No current song available")
