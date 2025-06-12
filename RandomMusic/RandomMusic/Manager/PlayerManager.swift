@@ -10,6 +10,8 @@ final class PlayerManager {
     private(set) var player: AVPlayer?
     private var timeObserverToken: Any?
 
+    private let preferenceManager = PreferenceManager()
+
     /// 한 곡 반복 재생 여부를 설정합니다.
     var isRepeatEnabled = false
 
@@ -31,6 +33,7 @@ final class PlayerManager {
     var onSongChanged: (() -> Void)?
     var onNeedNewSong: (() -> Void)?
     var onRemote: ((SongModel?) -> Void)?
+    var onFeedbackChanged: ((FeedbackType) -> Void)?
 
     private init() {}
 
@@ -42,6 +45,24 @@ final class PlayerManager {
 
     func setCurrentIndex(_ value: Int) {
         currentIndex = value
+    }
+
+    // MARK: - Feedback Management
+
+    /// 현재 곡의 피드백 상태를 가져옵니다.
+    func getCurrentSongFeedback() -> FeedbackType {
+        guard let currentSong = currentSong else { return .none }
+        return preferenceManager.getUserFeedback(for: currentSong.id)
+    }
+
+    /// 좋아요 처리
+    func likeSong() {
+        handleFeedback(isLike: true)
+    }
+
+    /// 싫어요 처리
+    func dislikeSong() {
+        handleFeedback(isLike: false)
     }
 
     // MARK: - Playback Controls
@@ -152,6 +173,35 @@ final class PlayerManager {
     }
 
     // MARK: - Private Methods
+
+    /// 피드백 처리 (좋아요/싫어요/취소)
+    private func handleFeedback(isLike: Bool) {
+        guard let currentSong = currentSong else {
+            print("현재 재생 중인 곡이 없습니다.")
+            return
+        }
+
+        let currentFeedback = getCurrentSongFeedback()
+        let targetFeedback: FeedbackType = isLike ? .like : .dislike
+
+        let newFeedback: FeedbackType
+
+        // 이미 같은 피드백이 있는 경우 -> 취소
+        if currentFeedback == targetFeedback {
+            if preferenceManager.cancelFeedback(for: currentSong.id) {
+                newFeedback = .none
+            } else {
+                newFeedback = currentFeedback
+            }
+        } else {
+            // 새로운 피드백 등록 또는 변경
+            preferenceManager.recordAction(genre: currentSong.genre, songId: currentSong.id, isLike: isLike)
+            newFeedback = targetFeedback
+        }
+
+        // UI 업데이트를 위한 콜백 호출
+        onFeedbackChanged?(newFeedback)
+    }
 
     private func setupPlayer(with asset: AVURLAsset) {
         cleanupPlayer()

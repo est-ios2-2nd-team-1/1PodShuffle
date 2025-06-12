@@ -23,8 +23,8 @@ class MainViewController: UIViewController {
     
     @IBOutlet weak var playlistBackgroundHeightConstraint: NSLayoutConstraint!
 
-    var isDisliked = false
-    var isLiked = false
+    // 현재 곡의 피드백 상태를 나타내는 변수
+    private var currentFeedbackType: FeedbackType = .none
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,8 +58,8 @@ class MainViewController: UIViewController {
 
     /// 좋아요/싫어요 버튼의 아이콘을 상태에 따라 갱신합니다.
     private func updateLikeDislikeButtons() {
-        let likeIcon = isLiked ? "hand.thumbsup.fill" : "hand.thumbsup"
-        let dislikeIcon = isDisliked ? "hand.thumbsdown.fill" : "hand.thumbsdown"
+        let likeIcon = currentFeedbackType == .like ? "hand.thumbsup.fill" : "hand.thumbsup"
+        let dislikeIcon = currentFeedbackType == .dislike ? "hand.thumbsdown.fill" : "hand.thumbsdown"
 
         likeButton.setImage(UIImage(systemName: likeIcon), for: .normal)
         dislikeButton.setImage(UIImage(systemName: dislikeIcon), for: .normal)
@@ -79,6 +79,11 @@ class MainViewController: UIViewController {
 
         PlayerManager.shared.onNeedNewSong = { [weak self] in
             self?.fetchRandomSong(shouldPlay: true)
+        }
+
+        PlayerManager.shared.onFeedbackChanged = { [weak self] feedbackType in
+            self?.currentFeedbackType = feedbackType
+            self?.updateLikeDislikeButtons()
         }
     }
 
@@ -127,6 +132,10 @@ class MainViewController: UIViewController {
         playlistSingerLabel.text = currentSong.artist
         playlistThumbnail.image = currentSong.thumbnailData.flatMap { UIImage(data: $0) }
 
+        // 현재 곡의 피드백 상태 조회
+        currentFeedbackType = PlayerManager.shared.getCurrentSongFeedback()
+        updateLikeDislikeButtons()
+
         PlayerManager.shared.loadDuration() { [weak self] seconds in
             guard let self, let duration = seconds else { return }
 
@@ -149,25 +158,12 @@ class MainViewController: UIViewController {
 
     /// 좋아요 버튼을 탭했을 때 호출됩니다.
     @IBAction func likeTapped(_ sender: UIButton) {
-        toggleLikeDislike(like: true)
+        PlayerManager.shared.likeSong()
     }
 
     /// 싫어요 버튼을 탭했을 때 호출됩니다.
     @IBAction func dislikeTapped(_ sender: UIButton) {
-        toggleLikeDislike(like: false)
-    }
-
-    /// 좋아요/싫어요 상태를 전환하고 버튼을 갱신합니다.
-    /// - Parameter like: true이면 좋아요, false이면 싫어요 처리입니다.
-    private func toggleLikeDislike(like: Bool) {
-        if like {
-            isLiked.toggle()
-            if isLiked { isDisliked = false }
-        } else {
-            isDisliked.toggle()
-            if isDisliked { isLiked = false }
-        }
-        updateLikeDislikeButtons()
+        PlayerManager.shared.dislikeSong()
     }
 
     /// 재생/일시정지 버튼을 탭했을 때 호출됩니다.
