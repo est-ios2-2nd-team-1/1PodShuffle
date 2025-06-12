@@ -14,8 +14,8 @@ class SongService {
 
     // 의존성 주입하는 방법을 사용했습니다.
     let networkService: NetworkService
-    init(networkService: NetworkService) {
-        self.networkService = networkService
+    init(networkService: NetworkService = NetworkService()) {
+        self.networkService = NetworkService()
     }
 
     /// 장르별 랜덤곡을 요청
@@ -92,7 +92,7 @@ class SongService {
     /// - Parameter id: 곡 id
     /// - Returns: api 응답형식. SongModel 로 변환 후 사용해야함
     private func fetchMusicById(id: Int) async throws -> SongResponse {
-        var endpoint = "/api/music/\(id)"
+        let endpoint = "/api/music/\(id)"
 
         return try await networkService.fetch(endpoint: endpoint)
     }
