@@ -4,21 +4,11 @@ class SettingViewController: UIViewController {
 
     private let preferenceManager = PreferenceManager()
 
-    private let resetButton = UIButton(type: .system)
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
     }
 
-    private func setupUI() {
-
-        resetButton.setTitle("추천 알고리즘 초기화ㅏ", for: .normal)
-        resetButton.backgroundColor = UIColor.systemBackground
-    }
-
-
-    @objc private func resetButtonTapped() {
+    @IBAction func resetButtonTapped(_ sender: UIButton) {
         let alert = UIAlertController(
             title: "추천 알고리즘 초기화",
             message: "데이터가 모두 삭제됩니다. 계속하시겠습니까?",
@@ -34,6 +24,11 @@ class SettingViewController: UIViewController {
 
     }
 
+    @IBAction func backButtonTapped(_ sender: UIButton) {
+        navigationController?.popViewController(animated: true)
+    }
+
 }
+
 
 
