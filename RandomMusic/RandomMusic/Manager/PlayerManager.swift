@@ -176,7 +176,7 @@ final class PlayerManager {
 
     /// 피드백 처리 (좋아요/싫어요/취소)
     private func handleFeedback(isLike: Bool) {
-        guard let currentSong = currentSong else {
+        guard let currentSong else {
             print("현재 재생 중인 곡이 없습니다.")
             return
         }
