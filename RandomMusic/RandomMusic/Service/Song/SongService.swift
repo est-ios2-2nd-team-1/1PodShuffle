@@ -12,11 +12,8 @@ import AVFoundation
 /// Song 관련 비지니스로직
 class SongService {
 
-    // 의존성 주입하는 방법을 사용했습니다.
-    let networkService: NetworkService
-    init(networkService: NetworkService = NetworkService()) {
-        self.networkService = NetworkService()
-    }
+    // 참조 객체 생성
+    let networkService = NetworkService()
 
     /// 장르별 랜덤곡을 요청
     /// - Warning: 파라미터를 넣지 않으면 선호도에 기반해서 자동으로 랜덤장르를 요청함. 특수한 상황이 아니라면 파라미터 넣지 말고 쓰세요

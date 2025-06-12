@@ -4,8 +4,9 @@ import AVFoundation
 final class PlayerManager {
     static let shared = PlayerManager()
 
-    // SongService 의존성주입
-    private lazy var songService = SongService()
+    // 참조 객체 생성
+    private let songService = SongService()
+    private let preferenceManager = PreferenceManager()
 
     private(set) var playlist: [SongModel] = []
     private(set) var currentIndex: Int = 0
@@ -13,7 +14,6 @@ final class PlayerManager {
     private(set) var player: AVPlayer?
     private var timeObserverToken: Any?
 
-    private let preferenceManager = PreferenceManager()
 
     /// 한 곡 반복 재생 여부를 설정합니다.
     var isRepeatEnabled = false
