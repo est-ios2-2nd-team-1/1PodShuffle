@@ -35,11 +35,35 @@ final class PlayerManager {
     var onPlayStateChangedToMainView: ((Bool) -> Void)?
     var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
     var onSongChanged: (() -> Void)? // Main에서만 사용 중
-    var onNeedNewSong: (() -> Void)? // Main에서만 사용 중
     var onFeedbackChanged: ((FeedbackType) -> Void)? // Main에서만 사용 중
     var onRemote: ((SongModel?) -> Void)?
 
-    private init() {}
+    private init() {
+        loadPlaylistFromDB()
+    }
+
+    // MARK: - Database Synchronization
+
+    /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
+    private func loadPlaylistFromDB() {
+        let savedSongs = DataManager.shared.fetchSongData()
+        playlist = savedSongs
+
+        print("DB에서 \(savedSongs.count)곡 로드됨")
+
+        if !savedSongs.isEmpty {
+          currentIndex = 0
+      	}
+    }
+
+    /// 플레이리스트 초기화를 완료합니다. UI가 준비된 후 호출해야 합니다.
+    func initializePlaylistIfNeeded() async {
+        if playlist.isEmpty {
+            print("플레이리스트가 비어있어서 랜덤곡을 추가합니다.")
+            await addRandomSong()
+            onSongChanged?()
+        }
+    }
 
     // MARK: - Playlist Management
     func setPlaylist(_ value: [SongModel]) {
@@ -48,6 +72,69 @@ final class PlayerManager {
 
     func setCurrentIndex(_ value: Int) {
         currentIndex = value
+    }
+
+    // MARK: - Playlist Operations
+
+    /// 랜덤 곡을 가져와서 플레이리스트에 추가합니다.
+    func addRandomSong() async {
+        do {
+            let song = try await songService.getMusic()
+
+            await MainActor.run {
+                let newIndex = playlist.count
+                DataManager.shared.insertSongData(from: song)
+                playlist.append(song)
+                setCurrentIndex(newIndex)
+            }
+        } catch {
+            print("랜덤 곡 추가 실패: \(error)")
+        }
+    }
+
+    /// 플레이리스트에서 곡을 제거합니다.
+    func removeSong(at index: Int) {
+        guard index >= 0 && index < playlist.count else { return }
+
+        // 현재 재생 중인 곡이 삭제되는 경우
+        if index == currentIndex {
+            pause()
+            if playlist.count > 1 {
+                // 다음 곡으로 이동 (마지막 곡이면 이전 곡으로)
+                if index == playlist.count - 1 {
+                    currentIndex = max(0, currentIndex - 1)
+                }
+            } else {
+                currentIndex = 0
+            }
+        } else if index < currentIndex {
+            // 현재 곡보다 앞의 곡이 삭제되면 인덱스 조정
+            currentIndex -= 1
+        }
+
+        DataManager.shared.deleteSongData(to: playlist[index])
+        playlist.remove(at: index)
+
+        if playlist.isEmpty {
+            pause()
+            cleanupPlayer()
+        } else if index == currentIndex {
+            // 현재 곡이 삭제되었으면 새로운 곡을 현재 곡으로 변경
+            onSongChanged?()
+        }
+    }
+
+    /// 플레이리스트를 초기화합니다.
+    func clearPlaylist() {
+        pause()
+        cleanupPlayer()
+
+        for song in playlist {
+            DataManager.shared.deleteSongData(to: song)
+        }
+        playlist.removeAll()
+
+        currentIndex = 0
     }
 
     // MARK: - Feedback Management
@@ -124,14 +211,14 @@ final class PlayerManager {
         play()
     }
 
-    func moveForward() {
+    func moveForward() async {
         if currentIndex < playlist.count - 1 {
             setCurrentIndex(currentIndex + 1)
-            onSongChanged?()
-            play()
         } else {
-            onNeedNewSong?()
+            await addRandomSong()
         }
+        onSongChanged?()
+        play()
     }
 
     /// 재생 위치를 지정한 시간으로 이동합니다.
@@ -241,7 +328,9 @@ final class PlayerManager {
             self.player?.play()
         } else {
             self.updatePlayingState(false)
-            self.moveForward()
+            Task { @MainActor in
+                await self.moveForward()
+            }
         }
     }
 

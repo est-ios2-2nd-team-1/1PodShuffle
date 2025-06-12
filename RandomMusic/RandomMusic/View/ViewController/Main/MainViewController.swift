@@ -35,9 +35,17 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
 
         setupUI()
-        fetchRandomSong()
+        updateSongUI()
         bindPlayerCallbacks()
         setupTapGestureForPlaylist()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        Task {
+            await PlayerManager.shared.initializePlaylistIfNeeded()
+        }
     }
 
     override func viewSafeAreaInsetsDidChange() {
@@ -72,53 +80,35 @@ class MainViewController: UIViewController {
 
     /// AVPlayer의 시간 업데이트 및 재생 완료 콜백을 바인딩합니다.
     private func bindPlayerCallbacks() {
-        PlayerManager.shared.onTimeUpdateToMainView = updateProgressUI
+        PlayerManager.shared.onTimeUpdateToMainView = { [weak self] seconds in
+            Task { @MainActor in
+                self?.updateProgressUI(seconds: seconds)
+            }
+        }
 
         PlayerManager.shared.onPlayStateChangedToMainView = { [weak self] isPlaying in
-            self?.updatePlayPauseButton()
+            Task { @MainActor in
+                self?.updatePlayPauseButton()
+            }
         }
 
         PlayerManager.shared.onSongChanged = { [weak self] in
-            self?.updateSongUI()
-        }
-
-        PlayerManager.shared.onNeedNewSong = { [weak self] in
-            self?.fetchRandomSong(shouldPlay: true)
+            Task { @MainActor in
+                self?.updateSongUI()
+            }
         }
 
         PlayerManager.shared.onFeedbackChanged = { [weak self] feedbackType in
-            self?.currentFeedbackType = feedbackType
-            self?.updateLikeDislikeButtons()
+            Task { @MainActor in
+                self?.currentFeedbackType = feedbackType
+                self?.updateLikeDislikeButtons()
+            }
         }
     }
 
     private func updateProgressUI(seconds: Double) {
         progressSlider.value = Float(seconds)
         currentTimeLabel.text = TimeFormatter.formatTime(seconds)
-    }
-
-    private func fetchRandomSong(shouldPlay: Bool = false) {
-        Task {
-            do {
-                let song = try await songService.getMusic()
-                await MainActor.run {
-                    let currentPlaylist = PlayerManager.shared.playlist
-                    let newPlaylist = currentPlaylist + [song]
-                    let newIndex = currentPlaylist.count
-
-                    PlayerManager.shared.setPlaylist(newPlaylist)
-                    PlayerManager.shared.setCurrentIndex(newIndex)
-
-                    updateSongUI()
-
-                    if shouldPlay {
-                        PlayerManager.shared.play()
-                    }
-                }
-            } catch {
-                print(error)
-            }
-        }
     }
 
     private func updateSongUI() {
@@ -183,7 +173,9 @@ class MainViewController: UIViewController {
 
     /// 다음 곡 버튼을 탭했을 때 호출됩니다.
     @IBAction func forwardTapped(_ sender: UIButton) {
-        PlayerManager.shared.moveForward()
+        Task {
+            await PlayerManager.shared.moveForward()
+        }
     }
 
     /// 슬라이더를 변경하여 재생 위치를 이동합니다.
