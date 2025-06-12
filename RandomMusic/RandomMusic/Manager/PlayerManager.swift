@@ -1,6 +1,7 @@
 import AVFoundation
 
 /// AVPlayer 기반의 오디오 재생을 관리하는 클래스입니다.
+///
 final class PlayerManager {
     static let shared = PlayerManager()
 
