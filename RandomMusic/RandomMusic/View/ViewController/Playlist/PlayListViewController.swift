@@ -11,7 +11,7 @@ class PlayListViewController: UIViewController {
     @IBOutlet weak var forButton: UIButton!
     
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
-    let playConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .regular, scale: .large)
+    let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
     let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
     
     var playImage: UIImage?
@@ -26,7 +26,7 @@ class PlayListViewController: UIViewController {
         
         playProgressView.progress = 0
         updateProgressView()
-        collbakcFunc()
+        callbackFunc()
     }
     
     /// 이전곡 버튼 터치
@@ -50,7 +50,7 @@ class PlayListViewController: UIViewController {
        } else {
            PlayerManager.shared.moveForward()
            //fetchPlaySong(totalRows: totalRows)
-           collbakcFunc()
+           callbackFunc()
        }
         setPlayPauseButton()
     }
@@ -79,7 +79,7 @@ class PlayListViewController: UIViewController {
     func playSong(streamUrl: String) {
         PlayerManager.shared.play()
         
-        collbakcFunc()
+        callbackFunc()
     }
     
     // 랜덤으로 노래 재생
@@ -100,9 +100,6 @@ class PlayListViewController: UIViewController {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                 self?.playListTableView.refreshControl?.endRefreshing()
                 
-                guard let row = totalRows else { return }
-                let indexPath = IndexPath(row: 0, section: 0)
-                self?.playListTableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
             }
         }
     }
@@ -118,7 +115,7 @@ class PlayListViewController: UIViewController {
         }
     }
     
-    private func collbakcFunc() {
+    private func callbackFunc() {
         PlayerManager.shared.onPlayStateChangedToPlaylistView = { [weak self] isPlaying in
             self?.setPlayPauseButton()
         }
@@ -127,6 +124,10 @@ class PlayListViewController: UIViewController {
             self?.duration = seconds
             self?.updateProgressView()
         }
+        
+        //PlayerManager.shared.onPlayList = { [weak self] in
+        //    self?.playListTableView.reloadData()
+        //}
     }
 
     deinit {
@@ -145,6 +146,10 @@ extension PlayListViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: SongTableViewCell.self), for: indexPath) as! SongTableViewCell
         
         let model = PlayerManager.shared.playlist[indexPath.row]
+
+        if let thumbnailImage = model.thumbnailData {
+            cell.thumbnailImageView.image = UIImage(data: thumbnailImage)
+        }
         cell.artistLabel.text = model.artist
         cell.titleLabel.text = model.title
         
@@ -165,13 +170,13 @@ extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let song = PlayerManager.shared.playlist[indexPath.row]
 
-        Task {
-            playSong(streamUrl: song.streamUrl)
-            
-            PlayerManager.shared.setCurrentIndex(indexPath.row)
-            setPlayPauseButton()
-        }
+        PlayerManager.shared.setCurrentIndex(indexPath.row)
         
+        let streamUrl = song.streamUrl
+        playSong(streamUrl: streamUrl)
+        
+        setPlayPauseButton()
+    
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
     }
 }
