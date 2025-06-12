@@ -1,13 +1,18 @@
 import AVFoundation
 
 /// AVPlayer 기반의 오디오 재생을 관리하는 클래스입니다.
+///
 final class PlayerManager {
     static let shared = PlayerManager()
 
     // SongService 의존성주입
     private lazy var songService = SongService()
 
-    private(set) var playlist: [SongModel] = []
+    private(set) var playlist: [SongModel] = [] {
+        didSet {
+            onPlayList?()
+        }
+    }
     private(set) var currentIndex: Int = 0
     private(set) var isPlaying = false
     private(set) var player: AVPlayer?
@@ -34,21 +39,20 @@ final class PlayerManager {
     var onTimeUpdateToPlaylistView: ((Double) -> Void)?
     var onPlayStateChangedToMainView: ((Bool) -> Void)?
     var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
+    var onPlaylistChanged: (([SongModel]) -> Void)?
     var onSongChanged: (() -> Void)? // Main에서만 사용 중
     var onFeedbackChanged: ((FeedbackType) -> Void)? // Main에서만 사용 중
     var onRemote: ((SongModel?) -> Void)?
+    var onPlayList: (() -> Void)?
 
     private init() {
         loadPlaylistFromDB()
     }
 
-    // MARK: - Database Synchronization
-
     /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
     private func loadPlaylistFromDB() {
         let savedSongs = DataManager.shared.fetchSongData()
         playlist = savedSongs
-
         print("DB에서 \(savedSongs.count)곡 로드됨")
 
         if !savedSongs.isEmpty {

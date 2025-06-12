@@ -5,33 +5,66 @@ import AVKit
 class PlayListViewController: UIViewController {
     @IBOutlet weak var playListTableView: UITableView!
     @IBOutlet weak var playProgressView: UIProgressView!
-    
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var forButton: UIButton!
 
-    // 의존성 주입
-    private lazy var songService = SongService()
-
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
     let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
     let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
-    
     var playImage: UIImage?
-    
     var duration: Double?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        /// 재생, 뒤로, 앞으로 버튼 UI Setting
         setButtonUI()
-        
+        bindPlayerCallbacks()
         playProgressView.progress = 0
-        updateProgressView()
-        callbackFunc()
     }
-    
+
+    /// 재생, 이전곡, 다음곡 버튼 UI Setting
+    @MainActor
+    private func setButtonUI() {
+        let backImage = UIImage(systemName: "backward.frame.fill", withConfiguration: backforConfig)
+        let forImage = UIImage(systemName: "forward.frame.fill", withConfiguration: backforConfig)
+
+        backButton.setImage(backImage, for: .normal)
+        forButton.setImage(forImage, for: .normal)
+
+        setPlayPauseButton()
+    }
+
+    /// 재생/일시정지 버튼 UI
+    private func setPlayPauseButton() {
+        playImage = PlayerManager.shared.isPlaying ?
+                        UIImage(systemName: "pause.circle", withConfiguration: playConfig) :
+                        UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
+        playButton.setImage(playImage, for: .normal)
+    }
+
+    /// 바인딩 메소드
+    private func bindPlayerCallbacks() {
+        PlayerManager.shared.onPlayStateChangedToPlaylistView = { [weak self] isPlaying in
+            self?.setPlayPauseButton()
+        }
+
+        PlayerManager.shared.loadDuration { [weak self] seconds in
+            self?.duration = seconds
+        }
+
+        PlayerManager.shared.onTimeUpdateToPlaylistView = { [weak self] seconds in
+            guard let self = self, let duration = self.duration, duration > 0 else { return }
+            let progress = Float(seconds / duration)
+            DispatchQueue.main.async {
+                self.playProgressView.progress = progress
+            }
+        }
+
+        PlayerManager.shared.onPlayList = { [weak self] in
+            self?.playListTableView.reloadData()
+        }
+    }
+
     /// 이전곡 버튼 터치
     @IBAction func backwardButton(_ sender: Any) {
         PlayerManager.shared.moveBackward()
@@ -45,95 +78,8 @@ class PlayListViewController: UIViewController {
     
     /// 다음곡 버튼 터치
     @IBAction func forwardButton(_ sender: Any) {
-       let section = 0
-       let totalRows = playListTableView.numberOfRows(inSection: section)
-       
-       if totalRows == 0 {
-           fetchPlaySong()
-       } else {
-           Task {
-               await PlayerManager.shared.moveForward()
-               await MainActor.run {
-                   callbackFunc()
-               }
-           }
-       }
+        Task { await PlayerManager.shared.moveForward() }
         setPlayPauseButton()
-    }
-    
-    /// 재생/일시정지 버튼 UI
-    //func setPlayPauseButton(isPlay: Bool) {
-    func setPlayPauseButton() {
-        playImage = PlayerManager.shared.isPlaying ?
-                        UIImage(systemName: "pause.circle", withConfiguration: playConfig) :
-                        UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
-        playButton.setImage(playImage, for: .normal)
-    }
-    
-    /// 재생, 이전곡, 다음곡 버튼 UI Setting
-    func setButtonUI() {
-        let backImage = UIImage(systemName: "backward.frame.fill", withConfiguration: backforConfig)
-        let forImage = UIImage(systemName: "forward.frame.fill", withConfiguration: backforConfig)
-        
-        backButton.setImage(backImage, for: .normal)
-        forButton.setImage(forImage, for: .normal)
-        
-        setPlayPauseButton()
-    }
-    
-    /// 재생/일시정지 버튼
-    func playSong(streamUrl: String) {
-        PlayerManager.shared.play()
-        
-        callbackFunc()
-    }
-    
-    // 랜덤으로 노래 재생
-    func fetchPlaySong(totalRows: Int? = nil) {
-        Task {
-            let song =  try await songService.getMusic()
-
-            let currentPlaylist = PlayerManager.shared.playlist
-            let newPlaylist = currentPlaylist + [song]
-            let newIndex = currentPlaylist.count
-
-            PlayerManager.shared.setPlaylist(newPlaylist)
-            PlayerManager.shared.setCurrentIndex(newIndex)
-            
-            /// 음악 play
-            playSong(streamUrl: song.streamUrl)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                self?.playListTableView.refreshControl?.endRefreshing()
-                
-            }
-        }
-    }
-    
-    /// ProgressView Update
-    private func updateProgressView() {
-        PlayerManager.shared.onTimeUpdateToPlaylistView = { [weak self] seconds in
-            guard let self = self, let duration = self.duration, duration > 0 else { return }
-            let progress = Float(seconds / duration)
-            DispatchQueue.main.async {
-                self.playProgressView.progress = progress
-            }
-        }
-    }
-    
-    private func callbackFunc() {
-        PlayerManager.shared.onPlayStateChangedToPlaylistView = { [weak self] isPlaying in
-            self?.setPlayPauseButton()
-        }
-        
-        PlayerManager.shared.loadDuration { [weak self] seconds in
-            self?.duration = seconds
-            self?.updateProgressView()
-        }
-        
-        //PlayerManager.shared.onPlayList = { [weak self] in
-        //    self?.playListTableView.reloadData()
-        //}
     }
 
     deinit {
@@ -150,23 +96,15 @@ extension PlayListViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: SongTableViewCell.self), for: indexPath) as! SongTableViewCell
-        
         let model = PlayerManager.shared.playlist[indexPath.row]
+        cell.setUI(model: model)
 
-        if let thumbnailImage = model.thumbnailData {
-            cell.thumbnailImageView.image = UIImage(data: thumbnailImage)
-        }
-        cell.artistLabel.text = model.artist
-        cell.titleLabel.text = model.title
-        
         return cell
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            
-            PlayerManager.shared.pause()
-            setPlayPauseButton()
+            // Delete시에 작업
         }
     }
 }
@@ -174,15 +112,7 @@ extension PlayListViewController: UITableViewDataSource {
 // MARK: - TableView Delegate
 extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let song = PlayerManager.shared.playlist[indexPath.row]
-
         PlayerManager.shared.setCurrentIndex(indexPath.row)
-        
-        let streamUrl = song.streamUrl
-        playSong(streamUrl: streamUrl)
-        
-        setPlayPauseButton()
-    
-        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+        PlayerManager.shared.play()
     }
 }

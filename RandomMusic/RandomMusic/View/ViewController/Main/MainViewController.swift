@@ -110,7 +110,7 @@ class MainViewController: UIViewController {
         progressSlider.value = Float(seconds)
         currentTimeLabel.text = TimeFormatter.formatTime(seconds)
     }
-
+  
     private func updateSongUI() {
         guard let currentSong = PlayerManager.shared.currentSong else {
             print("No current song available")
