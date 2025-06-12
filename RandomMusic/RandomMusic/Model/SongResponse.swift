@@ -6,7 +6,7 @@ struct SongResponse: Codable {
     let title: String
     let album: String
     let artist: String
-    let genre: String
+    let genre: Genre.RawValue
     let id: Int
     let streamUrl: String
     let thumbnail: Int
