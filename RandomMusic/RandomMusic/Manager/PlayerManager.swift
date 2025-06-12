@@ -45,9 +45,6 @@ final class PlayerManager {
 
     // MARK: - Database Synchronization
 
-    /// DB 로딩 중임을 나타내는 플래그
-    private var isLoadingFromDB = false
-
     /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
     private func loadPlaylistFromDB() {
         let savedSongs = DataManager.shared.fetchSongData()
