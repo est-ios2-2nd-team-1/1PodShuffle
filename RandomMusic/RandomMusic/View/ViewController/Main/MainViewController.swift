@@ -35,7 +35,7 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
 
         setupUI()
-        fetchRandomSong()
+        updateSongUI()
         bindPlayerCallbacks()
         setupTapGestureForPlaylist()
     }
@@ -82,10 +82,6 @@ class MainViewController: UIViewController {
             self?.updateSongUI()
         }
 
-        PlayerManager.shared.onNeedNewSong = { [weak self] in
-            self?.fetchRandomSong(shouldPlay: true)
-        }
-
         PlayerManager.shared.onFeedbackChanged = { [weak self] feedbackType in
             self?.currentFeedbackType = feedbackType
             self?.updateLikeDislikeButtons()
@@ -95,30 +91,6 @@ class MainViewController: UIViewController {
     private func updateProgressUI(seconds: Double) {
         progressSlider.value = Float(seconds)
         currentTimeLabel.text = TimeFormatter.formatTime(seconds)
-    }
-
-    private func fetchRandomSong(shouldPlay: Bool = false) {
-        Task {
-            do {
-                let song = try await songService.getMusic()
-                await MainActor.run {
-                    let currentPlaylist = PlayerManager.shared.playlist
-                    let newPlaylist = currentPlaylist + [song]
-                    let newIndex = currentPlaylist.count
-
-                    PlayerManager.shared.setPlaylist(newPlaylist)
-                    PlayerManager.shared.setCurrentIndex(newIndex)
-
-                    updateSongUI()
-
-                    if shouldPlay {
-                        PlayerManager.shared.play()
-                    }
-                }
-            } catch {
-                print(error)
-            }
-        }
     }
 
     private func updateSongUI() {

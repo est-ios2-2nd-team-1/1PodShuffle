@@ -51,9 +51,12 @@ class PlayListViewController: UIViewController {
        if totalRows == 0 {
            fetchPlaySong()
        } else {
-           PlayerManager.shared.moveForward()
-           //fetchPlaySong(totalRows: totalRows)
-           callbackFunc()
+           Task {
+               await PlayerManager.shared.moveForward()
+               await MainActor.run {
+                   callbackFunc()
+               }
+           }
        }
         setPlayPauseButton()
     }
