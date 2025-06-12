@@ -7,7 +7,7 @@ enum Genre: String, CaseIterable, Codable {
     case classic = "Classic"
     case rnb = "RnB"
     case hiphop = "Hiphop"
-    case unknown = "Unknown"
+//    case unknown = "Pop"
 
     init(rawValue: String) {
         switch rawValue {
@@ -17,7 +17,7 @@ enum Genre: String, CaseIterable, Codable {
         case "Classic": self = .classic
         case "RnB": self = .rnb
         case "Hiphop": self = .hiphop
-        default: self = .unknown
+        default: self = .pop
         }
     }
 }
