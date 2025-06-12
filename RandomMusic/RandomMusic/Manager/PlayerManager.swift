@@ -74,6 +74,7 @@ final class PlayerManager {
 
     func setCurrentIndex(_ value: Int) {
         currentIndex = value
+        onSongChanged?()
     }
 
     // MARK: - Playlist Operations

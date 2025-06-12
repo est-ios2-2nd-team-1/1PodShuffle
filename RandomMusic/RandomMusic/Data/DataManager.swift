@@ -26,7 +26,7 @@ final class DataManager {
     /// - Returns: 음악 데이터를 날짜순으로 반환합니다.
     func fetchSongData() -> [SongModel] {
         let request = Song.fetchRequest()
-        let sortedByDateDesc = NSSortDescriptor(key: "insertDate", ascending: false)
+        let sortedByDateDesc = NSSortDescriptor(key: "insertDate", ascending: true)
         request.sortDescriptors = [sortedByDateDesc]
 
         do {
