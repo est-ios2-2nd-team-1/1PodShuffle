@@ -46,7 +46,7 @@ final class DataManager {
         newSong.title = song.title
         newSong.album = song.album
         newSong.artist = song.artist
-        newSong.genre = song.genre
+        newSong.genre = song.genre.rawValue
         newSong.id = Int64(song.id)
         newSong.streamUrl = song.streamUrl
         newSong.insertDate = .now
