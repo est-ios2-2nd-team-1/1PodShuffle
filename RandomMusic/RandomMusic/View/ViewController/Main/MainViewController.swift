@@ -67,9 +67,9 @@ class MainViewController: UIViewController {
 
     /// AVPlayer의 시간 업데이트 및 재생 완료 콜백을 바인딩합니다.
     private func bindPlayerCallbacks() {
-        PlayerManager.shared.onTimeUpdate = updateProgressUI
+        PlayerManager.shared.onTimeUpdateToMainView = updateProgressUI
 
-        PlayerManager.shared.onPlayStateChanged = { [weak self] isPlaying in
+        PlayerManager.shared.onPlayStateChangedToMainView = { [weak self] isPlaying in
             self?.updatePlayPauseButton()
         }
 
