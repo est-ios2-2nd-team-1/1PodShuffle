@@ -106,7 +106,7 @@ class PlayListViewController: UIViewController {
     
     /// ProgressView Update
     private func updateProgressView() {
-        PlayerManager.shared.onTimeUpdate = { [weak self] seconds in
+        PlayerManager.shared.onTimeUpdateToPlaylistView = { [weak self] seconds in
             guard let self = self, let duration = self.duration, duration > 0 else { return }
             let progress = Float(seconds / duration)
             DispatchQueue.main.async {
@@ -116,7 +116,7 @@ class PlayListViewController: UIViewController {
     }
     
     private func callbackFunc() {
-        PlayerManager.shared.onPlayStateChanged = { [weak self] isPlaying in
+        PlayerManager.shared.onPlayStateChangedToPlaylistView = { [weak self] isPlaying in
             self?.setPlayPauseButton()
         }
         
@@ -128,6 +128,11 @@ class PlayListViewController: UIViewController {
         //PlayerManager.shared.onPlayList = { [weak self] in
         //    self?.playListTableView.reloadData()
         //}
+    }
+
+    deinit {
+        PlayerManager.shared.onTimeUpdateToPlaylistView = nil
+        PlayerManager.shared.onPlayStateChangedToPlaylistView = nil
     }
 }
 
@@ -145,7 +150,6 @@ extension PlayListViewController: UITableViewDataSource {
         if let thumbnailImage = model.thumbnailData {
             cell.thumbnailImageView.image = UIImage(data: thumbnailImage)
         }
-        
         cell.artistLabel.text = model.artist
         cell.titleLabel.text = model.title
         
@@ -154,7 +158,6 @@ extension PlayListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            DataManager.shared.deleteSongData(at: indexPath)
             
             PlayerManager.shared.pause()
             setPlayPauseButton()
