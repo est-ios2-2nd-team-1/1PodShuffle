@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// 네트워크 관련 기능 '민' 담당한다.
+/// 네트워크 관련 기능 '만' 담당한다.
 class NetworkService {
     private let baseURL = "https://drfranken.net:8091"
     private let name = Bundle.main.object(forInfoDictionaryKey: "NAME") as? String ?? ""
