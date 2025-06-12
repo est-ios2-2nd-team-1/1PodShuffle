@@ -36,6 +36,21 @@ class PreferenceManager {
         saveContext()
     }
 
+
+    /// 모든 선호도 데이터를 완전히 초기화(삭제)합니다.
+    func resetAllPreferences() {
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = PreferenceData.fetchRequest()
+        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        do {
+            try context.execute(batchDeleteRequest)
+            print("모든 선호도 데이터 삭제완료")
+            saveContext()
+        } catch {
+            print("선호도 데이터 초기화 실패: \(error)")
+        }
+    }
+
+
     /// 좋아요/싫어요 누를 때 DB에 저장하는 함수
     /// - Parameters:
     ///   - genre: 곡의 장르
