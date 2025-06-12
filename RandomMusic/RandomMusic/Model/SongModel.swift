@@ -21,4 +21,17 @@ struct SongModel {
         self.streamUrl = response.streamUrl
         self.thumbnailData = thumbnailData
     }
+
+    
+    /// 코어데이터 Song 엔티티를 SongModel 객체로 변환합니다.
+    /// - Parameter entity: Song Entity를 받습니다.
+    init(from entity: Song) {
+        self.title = entity.title ?? ""
+        self.album = entity.album ?? ""
+        self.artist = entity.artist ?? ""
+        self.genre = entity.genre ?? ""
+        self.id = Int(entity.id)
+        self.streamUrl = entity.streamUrl ?? ""
+        self.thumbnailData = entity.thumbnailData
+    }
 }

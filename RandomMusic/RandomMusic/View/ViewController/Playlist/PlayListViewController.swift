@@ -27,10 +27,6 @@ class PlayListViewController: UIViewController {
         playProgressView.progress = 0
         updateProgressView()
         collbakcFunc()
-        
-        /// NSFetchedResultsControllerDelegate Delegate
-        DataManager.shared.fetchedResults.delegate = self
-        
     }
     
     /// 이전곡 버튼 터치
@@ -136,25 +132,14 @@ class PlayListViewController: UIViewController {
 
 // MARK: - TabelView DataSource
 extension PlayListViewController: UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return DataManager.shared.fetchedResults.sections?.count ?? 0
-    }
-
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let sections = DataManager.shared.fetchedResults.sections else {
-            return 0
-        }
-
-        let sectionInfo = sections[section]
-        return sectionInfo.numberOfObjects
+        return PlayerManager.shared.playlist.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: SongTableViewCell.self), for: indexPath) as! SongTableViewCell
         
-        let model = DataManager.shared.fetchedResults.object(at: indexPath)
-
-        cell.thumbnailImageView.image = model.thumbnailImage
+        let model = PlayerManager.shared.playlist[indexPath.row]
         cell.artistLabel.text = model.artist
         cell.titleLabel.text = model.title
         
@@ -163,7 +148,6 @@ extension PlayListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            DataManager.shared.deleteSongData(at: indexPath)
             
             PlayerManager.shared.pause()
             setPlayPauseButton()
@@ -174,46 +158,15 @@ extension PlayListViewController: UITableViewDataSource {
 // MARK: - TableView Delegate
 extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let song = DataManager.shared.fetchedResults.object(at: indexPath)
+        let song = PlayerManager.shared.playlist[indexPath.row]
 
         Task {
-            guard let streamUrl = song.streamUrl else { return }
-            playSong(streamUrl: streamUrl)
+            playSong(streamUrl: song.streamUrl)
             
             PlayerManager.shared.setCurrentIndex(indexPath.row)
             setPlayPauseButton()
         }
         
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
-    }
-}
-
-// MARK: - NSFetchedResultsController Delegate
-extension PlayListViewController: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        playListTableView.beginUpdates()
-    }
-
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-            case .insert:
-                if let insertIndexPath = newIndexPath {
-                    playListTableView.insertRows(at: [insertIndexPath], with: .automatic)
-                }
-            case .delete:
-                if let deleteIndexPath = indexPath {
-                    playListTableView.deleteRows(at: [deleteIndexPath], with: .automatic)
-                }
-            case .move:
-                if let originalIndexPath = indexPath, let targetIndexPath = newIndexPath {
-                    playListTableView.moveRow(at: originalIndexPath, to: targetIndexPath)
-                }
-            default:
-                break
-        }
-    }
-
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        playListTableView.endUpdates()
     }
 }

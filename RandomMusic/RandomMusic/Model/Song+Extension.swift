@@ -1,13 +1,13 @@
 import UIKit
 
 extension Song {
-    var thumbnailImage: UIImage? {
+    var thumbnailData: Data? {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let url = documentsDirectory.appendingPathComponent(self.thumbnail ?? "")
-        if let data = try? Data(contentsOf: url) {
-            return UIImage(data: data)
-        }
+        return try? Data(contentsOf: url)
+    }
 
-        return nil
+    func toModel() -> SongModel {
+        SongModel(from: self)
     }
 }
