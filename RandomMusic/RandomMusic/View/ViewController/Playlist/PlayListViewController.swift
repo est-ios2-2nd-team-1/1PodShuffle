@@ -9,9 +9,6 @@ class PlayListViewController: UIViewController {
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var forButton: UIButton!
 
-    // 의존성 주입
-    private lazy var songService = SongService()
-
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
     let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
     let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
@@ -21,19 +18,12 @@ class PlayListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setButtonUI()
-        callbackFunc()
+        bindPlayerCallbacks()
         playProgressView.progress = 0
     }
 
-    /// 재생/일시정지 버튼 UI
-    private func setPlayPauseButton() {
-        playImage = PlayerManager.shared.isPlaying ?
-                        UIImage(systemName: "pause.circle", withConfiguration: playConfig) :
-                        UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
-        playButton.setImage(playImage, for: .normal)
-    }
-
     /// 재생, 이전곡, 다음곡 버튼 UI Setting
+    @MainActor
     private func setButtonUI() {
         let backImage = UIImage(systemName: "backward.frame.fill", withConfiguration: backforConfig)
         let forImage = UIImage(systemName: "forward.frame.fill", withConfiguration: backforConfig)
@@ -44,14 +34,16 @@ class PlayListViewController: UIViewController {
         setPlayPauseButton()
     }
 
-    /// 재생/일시정지 버튼
-    func playSong(streamUrl: String) {
-        PlayerManager.shared.play()
-        callbackFunc()
+    /// 재생/일시정지 버튼 UI
+    private func setPlayPauseButton() {
+        playImage = PlayerManager.shared.isPlaying ?
+                        UIImage(systemName: "pause.circle", withConfiguration: playConfig) :
+                        UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
+        playButton.setImage(playImage, for: .normal)
     }
 
-    /// ProgressView Update
-    private func callbackFunc() {
+    /// 바인딩 메소드
+    private func bindPlayerCallbacks() {
         PlayerManager.shared.onPlayStateChangedToPlaylistView = { [weak self] isPlaying in
             self?.setPlayPauseButton()
         }
@@ -86,9 +78,7 @@ class PlayListViewController: UIViewController {
     
     /// 다음곡 버튼 터치
     @IBAction func forwardButton(_ sender: Any) {
-        Task {
-            await PlayerManager.shared.moveForward()
-        }
+        Task { await PlayerManager.shared.moveForward() }
         setPlayPauseButton()
     }
 
@@ -106,22 +96,15 @@ extension PlayListViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: SongTableViewCell.self), for: indexPath) as! SongTableViewCell
-        
         let model = PlayerManager.shared.playlist[indexPath.row]
+        cell.setUI(model: model)
 
-        if let thumbnailImage = model.thumbnailData {
-            cell.thumbnailImageView.image = UIImage(data: thumbnailImage)
-        }
-        cell.artistLabel.text = model.artist
-        cell.titleLabel.text = model.title
-        
         return cell
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            PlayerManager.shared.pause()
-            setPlayPauseButton()
+            // Delete시에 작업
         }
     }
 }
@@ -129,13 +112,7 @@ extension PlayListViewController: UITableViewDataSource {
 // MARK: - TableView Delegate
 extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let song = PlayerManager.shared.playlist[indexPath.row]
         PlayerManager.shared.setCurrentIndex(indexPath.row)
-        
-        let streamUrl = song.streamUrl
-        playSong(streamUrl: streamUrl)
-        setPlayPauseButton()
-
-        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+        PlayerManager.shared.play()
     }
 }
