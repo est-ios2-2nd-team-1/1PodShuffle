@@ -1,13 +1,12 @@
 import Foundation
 
-
 /// 앱 내부 사용 모델
 /// thumbnail의 실제 이미지 데이터가 있음
 struct SongModel {
     let title: String
     let album: String
     let artist: String
-    let genre: String
+    let genre: Genre
     let id: Int
     let streamUrl: String
     let thumbnailData: Data?
@@ -17,7 +16,7 @@ struct SongModel {
         self.title = response.title
         self.album = response.album
         self.artist = response.artist
-        self.genre = response.genre
+        self.genre = Genre(rawValue: response.genre)
         self.id = response.id
         self.streamUrl = response.streamUrl
         self.thumbnailData = thumbnailData

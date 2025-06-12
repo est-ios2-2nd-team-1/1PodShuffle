@@ -1,9 +1,4 @@
-//
-//  SongResponse.swift
-//  RandomMusic
-//
-//  Created by drfranken on 6/9/25.
-//
+import Foundation
 
 /// 서버 응답 모델
 /// thumbnail 의 실제 이미지 데이터는 없음
