@@ -15,13 +15,13 @@
         <attribute name="songId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="Song" representedClassName="Song" syncable="YES" codeGenerationType="class">
-        <attribute name="album" attributeType="String"/>
-        <attribute name="artist" attributeType="String"/>
-        <attribute name="genre" attributeType="String"/>
+        <attribute name="album" attributeType="String" defaultValueString="&quot;&quot;"/>
+        <attribute name="artist" attributeType="String" defaultValueString="&quot;&quot;"/>
+        <attribute name="genre" attributeType="String" defaultValueString="&quot;&quot;"/>
         <attribute name="id" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="insertDate" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="streamUrl" attributeType="String"/>
+        <attribute name="streamUrl" optional="YES" attributeType="String"/>
         <attribute name="thumbnail" optional="YES" attributeType="String"/>
-        <attribute name="title" attributeType="String"/>
+        <attribute name="title" attributeType="String" defaultValueString="&quot;&quot;"/>
     </entity>
 </model>

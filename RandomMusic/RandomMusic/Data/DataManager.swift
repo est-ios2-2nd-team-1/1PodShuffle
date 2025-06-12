@@ -6,9 +6,8 @@ final class DataManager {
 
     let mainContext: NSManagedObjectContext
     let persistentContainer: NSPersistentContainer
-    let fetchedResults: NSFetchedResultsController<Song>
 
-    /// 코어 데이터 초기화 및 데이터를 가져옵니다.
+    /// 초기화 및 Context를 생성합니다.
     private init() {
         let container = NSPersistentContainer(name: "RandomMusic")
 
@@ -20,26 +19,28 @@ final class DataManager {
 
         persistentContainer = container
         mainContext = container.viewContext
-
+    }
+    
+    /// 음악 데이터를 모두 가져옵니다.
+    /// (PlayerManager로부터 호출받습니다.)
+    /// - Returns: 음악 데이터를 날짜순으로 반환합니다.
+    func fetchSongData() -> [SongModel] {
         let request = Song.fetchRequest()
-        let sortedByDate = NSSortDescriptor(keyPath: \Song.insertDate, ascending: false)
-        request.sortDescriptors = [sortedByDate]
-
-        fetchedResults = NSFetchedResultsController(
-            fetchRequest: request,
-            managedObjectContext: mainContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
+        let sortedByDateDesc = NSSortDescriptor(key: "insertDate", ascending: false)
+        request.sortDescriptors = [sortedByDateDesc]
 
         do {
-            try fetchedResults.performFetch()
+            let songList = try mainContext.fetch(request)
+            return songList.map { $0.toModel() }
         } catch {
             print(error)
         }
+
+        return []
     }
-    
+
     /// 음악 데이터를 영구적으로 저장합니다.
+    /// (PlayerManager로부터 호출받습니다.)
     /// - Parameter song: 저장할 음악 데이터를 받습니다.
     func insertSongData(from song: SongModel) {
         let newSong = Song(context: mainContext)
@@ -58,15 +59,23 @@ final class DataManager {
         saveContext()
     }
 
-    // TODO: 오버로딩이 필요할 수도 있음. (다른 파라미터를 받는 Delete 메소드)
     /// 음악 데이터를 영구적으로 삭제합니다.
+    /// (PlaylistView로부터 호출받습니다.)
     /// - Parameter indexPath: 삭제할 음악 데이터의 IndexPath를 받습니다.
-    func deleteSongData(at indexPath: IndexPath) {
-        let deletedSong = fetchedResults.object(at: indexPath)
+    func deleteSongData(to song: SongModel) {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
+        fetchRequest.predicate = NSPredicate(format: "id == %ld", song.id)
+        fetchRequest.fetchLimit = 1
 
-        deleteImageFile(fileName: deletedSong.thumbnail)
-        mainContext.delete(deletedSong)
-        saveContext()
+        do {
+            if let results = try mainContext.fetch(fetchRequest) as? [NSManagedObject], let deletedSong = results.first {
+                deleteImageFile(fileName: String(song.id) + ".jpg")
+                mainContext.delete(deletedSong)
+                saveContext()
+            }
+        } catch {
+            print(error)
+        }
     }
 
     /// Context에서 변경된 데이터를 영구적으로 저장합니다.
