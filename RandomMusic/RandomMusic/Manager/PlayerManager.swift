@@ -46,6 +46,15 @@ final class PlayerManager {
         loadPlaylistFromDB()
     }
 
+    /// 플레이리스트 초기화를 완료합니다. UI가 준비된 후 호출해야 합니다.
+    func initializePlaylistIfNeeded() async {
+        if playlist.isEmpty {
+            print("플레이리스트가 비어있어서 랜덤곡을 추가합니다.")
+            await addRandomSong()
+            onSongChanged?()
+        }
+    }
+
     // MARK: - Playback Controls
     func play() {
         guard let currentSong = currentSong else {
@@ -104,23 +113,6 @@ final class PlayerManager {
         player?.seek(to: time)
     }
 
-    /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
-    private func loadPlaylistFromDB() {
-        let savedSongs = DataManager.shared.fetchSongData()
-        playlist = savedSongs
-        currentIndex = UserDefaults.standard.integer(forKey: "heardLastSong")
-    }
-
-    /// 플레이리스트 초기화를 완료합니다. UI가 준비된 후 호출해야 합니다.
-    func initializePlaylistIfNeeded() async {
-        if playlist.isEmpty {
-            print("플레이리스트가 비어있어서 랜덤곡을 추가합니다.")
-            await addRandomSong()
-            onSongChanged?()
-        }
-    }
-
-    // MARK: - Playlist Management
     func setPlaylist(_ value: [SongModel]) {
         playlist = value
     }
@@ -129,8 +121,6 @@ final class PlayerManager {
         currentIndex = max(0, value)
         onSongChanged?()
     }
-
-    // MARK: - Playlist Operations
 
     /// 랜덤 곡을 가져와서 플레이리스트에 추가합니다.
     func addRandomSong() async {
@@ -214,7 +204,7 @@ final class PlayerManager {
     func dislikeSong() {
         handleFeedback(isLike: false)
     }
-    
+
     /// 노래의 전체 시간을 반환합니다.
     /// - Parameter completion: Completion 콜백 메소드입니다. 원하시는 작업을 입력해주세요.
     func loadDuration(completion: @escaping (Double?) -> Void) {
@@ -255,6 +245,13 @@ final class PlayerManager {
 
 // MARK: - Private Methods
 private extension PlayerManager {
+    /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
+    private func loadPlaylistFromDB() {
+        let savedSongs = DataManager.shared.fetchSongData()
+        playlist = savedSongs
+        currentIndex = UserDefaults.standard.integer(forKey: "heardLastSong")
+    }
+
     /// 피드백 처리 (좋아요/싫어요/취소)
     func handleFeedback(isLike: Bool) {
         guard let currentSong else {
