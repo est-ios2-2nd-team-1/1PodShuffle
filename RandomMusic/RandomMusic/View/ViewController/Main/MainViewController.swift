@@ -32,6 +32,9 @@ class MainViewController: UIViewController {
     /// 곡 관련 서비스를 제공하는 객체
     private lazy var songService = SongService()
 
+    /// Throttle 객체
+    private let throttle = Throttle()
+
     /// 현재 곡의 피드백 상태 (좋아요/싫어요/없음)
     private var currentFeedbackType: FeedbackType = .none
 
@@ -361,15 +364,17 @@ class MainViewController: UIViewController {
     ///
     /// 재생목록에서 이전 곡으로 이동합니다.
     @IBAction func backwardTapped(_ sender: UIButton) {
-        PlayerManager.shared.moveBackward()
+        throttle.run {
+            PlayerManager.shared.moveBackward()
+        }
     }
 
     /// 다음 곡 버튼이 탭되었을 때 호출됩니다.
     ///
     /// 재생목록에서 다음 곡으로 이동합니다. 비동기적으로 처리됩니다.
     @IBAction func forwardTapped(_ sender: UIButton) {
-        Task {
-            await PlayerManager.shared.moveForward()
+        throttle.run {
+            Task { await PlayerManager.shared.moveForward() }
         }
     }
 
