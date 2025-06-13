@@ -5,9 +5,8 @@ import AVFoundation
 final class PlayerManager {
     static let shared = PlayerManager()
 
-    // 참조 객체 생성
-    private let songService = SongService()
-    private let preferenceManager = PreferenceManager()
+    private let songService: SongService
+    private let preferenceManager: PreferenceManager
 
     private(set) var playlist: [SongModel] = [] {
         didSet { onPlayList?() }
@@ -43,7 +42,9 @@ final class PlayerManager {
     var onRemote: ((SongModel?) -> Void)?
     var onPlayList: (() -> Void)?
 
-    private init() {
+    private init(songService: SongService = SongService(), preferenceManager: PreferenceManager = PreferenceManager()) {
+        self.songService = songService
+        self.preferenceManager = preferenceManager
         loadPlaylistFromDB()
     }
 
@@ -51,11 +52,7 @@ final class PlayerManager {
     private func loadPlaylistFromDB() {
         let savedSongs = DataManager.shared.fetchSongData()
         playlist = savedSongs
-        print("DB에서 \(savedSongs.count)곡 로드됨")
-
-        if !savedSongs.isEmpty {
-          currentIndex = 0
-      	}
+        currentIndex = UserDefaults.standard.integer(forKey: "heardLastSong")
     }
 
     /// 플레이리스트 초기화를 완료합니다. UI가 준비된 후 호출해야 합니다.
@@ -141,7 +138,7 @@ final class PlayerManager {
             DataManager.shared.deleteSongData(to: song)
         }
         playlist.removeAll()
-
+        UserDefaults.standard.set(0, forKey: "heardLastSong")
         currentIndex = 0
     }
 
@@ -178,6 +175,7 @@ final class PlayerManager {
         setupPlayer(with: asset)
         player?.play()
         updatePlayingState(true)
+        UserDefaults.standard.set(currentIndex, forKey: "heardLastSong")
     }
 
     /// 현재 오디오 재생을 일시정지합니다.
