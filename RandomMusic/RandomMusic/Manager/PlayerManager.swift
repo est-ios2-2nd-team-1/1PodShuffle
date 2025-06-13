@@ -212,6 +212,11 @@ final class PlayerManager {
             return
         }
 
+        guard let playBackTime, playBackTime < 3.0 else {
+            play()
+            return
+        }
+
         setCurrentIndex(currentIndex - 1)
         onSongChanged?()
         play()
