@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Setting View Controller-->
+        <!--Setting-->
         <scene sceneID="s0d-6b-0kx">
             <objects>
                 <viewController id="Y6W-OH-hqX" customClass="SettingViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
@@ -17,8 +17,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oH9-cs-LJI">
-                                <rect key="frame" x="20" y="676" width="353" height="35"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oH9-cs-LJI">
+                                <rect key="frame" x="20" y="649" width="353" height="35"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="추천 알고리즘 초기화">
@@ -30,15 +30,6 @@
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zAj-E3-Buo">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="220"/>
-                                <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Setting" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="awE-K0-zcp">
-                                        <rect key="frame" x="14" y="170" width="125" height="45"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="37"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="220" id="u7e-Jr-buA"/>
@@ -52,10 +43,11 @@
                             <constraint firstItem="oH9-cs-LJI" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="52F-VB-I4y"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="oH9-cs-LJI" secondAttribute="trailing" constant="20" id="GKi-7W-Urc"/>
                             <constraint firstItem="zAj-E3-Buo" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="W1V-Rf-xL8"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="oH9-cs-LJI" secondAttribute="bottom" constant="100" id="YLi-Nn-XrW"/>
                             <constraint firstItem="zAj-E3-Buo" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="ruX-xQ-Dvo"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="n6f-se-mK9">
+                    <navigationItem key="navigationItem" title="Setting" id="n6f-se-mK9">
                         <barButtonItem key="backBarButtonItem" title="Back" id="H4J-m5-Y5d"/>
                     </navigationItem>
                     <connections>
