@@ -37,8 +37,8 @@ class PlayListViewController: UIViewController {
     /// 재생/일시정지 버튼 UI
     private func setPlayPauseButton() {
         let playImage = PlayerManager.shared.isPlaying ?
-                        UIImage(systemName: "pause.circle", withConfiguration: playConfig) :
-                        UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
+        UIImage(systemName: "pause.circle", withConfiguration: playConfig) :
+        UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
         playButton.setImage(playImage, for: .normal)
     }
 
@@ -54,14 +54,33 @@ class PlayListViewController: UIViewController {
         }
 
         PlayerManager.shared.onPlayList = { [weak self] in
-            /// playlist 삭제 시 tableView reload 시점 지연 시키기 위한 Tesk
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3초 = 300,000,000ns
                 self?.playListTableView.reloadData()
+                try? await Task.sleep(nanoseconds: 20_000_000) // 0.2초 = 2,00,000,000ns
+                self?.scrollSelectPlaySong()
+            }
+        }
+        
+        PlayerManager.shared.onSongChangedToPlayListView = { [weak self] in
+            Task { @MainActor in
+                self?.playListTableView.reloadData()
+                try? await Task.sleep(nanoseconds: 1_000_000)
+                self?.scrollSelectPlaySong()
             }
         }
     }
-
+    
+    /// 재생곡 select 및 위치로 스크롤 이동
+    private func scrollSelectPlaySong() {
+        let index = PlayerManager.shared.currentIndex
+        let rowCount = PlayerManager.shared.playlist.count
+        
+        guard index >= 0 && index < rowCount else { return }
+        
+        let indexPath = IndexPath(row: index, section: 0)
+        playListTableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+    }
+    
     /// 이전곡 버튼 터치
     @IBAction func backwardButton(_ sender: Any) {
         PlayerManager.shared.moveBackward()
@@ -78,7 +97,7 @@ class PlayListViewController: UIViewController {
         Task { await PlayerManager.shared.moveForward() }
         setPlayPauseButton()
     }
-
+    
     deinit {
         PlayerManager.shared.onTimeUpdateToPlaylistView = nil
         PlayerManager.shared.onPlayStateChangedToPlaylistView = nil
@@ -90,12 +109,14 @@ extension PlayListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return PlayerManager.shared.playlist.count
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: SongTableViewCell.self), for: indexPath) as! SongTableViewCell
         let model = PlayerManager.shared.playlist[indexPath.row]
-        cell.setUI(model: model)
-
+        let isPlaying = indexPath.row == PlayerManager.shared.currentIndex
+        cell.selectionStyle = .none
+        cell.setUI(model: model, isPlaying: isPlaying)
+        
         return cell
     }
     

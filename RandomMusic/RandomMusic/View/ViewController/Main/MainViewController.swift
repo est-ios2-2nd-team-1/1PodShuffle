@@ -132,7 +132,7 @@ class MainViewController: UIViewController {
             }
         }
 
-        PlayerManager.shared.onSongChanged = { [weak self] in
+        PlayerManager.shared.onSongChangedToMainView = { [weak self] in
             Task { @MainActor in
                 self?.updateSongUI()
             }
