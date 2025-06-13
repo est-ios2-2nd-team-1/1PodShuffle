@@ -38,7 +38,8 @@ final class PlayerManager {
     var onTimeUpdateToMainView: ((Double) -> Void)?
     var onPlayStateChangedToMainView: ((Bool) -> Void)?
     var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
-    var onSongChanged: (() -> Void)? // Main에서만 사용 중
+    var onSongChangedToMainView: (() -> Void)?
+    var onSongChangedToPlayListView: (() -> Void)?
     var onFeedbackChanged: ((FeedbackType) -> Void)? // Main에서만 사용 중
     var onRemote: ((SongModel?) -> Void)?
     var onPlayList: (() -> Void)?
@@ -63,7 +64,8 @@ final class PlayerManager {
         if playlist.isEmpty {
             print("플레이리스트가 비어있어서 랜덤곡을 추가합니다.")
             await addRandomSong()
-            onSongChanged?()
+            onSongChangedToMainView?()
+            onSongChangedToPlayListView?()
         }
     }
 
@@ -74,7 +76,8 @@ final class PlayerManager {
 
     func setCurrentIndex(_ value: Int) {
         currentIndex = value
-        onSongChanged?()
+        onSongChangedToMainView?()
+        onSongChangedToPlayListView?()
     }
 
     // MARK: - Playlist Operations
@@ -105,7 +108,8 @@ final class PlayerManager {
         if playlist.isEmpty {
             pause()
             cleanupPlayer()
-            onSongChanged?()
+            onSongChangedToMainView?()
+            onSongChangedToPlayListView?()
         } else if index == currentIndex {
             // 현재 재생 중인 곡이 삭제되는 경우
             if playlist.count > 1 {
@@ -119,7 +123,8 @@ final class PlayerManager {
                 currentIndex = 0
             }
             
-            onSongChanged?()
+            onSongChangedToMainView?()
+            onSongChangedToPlayListView?()
             if isPlaying {
                 play()
             } else {
@@ -128,7 +133,8 @@ final class PlayerManager {
         } else if index < currentIndex {
             // 현재 곡보다 앞의 곡이 삭제되면 인덱스 조정
             currentIndex -= 1
-            onSongChanged?()
+            onSongChangedToMainView?()
+            onSongChangedToPlayListView?()
         }
     }
 
@@ -215,7 +221,8 @@ final class PlayerManager {
         }
 
         setCurrentIndex(currentIndex - 1)
-        onSongChanged?()
+        onSongChangedToMainView?()
+        onSongChangedToPlayListView?()
         play()
     }
 
@@ -227,7 +234,8 @@ final class PlayerManager {
         }
 
         Task { @MainActor in
-            onSongChanged?()
+            onSongChangedToMainView?()
+            onSongChangedToPlayListView?()
             play()
         }
     }
