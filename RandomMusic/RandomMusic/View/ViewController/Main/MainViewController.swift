@@ -70,8 +70,8 @@ class MainViewController: UIViewController {
     }
 
     /// 뷰가 나타나기 직전에 호출됩니다.
-    ///
-    /// 재생목록 초기화를 비동기적으로 수행합니다.
+ 	///
+ 	/// 재생목록 초기화를 비동기적으로 수행합니다.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
