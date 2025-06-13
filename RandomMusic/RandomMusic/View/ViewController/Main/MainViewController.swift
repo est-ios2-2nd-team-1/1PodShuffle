@@ -341,8 +341,52 @@ class MainViewController: UIViewController {
         repeatButton.setImage(UIImage(systemName: icon), for: .normal)
     }
 
+
     /// 재생속도 버튼을 탭했을 때 호출됩니다.
     @IBAction func speedTapped(_ sender: UIButton) {
-        // TODO: 재생속도 클릭 로직 구현
+        let alert = UIAlertController(title: "재생 속도", message: nil, preferredStyle: .actionSheet)
+
+        let speeds = [0.5, 0.75, 1.0, 1.25, 1.5]
+        for speed in speeds {
+            let action = UIAlertAction(title: "\(speed)x", style: .default) { _ in
+                self.changePlaybackSpeed(Float(speed))
+            }
+            alert.addAction(action)
+        }
+
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        present(alert, animated: true)
+    }
+
+    /// 재생속도에 따른 아이콘 선택 함수
+    private func getSpeedIcon(for speed: Float) -> String {
+        switch speed {
+        case 0.5:
+            return "gauge.with.dots.needle.0percent"
+        case 0.75:
+            return "gauge.with.dots.needle.33percent"
+        case 1.0:
+            return "gauge.with.dots.needle.50percent"
+        case 1.25:
+            return "gauge.with.dots.needle.67percent"
+        case 1.5:
+            return "gauge.with.dots.needle.100percent"
+        default:
+            return "gauge.with.dots.needle.50percent"
+        }
+    }
+
+    /// 재생속도 변경 함수
+    private func changePlaybackSpeed(_ speed: Float) {
+        PlayerManager.shared.currentPlaybackSpeed = speed
+
+        // AVAudioPlayer에 배속 적용
+        if let player = PlayerManager.shared.player {
+            player.rate = speed
+        }
+
+        // 배속에 따른 아이콘만 변경
+        let iconName = getSpeedIcon(for: speed)
+        speedButton.setImage(UIImage(systemName: iconName), for: .normal)
     }
 }
