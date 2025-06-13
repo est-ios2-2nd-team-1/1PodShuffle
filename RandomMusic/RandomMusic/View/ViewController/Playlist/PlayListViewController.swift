@@ -54,7 +54,11 @@ class PlayListViewController: UIViewController {
         }
 
         PlayerManager.shared.onPlayList = { [weak self] in
-            self?.playListTableView.reloadData()
+            /// playlist 삭제 시 tableView reload 시점 지연 시키기 위한 Tesk
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3초 = 300,000,000ns
+                self?.playListTableView.reloadData()
+            }
         }
     }
 
@@ -97,7 +101,8 @@ extension PlayListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete시에 작업
+            PlayerManager.shared.removeSong(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
 }
