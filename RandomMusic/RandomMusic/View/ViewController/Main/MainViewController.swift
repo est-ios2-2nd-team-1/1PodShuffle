@@ -2,6 +2,7 @@ import UIKit
 import AVFoundation
 
 class MainViewController: UIViewController {
+
     // MARK: - IBOutlets
 
     @IBOutlet weak var dislikeButton: UIButton!
@@ -22,7 +23,19 @@ class MainViewController: UIViewController {
     @IBOutlet weak var playlistThumbnail: UIImageView!
     @IBOutlet weak var playlistTitleLabel: UILabel!
     @IBOutlet weak var playlistSingerLabel: UILabel!
+    @IBOutlet weak var mostTopConstraint: NSLayoutConstraint!
+    @IBOutlet weak var thumbnailImageWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var playlistBackgroundHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var playlistContentHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var playlistThumbnailWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var topStackViewTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var topStackViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var progressStackViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var progressStackViewTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var buttonStackViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var buttonStackViewTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var playlistStackViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var playlistStackViewTrailingConstraint: NSLayoutConstraint!
 
     // MARK: - Properties
 
@@ -41,14 +54,19 @@ class MainViewController: UIViewController {
 
     /// 뷰가 메모리에 로드된 후 호출됩니다.
     ///
-	/// 이 메서드에서는 UI 초기화, 콜백 바인딩, 제스처 설정 등의 초기 설정 작업을 수행합니다.
+    /// 이 메서드에서는 UI 초기화, 콜백 바인딩, 제스처 설정 등의 초기 설정 작업을 수행합니다.
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupUI()
+        setupInitialButtonConfigurations()
+        setupSlider()
         updateSongUI()
         bindPlayerCallbacks()
         setupTapGestureForPlaylist()
+
+        Task { @MainActor in
+            await updateLayoutForCurrentTraitCollection()
+        }
     }
 
     /// 뷰가 나타나기 직전에 호출됩니다.
@@ -68,28 +86,60 @@ class MainViewController: UIViewController {
     override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
 
-        let bottomInset = view.safeAreaInsets.bottom
-        let playlistHeight = 80
-        playlistBackgroundHeightConstraint.constant = bottomInset + CGFloat(playlistHeight)
+        Task { @MainActor in
+            await updateLayoutForCurrentTraitCollection()
+        }
+    }
+
+    /// 뷰의 레이아웃이 완료된 후 호출됩니다.
+    ///
+    /// 썸네일 이미지뷰를 원형으로 만들기 위해 cornerRadius를 설정합니다.
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        thumbnailImageView.layer.cornerRadius = thumbnailImageView.frame.width / 2
     }
 
     // MARK: - Setup Methods
 
-    /// UI 컴포넌트들의 초기 설정을 수행합니다.
+    /// 모든 버튼의 초기 Configuration을 설정합니다.
     ///
-    /// 썸네일 이미지 뷰와 진행률 슬라이더의 초기 상태를 설정합니다.
-    private func setupUI() {
-        setupThumbnailImageView()
-        setupSlider()
+    /// 각 버튼의 기본 이미지, 크기, 색상을 설정하고 초기 상태를 업데이트합니다.
+    private func setupInitialButtonConfigurations() {
+        // 각 버튼의 기본 이미지와 Configuration 설정
+        setupButtonConfiguration(playPauseButton, imageName: "play.circle.fill", pointSize: 50)
+        setupButtonConfiguration(backwardButton, imageName: "backward.frame.fill", pointSize: 20)
+        setupButtonConfiguration(forwardButton, imageName: "forward.frame.fill", pointSize: 20)
+        setupButtonConfiguration(likeButton, imageName: "hand.thumbsup", pointSize: 20)
+        setupButtonConfiguration(dislikeButton, imageName: "hand.thumbsdown", pointSize: 20)
+        setupButtonConfiguration(repeatButton, imageName: "repeat.1.circle", pointSize: 20)
+        setupButtonConfiguration(speedButton, imageName: "gauge.with.dots.needle.50percent", pointSize: 20)
+
+        // 초기 상태 업데이트
+        updatePlayPauseButton()
+        updateLikeDislikeButtons()
+        updateRepeatButton()
     }
 
-    /// 썸네일 이미지 뷰의 스타일을 설정합니다.
+    /// 개별 버튼의 Configuration을 설정합니다.
     ///
-    /// 원형 모양으로 만들고 이미지 비율을 맞춰 표시하도록 설정합니다.
-    private func setupThumbnailImageView() {
-        thumbnailImageView.layer.cornerRadius = thumbnailImageView.frame.width / 2
-        thumbnailImageView.clipsToBounds = true
-        thumbnailImageView.contentMode = .scaleAspectFill
+    /// - Parameters:
+    ///   - button: 설정할 버튼 객체
+    ///   - imageName: SF Symbol 이미지 이름
+    ///   - pointSize: 아이콘의 크기 (포인트 단위)
+    private func setupButtonConfiguration(_ button: UIButton, imageName: String, pointSize: CGFloat) {
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: imageName)
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: pointSize)
+
+        // 색상 설정
+        if button == playPauseButton {
+            config.baseForegroundColor = UIColor(named: "MainColor")
+        } else {
+            config.baseForegroundColor = .secondaryLabel
+        }
+
+        button.configuration = config
     }
 
     /// 진행률 슬라이더의 초기 설정을 수행합니다.
@@ -152,19 +202,27 @@ class MainViewController: UIViewController {
     ///
     /// 재생 중일 때는 일시정지 아이콘을, 일시정지 상태일 때는 재생 아이콘을 표시합니다.
     private func updatePlayPauseButton() {
-        let icon = PlayerManager.shared.isPlaying ? "pause.circle.fill" : "play.circle.fill"
-        playPauseButton.setImage(UIImage(systemName: icon), for: .normal)
+        let iconName = PlayerManager.shared.isPlaying ? "pause.circle.fill" : "play.circle.fill"
+        guard var config = playPauseButton.configuration else { return }
+        config.image = UIImage(systemName: iconName)
+        playPauseButton.configuration = config
     }
 
     /// 좋아요/싫어요 버튼의 아이콘을 현재 피드백 상태에 따라 업데이트합니다.
     ///
     /// 활성화된 피드백은 채워진 아이콘으로, 비활성화된 피드백은 빈 아이콘으로 표시됩니다.
     private func updateLikeDislikeButtons() {
-        let likeIcon = currentFeedbackType == .like ? "hand.thumbsup.fill" : "hand.thumbsup"
-        let dislikeIcon = currentFeedbackType == .dislike ? "hand.thumbsdown.fill" : "hand.thumbsdown"
+        // 좋아요 버튼
+        let likeIconName = currentFeedbackType == .like ? "hand.thumbsup.fill" : "hand.thumbsup"
+        guard var likeConfig = likeButton.configuration else { return }
+        likeConfig.image = UIImage(systemName: likeIconName)
+        likeButton.configuration = likeConfig
 
-        likeButton.setImage(UIImage(systemName: likeIcon), for: .normal)
-        dislikeButton.setImage(UIImage(systemName: dislikeIcon), for: .normal)
+        // 싫어요 버튼
+        let dislikeIconName = currentFeedbackType == .dislike ? "hand.thumbsdown.fill" : "hand.thumbsdown"
+        guard var dislikeConfig = dislikeButton.configuration else { return }
+        dislikeConfig.image = UIImage(systemName: dislikeIconName)
+        dislikeButton.configuration = dislikeConfig
     }
 
     /// 재생 진행률 UI를 업데이트합니다.
@@ -190,14 +248,14 @@ class MainViewController: UIViewController {
 
         updateMainViewUI(with: currentSong)
         updatePlaylistViewUI(with: currentSong)
-		updateFeedbackState()
+        updateFeedbackState()
         loadAndUpdateDuration()
     }
 
     /// 메인 재생 화면의 UI를 업데이트합니다.
     ///
     /// 곡 제목, 아티스트, 썸네일 이미지를 설정합니다.
-	///
+    ///
     /// - Parameter song: 표시할 곡 정보
     private func updateMainViewUI(with song: SongModel) {
         titleLabel.text = song.title
@@ -212,7 +270,7 @@ class MainViewController: UIViewController {
     /// 재생목록 영역의 UI를 업데이트합니다.
     ///
     /// 곡 제목, 아티스트, 썸네일 이미지를 설정합니다.
-	///
+    ///
     /// - Parameter song: 표시할 곡 정보
     private func updatePlaylistViewUI(with song: SongModel) {
         playlistTitleLabel.text = song.title
@@ -259,7 +317,7 @@ class MainViewController: UIViewController {
         present(vc, animated: true)
     }
 
-	/// 슬라이더 드래그가 시작되었을 때 호출됩니다.
+    /// 슬라이더 드래그가 시작되었을 때 호출됩니다.
     ///
     /// 자동 시간 업데이트와의 충돌을 방지하기 위해 플래그를 설정합니다.
     @objc private func sliderDidBeginDragging() {
@@ -278,7 +336,7 @@ class MainViewController: UIViewController {
     }
 
     /// 드래그 중 슬라이더 값이 변경될 때 호출됩니다.
-	///
+    ///
     /// 실제 seek는 수행하지 않고 시간 레이블만 업데이트합니다.
     @objc private func sliderValueChangedDuringDrag() {
         guard isSliderDragging else { return }
@@ -337,12 +395,16 @@ class MainViewController: UIViewController {
     ///
     /// 반복 모드가 활성화되면 채워진 아이콘을, 비활성화되면 빈 아이콘을 표시합니다.
     private func updateRepeatButton() {
-        let icon = PlayerManager.shared.isRepeatEnabled ? "repeat.1.circle.fill" : "repeat.1.circle"
-        repeatButton.setImage(UIImage(systemName: icon), for: .normal)
+        let iconName = PlayerManager.shared.isRepeatEnabled ? "repeat.1.circle.fill" : "repeat.1.circle"
+        guard var config = repeatButton.configuration else { return }
+        config.image = UIImage(systemName: iconName)
+        repeatButton.configuration = config
     }
 
 
     /// 재생속도 버튼을 탭했을 때 호출됩니다.
+    ///
+    /// 재생 속도 선택을 위한 액션 시트를 표시합니다.
     @IBAction func speedTapped(_ sender: UIButton) {
         let alert = UIAlertController(title: "재생 속도", message: nil, preferredStyle: .actionSheet)
 
@@ -356,9 +418,38 @@ class MainViewController: UIViewController {
 
         alert.addAction(UIAlertAction(title: "취소", style: .cancel))
         present(alert, animated: true)
+
+        // iPad에서 popover 설정
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = sender
+            popover.sourceRect = sender.bounds
+        }
+
+        present(alert, animated: true)
     }
 
-    /// 재생속도에 따른 아이콘 선택 함수
+    /// 재생속도를 변경합니다.
+    ///
+    /// - Parameter speed: 새로운 재생 속도 (0.5 ~ 1.5)
+    private func changePlaybackSpeed(_ speed: Float) {
+        PlayerManager.shared.currentPlaybackSpeed = speed
+
+        // AVAudioPlayer에 배속 적용
+        if let player = PlayerManager.shared.player {
+            player.rate = speed
+        }
+
+        // 배속에 따른 아이콘 변경
+        let iconName = getSpeedIcon(for: speed)
+        guard var config = speedButton.configuration else { return }
+        config.image = UIImage(systemName: iconName)
+        speedButton.configuration = config
+    }
+
+    /// 재생속도에 따른 적절한 SF Symbol 아이콘을 반환합니다.
+    ///
+    /// - Parameter speed: 재생 속도
+    /// - Returns: 해당 속도에 맞는 SF Symbol 이름
     private func getSpeedIcon(for speed: Float) -> String {
         switch speed {
         case 0.5:
@@ -375,25 +466,140 @@ class MainViewController: UIViewController {
             return "gauge.with.dots.needle.50percent"
         }
     }
+}
 
-    /// 재생속도 변경 함수
-    private func changePlaybackSpeed(_ speed: Float) {
-        let pm = PlayerManager.shared
-        pm.currentPlaybackSpeed = speed
-        let isPlaying = pm.isPlaying
+// MARK: - Adaptive Layout Support
 
-        if let player = PlayerManager.shared.player {
-            if isPlaying {
-                // 재생 중이었다면 새로운 배속으로 재생
-                player.rate = speed
-            } else {
-                // 일시정지 상태였다면 배속만 저장하고 일시정지 유지
-                player.rate = 0.0
+/// 아이패드와 아이폰에 대한 적응형 레이아웃 지원을 위한 확장
+extension MainViewController {
+
+    /// Trait Collection이 변경될 때 호출됩니다.
+    ///
+    /// Horizontal Size Class가 변경되면 레이아웃을 다시 구성합니다.
+    ///
+    /// - Parameter previousTraitCollection: 이전 Trait Collection
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        if traitCollection.horizontalSizeClass != previousTraitCollection?.horizontalSizeClass {
+            Task { @MainActor in
+                await updateLayoutForCurrentTraitCollection()
             }
         }
+    }
 
-        // 배속에 따른 아이콘만 변경
-        let iconName = getSpeedIcon(for: speed)
-        speedButton.setImage(UIImage(systemName: iconName), for: .normal)
+    /// 현재 Trait Collection에 맞게 레이아웃을 업데이트합니다.
+    ///
+    /// Regular Width (아이패드)와 Compact Width (아이폰)에 따라 다른 레이아웃을 적용합니다.
+    @MainActor
+    private func updateLayoutForCurrentTraitCollection() async {
+        if traitCollection.horizontalSizeClass == .regular {
+			setupLayoutForPad()
+        } else {
+            setupLayoutForPhone()
+        }
+
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
+    }
+
+    /// 아이패드용 레이아웃을 설정합니다.
+    ///
+    /// 큰 화면에 맞춰 썸네일 크기, 버튼 크기, 여백을 조정합니다.
+    @MainActor
+    private func setupLayoutForPad() {
+		// 최상단 여백
+        mostTopConstraint.constant = 40
+
+        // 메인 썸네일
+        thumbnailImageWidthConstraint.constant = 500
+
+        // 버튼 크기 업데이트
+        updateButtonSizes(subPointSize: 30, mainPointSize: 60)
+
+        // 좌우 여백
+        let sidePadding: CGFloat = 40
+        updateConstraints(padding: sidePadding)
+
+        // 하단 재생목록
+        let contentHeight: CGFloat = 120
+        updatePlaylistLayout(contentHeight: contentHeight)
+    }
+
+    /// 아이폰용 레이아웃을 설정합니다.
+    ///
+    /// 작은 화면에 맞춰 썸네일 크기, 버튼 크기, 여백을 조정합니다.
+    @MainActor
+    private func setupLayoutForPhone() {
+        // 최상단 여백
+        mostTopConstraint.constant = 20
+
+        // 메인 썸네일
+        thumbnailImageWidthConstraint.constant = 300
+
+        // 버튼 크기 업데이트
+        updateButtonSizes(subPointSize: 20, mainPointSize: 50)
+
+        // 좌우 여백
+        let sidePadding: CGFloat = 20
+        updateConstraints(padding: sidePadding)
+
+        // 하단 재생목록
+        let contentHeight: CGFloat = 80
+        updatePlaylistLayout(contentHeight: contentHeight)
+    }
+
+    /// 모든 버튼의 크기를 업데이트합니다.
+    ///
+    /// - Parameters:
+    ///   - subPointSize: 보조 버튼들의 아이콘 크기 (포인트 단위)
+    ///   - mainPointSize: 메인 재생 버튼의 아이콘 크기 (포인트 단위)
+    private func updateButtonSizes(subPointSize: CGFloat, mainPointSize: CGFloat) {
+        let targetButtons = [dislikeButton, likeButton, repeatButton, backwardButton, forwardButton, speedButton]
+
+        // 보조 버튼들 크기 업데이트
+        for button in targetButtons {
+            guard let button = button, var config = button.configuration else { continue }
+            config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: subPointSize)
+            button.configuration = config
+        }
+
+        // 메인 버튼 크기 업데이트
+        guard var mainConfig = playPauseButton.configuration else { return }
+        mainConfig.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: mainPointSize)
+        playPauseButton.configuration = mainConfig
+    }
+
+    /// 모든 스택뷰의 좌우 여백 제약조건을 업데이트합니다.
+    ///
+    /// - Parameter padding: 적용할 여백 크기 (포인트 단위)
+    private func updateConstraints(padding: CGFloat) {
+        let targetConstraints = [
+            topStackViewTrailingConstraint,
+            topStackViewLeadingConstraint,
+            progressStackViewLeadingConstraint,
+            progressStackViewTrailingConstraint,
+            buttonStackViewLeadingConstraint,
+            buttonStackViewTrailingConstraint,
+            playlistStackViewLeadingConstraint,
+            playlistStackViewTrailingConstraint
+        ]
+
+        for constraint in targetConstraints {
+            constraint?.constant = padding
+        }
+    }
+
+    /// 하단 재생목록 영역의 레이아웃을 업데이트합니다.
+    ///
+    /// Safe Area에 맞춰 높이를 조정하고 썸네일 크기를 설정합니다.
+    ///
+    /// - Parameter contentHeight: 재생목록 컨텐츠의 높이 (포인트 단위)
+    private func updatePlaylistLayout(contentHeight: CGFloat) {
+        let bottomInset = view.safeAreaInsets.bottom
+        playlistContentHeightConstraint.constant = contentHeight
+        playlistBackgroundHeightConstraint.constant = bottomInset + contentHeight
+        playlistThumbnailWidthConstraint.constant = contentHeight - (contentHeight > 100 ? 40 : 20)
     }
 }
