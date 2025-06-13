@@ -1,5 +1,6 @@
 import Foundation
 
+/// 장르
 enum Genre: String, CaseIterable, Codable {
     case jazz = "Jazz"
     case pop = "Pop"
@@ -7,7 +8,6 @@ enum Genre: String, CaseIterable, Codable {
     case classic = "Classic"
     case rnb = "RnB"
     case hiphop = "Hiphop"
-//    case unknown = "Pop"
 
     init(rawValue: String) {
         switch rawValue {
@@ -22,8 +22,3 @@ enum Genre: String, CaseIterable, Codable {
     }
 }
 
-enum FeedbackType {
-    case like      // 좋아요
-    case dislike   // 싫어요
-    case none      // 기록 없음
-}
