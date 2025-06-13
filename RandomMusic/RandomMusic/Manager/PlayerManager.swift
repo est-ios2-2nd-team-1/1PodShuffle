@@ -223,7 +223,6 @@ final class PlayerManager {
         }
 
         setCurrentIndex(currentIndex - 1)
-        onSongChanged?()
         play()
     }
 
@@ -235,7 +234,6 @@ final class PlayerManager {
         }
 
         Task { @MainActor in
-            onSongChanged?()
             play()
         }
     }
@@ -251,6 +249,7 @@ final class PlayerManager {
     // MARK: - Duration Loading
 
     func loadDuration(completion: @escaping (Double?) -> Void) {
+        print(#function)
         guard let currentSong = currentSong else {
             print("No current song available")
             completion(nil)
