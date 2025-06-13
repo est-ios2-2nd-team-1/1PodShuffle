@@ -7,6 +7,7 @@ final class PlayerManager {
 
     private let songService: SongService
     private let preferenceManager: PreferenceManager
+    private var timeObserverToken: Any?
 
     private(set) var playlist: [SongModel] = [] {
         didSet { onPlayList?() }
@@ -14,7 +15,6 @@ final class PlayerManager {
     private(set) var currentIndex: Int = 0
     private(set) var isPlaying = false
     private(set) var player: AVPlayer?
-    private var timeObserverToken: Any?
     private(set) var playBackTime: Double?
 
     /// 한 곡 반복 재생 여부를 설정합니다.
@@ -28,11 +28,6 @@ final class PlayerManager {
         return playlist[currentIndex]
     }
 
-    /// 플레이어가 초기화되었는지 여부를 나타냅니다.
-    var isPlayerReady: Bool {
-        return player != nil
-    }
-
     // MARK: - Callbacks
     var onTimeUpdateToPlaylistView: ((Double) -> Void)? {
         didSet { onTimeUpdateToPlaylistView?(playBackTime ?? 0.0) }
@@ -40,8 +35,8 @@ final class PlayerManager {
     var onTimeUpdateToMainView: ((Double) -> Void)?
     var onPlayStateChangedToMainView: ((Bool) -> Void)?
     var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
-    var onSongChanged: (() -> Void)? // Main에서만 사용 중
-    var onFeedbackChanged: ((FeedbackType) -> Void)? // Main에서만 사용 중
+    var onSongChanged: (() -> Void)?
+    var onFeedbackChanged: ((FeedbackType) -> Void)?
     var onRemote: ((SongModel?) -> Void)?
     var onPlayList: (() -> Void)?
 
@@ -49,13 +44,6 @@ final class PlayerManager {
         self.songService = songService
         self.preferenceManager = preferenceManager
         loadPlaylistFromDB()
-    }
-
-    /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
-    private func loadPlaylistFromDB() {
-        let savedSongs = DataManager.shared.fetchSongData()
-        playlist = savedSongs
-        currentIndex = UserDefaults.standard.integer(forKey: "heardLastSong")
     }
 
     /// 플레이리스트 초기화를 완료합니다. UI가 준비된 후 호출해야 합니다.
@@ -67,17 +55,72 @@ final class PlayerManager {
         }
     }
 
-    // MARK: - Playlist Management
+    // MARK: - Playback Controls
+    func play() {
+        guard let currentSong = currentSong else {
+            print("No current song available")
+            return
+        }
+
+        guard let asset = try? songService.createAssetWithHeaders(url: currentSong.streamUrl) else {
+            print("Invalid asset")
+            return
+        }
+
+        setupPlayer(with: asset)
+        player?.play()
+        updatePlayingState(true)
+        UserDefaults.standard.set(currentIndex, forKey: "heardLastSong")
+    }
+
+    /// 현재 오디오 재생을 일시정지합니다.
+    func pause() {
+        player?.pause()
+        updatePlayingState(false)
+    }
+
+    /// 일시정지된 오디오 재생을 다시 시작합니다.
+    func resume() {
+        player?.play()
+        updatePlayingState(true)
+    }
+
+    func togglePlayPause() {
+        isPlaying ? pause() : player != nil ? resume() : play()
+    }
+
+    func toggleRepeat() {
+        isRepeatEnabled.toggle()
+    }
+
+    func moveBackward() {
+        if let playBackTime, playBackTime < 3.0 {
+            setCurrentIndex(currentIndex - 1)
+        }
+        play()
+    }
+
+    func moveForward() async {
+        currentIndex < playlist.count - 1 ? setCurrentIndex(currentIndex + 1) : await addRandomSong()
+        Task { @MainActor in play() }
+    }
+
+    /// 재생 위치를 지정한 시간으로 이동합니다.
+    ///
+    /// - Parameter seconds: 이동할 시간(초)입니다.
+    func seek(to seconds: Float64) {
+        let time = CMTime(seconds: seconds, preferredTimescale: 1)
+        player?.seek(to: time)
+    }
+
     func setPlaylist(_ value: [SongModel]) {
         playlist = value
     }
 
     func setCurrentIndex(_ value: Int) {
-        currentIndex = value
+        currentIndex = max(0, value)
         onSongChanged?()
     }
-
-    // MARK: - Playlist Operations
 
     /// 랜덤 곡을 가져와서 플레이리스트에 추가합니다.
     func addRandomSong() async {
@@ -162,95 +205,10 @@ final class PlayerManager {
         handleFeedback(isLike: false)
     }
 
-    // MARK: - Playback Controls
-
-    func play() {
-        guard let currentSong = currentSong else {
-            print("No current song available")
-            return
-        }
-
-        guard let asset = try? songService.createAssetWithHeaders(url: currentSong.streamUrl) else {
-            print("Invalid asset")
-            return
-        }
-
-        setupPlayer(with: asset)
-        player?.play()
-        // 재생 시작 후 배속 적용
-        player?.rate = currentPlaybackSpeed
-        updatePlayingState(true)
-        UserDefaults.standard.set(currentIndex, forKey: "heardLastSong")
-    }
-
-    /// 현재 오디오 재생을 일시정지합니다.
-    func pause() {
-        player?.pause()
-        updatePlayingState(false)
-    }
-
-    /// 일시정지된 오디오 재생을 다시 시작합니다.
-    func resume() {
-        player?.play()
-        updatePlayingState(true)
-    }
-
-    func togglePlayPause() {
-        if isPlaying {
-            pause()
-        } else {
-            if isPlayerReady {
-                resume()
-            } else {
-                play()
-            }
-        }
-    }
-
-    func toggleRepeat() {
-        isRepeatEnabled.toggle()
-    }
-
-    func moveBackward() {
-        guard currentIndex > 0 else {
-            print("첫번째 곡입니다.")
-            return
-        }
-
-        guard let playBackTime, playBackTime < 3.0 else {
-            play()
-            return
-        }
-
-        setCurrentIndex(currentIndex - 1)
-        onSongChanged?()
-        play()
-    }
-
-    func moveForward() async {
-        if currentIndex < playlist.count - 1 {
-            setCurrentIndex(currentIndex + 1)
-        } else {
-            await addRandomSong()
-        }
-
-        Task { @MainActor in
-            onSongChanged?()
-            play()
-        }
-    }
-
-    /// 재생 위치를 지정한 시간으로 이동합니다.
-    ///
-    /// - Parameter seconds: 이동할 시간(초)입니다.
-    func seek(to seconds: Float64) {
-        let time = CMTime(seconds: seconds, preferredTimescale: 1)
-        player?.seek(to: time)
-    }
-
-    // MARK: - Duration Loading
-
+    /// 노래의 전체 시간을 반환합니다.
+    /// - Parameter completion: Completion 콜백 메소드입니다. 원하시는 작업을 입력해주세요.
     func loadDuration(completion: @escaping (Double?) -> Void) {
+        print(#function)
         guard let currentSong = currentSong else {
             print("No current song available")
             completion(nil)
@@ -280,10 +238,22 @@ final class PlayerManager {
         }
     }
 
-    // MARK: - Private Methods
+    deinit {
+        cleanupPlayer()
+    }
+}
+
+// MARK: - Private Methods
+private extension PlayerManager {
+    /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
+    private func loadPlaylistFromDB() {
+        let savedSongs = DataManager.shared.fetchSongData()
+        playlist = savedSongs
+        currentIndex = UserDefaults.standard.integer(forKey: "heardLastSong")
+    }
 
     /// 피드백 처리 (좋아요/싫어요/취소)
-    private func handleFeedback(isLike: Bool) {
+    func handleFeedback(isLike: Bool) {
         guard let currentSong else {
             print("현재 재생 중인 곡이 없습니다.")
             return
@@ -311,17 +281,16 @@ final class PlayerManager {
         onFeedbackChanged?(newFeedback)
     }
 
-    private func setupPlayer(with asset: AVURLAsset) {
+    func setupPlayer(with asset: AVURLAsset) {
         cleanupPlayer()
 
         let item = AVPlayerItem(asset: asset)
         player = AVPlayer(playerItem: item)
-
         setupNotifications(for: item)
         addPeriodicTimeObserver()
     }
 
-    private func setupNotifications(for item: AVPlayerItem) {
+    func setupNotifications(for item: AVPlayerItem) {
         // 재생 완료 알림
         NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
@@ -341,7 +310,7 @@ final class PlayerManager {
         }
     }
 
-    private func handlePlaybackEnd() {
+    func handlePlaybackEnd() {
         if self.isRepeatEnabled {
             self.seek(to: 0)
             self.player?.play()
@@ -353,14 +322,14 @@ final class PlayerManager {
         }
     }
 
-    private func updatePlayingState(_ playing: Bool) {
+    func updatePlayingState(_ playing: Bool) {
         isPlaying = playing
         onPlayStateChangedToMainView?(playing)
         onPlayStateChangedToPlaylistView?(playing)
     }
 
     /// 재생 시간 정보를 주기적으로 업데이트합니다.
-    private func addPeriodicTimeObserver() {
+    func addPeriodicTimeObserver() {
         timeObserverToken = player?.addPeriodicTimeObserver(
             forInterval: CMTime(seconds: 1, preferredTimescale: 1),
             queue: .main
@@ -374,7 +343,7 @@ final class PlayerManager {
         }
     }
 
-    private func cleanupPlayer() {
+    func cleanupPlayer() {
         if let token = timeObserverToken {
             player?.removeTimeObserver(token)
             timeObserverToken = nil
@@ -383,7 +352,4 @@ final class PlayerManager {
         NotificationCenter.default.removeObserver(self)
     }
 
-    deinit {
-        cleanupPlayer()
-    }
 }
