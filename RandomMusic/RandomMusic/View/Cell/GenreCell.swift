@@ -34,10 +34,10 @@ class GenreCell: UICollectionViewCell {
         genreButton.layer.cornerRadius = genreButton.bounds.height / 2
     }
 
-    func configure(with genre: OnboardingGenre, selected: Bool) {
+    func configure(with genre: Genre, selected: Bool) {
 
         let imageSize = CGSize(width: genreButton.bounds.width - 24, height: genreButton.bounds.height - 24)
-        if let image = UIImage(named: genre.iconName)?.resize(to: imageSize) {
+        if let image = UIImage(named: genre.rawValue.lowercased())?.resize(to: imageSize) {
             genreButton.setImage(image, for: .normal)
         }
 
@@ -46,6 +46,6 @@ class GenreCell: UICollectionViewCell {
         genreButton.setImage(checkmarkImage, for: .selected)
         genreButton.backgroundColor = selected ? UIColor(named: "SelectedColor") : UIColor(named: "MainColor")
 
-        genreLabel.text = genre.name
+        genreLabel.text = genre.rawValue
     }
 }

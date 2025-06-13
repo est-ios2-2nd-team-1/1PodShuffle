@@ -1,10 +1,5 @@
 import UIKit
 
-struct OnboardingGenre {
-    let name: String
-    let iconName: String
-}
-
 
 class OnBoardingViewController: UIViewController {
 
@@ -13,19 +8,9 @@ class OnBoardingViewController: UIViewController {
     @IBOutlet weak var confirmButton: UIButton!
     @IBOutlet weak var collectionView: UICollectionView!
 
-    var genres: [OnboardingGenre] = [
-        OnboardingGenre(name: "Rock", iconName: "rock"),
-        OnboardingGenre(name: "Hiphop", iconName: "hiphop"),
-        OnboardingGenre(name: "Jazz", iconName: "jazz"),
-        OnboardingGenre(name: "Pop", iconName: "pop"),
-        OnboardingGenre(name: "RnB", iconName: "rb"),
-        OnboardingGenre(name: "Classic", iconName: "classic"),
-        OnboardingGenre(name: "Dance", iconName: "dance"),
-        OnboardingGenre(name: "Ballad", iconName: "ballad"),
-        OnboardingGenre(name: "EDM", iconName: "edm")
-    ]
+    var genres: [Genre] = Genre.allCases
 
-    var selectedGenres: Set<String> = []
+    var selectedGenres: Set<Genre> = []
     private let preferenceManager = PreferenceManager()
 
     override func viewDidLoad() {
@@ -66,7 +51,7 @@ extension OnBoardingViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GenreCell", for: indexPath) as! GenreCell
         let genre = genres[indexPath.item]
-        let isSelected = selectedGenres.contains(genre.name)
+        let isSelected = selectedGenres.contains(genre)
 
         cell.configure(with: genre, selected: isSelected)
         cell.genreButton.tag = indexPath.item
@@ -114,10 +99,10 @@ extension OnBoardingViewController {
     // 장르 선택 제한: 3개 이하
     @objc func genreButtonTapped(_ sender: UIButton) {
         let genre = genres[sender.tag]
-        if selectedGenres.contains(genre.name) {
-            selectedGenres.remove(genre.name)
+        if selectedGenres.contains(genre) {
+            selectedGenres.remove(genre)
         } else if selectedGenres.count < 3 {
-            selectedGenres.insert(genre.name)
+            selectedGenres.insert(genre)
         }
         collectionView.reloadItems(at: [IndexPath(item: sender.tag, section: 0)])
     }
@@ -132,11 +117,8 @@ extension OnBoardingViewController {
 
     @IBAction func confirmButtonTapped(_ sender: UIButton) {
         // 확인: 선택된 장르만 저장
-        let selectedGenres: [Genre] = selectedGenres.compactMap { genreName in
-            Genre(rawValue: genreName)
-        }
 
-        preferenceManager.initializePreferences(initialPreferredGenres: selectedGenres)
+        preferenceManager.initializePreferences(initialPreferredGenres: Array(selectedGenres))
 
         toMainVC()
     }
