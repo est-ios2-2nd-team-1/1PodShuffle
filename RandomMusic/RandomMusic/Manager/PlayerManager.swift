@@ -85,6 +85,7 @@ final class PlayerManager {
     /// 일시정지된 오디오 재생을 다시 시작합니다.
     func resume() {
         player?.play()
+        player?.rate = currentPlaybackSpeed
         updatePlayingState(true)
     }
 
