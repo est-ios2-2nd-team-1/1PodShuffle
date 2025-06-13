@@ -20,6 +20,9 @@ final class PlayerManager {
     /// 한 곡 반복 재생 여부를 설정합니다.
     var isRepeatEnabled = false
 
+    // 현재 배속 저장용 변수
+    var currentPlaybackSpeed: Float = 1.0
+
     var currentSong: SongModel? {
         guard !playlist.isEmpty && currentIndex >= 0 && currentIndex < playlist.count else { return nil }
         return playlist[currentIndex]
@@ -174,6 +177,8 @@ final class PlayerManager {
 
         setupPlayer(with: asset)
         player?.play()
+        // 재생 시작 후 배속 적용
+        player?.rate = currentPlaybackSpeed
         updatePlayingState(true)
         UserDefaults.standard.set(currentIndex, forKey: "heardLastSong")
     }
