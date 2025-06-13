@@ -2,6 +2,10 @@ import UIKit
 
 class SettingViewController: UIViewController {
 
+    @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var resetButton: UIButton!
+
+
     private let preferenceManager = PreferenceManager()
 
     override func viewDidLoad() {
@@ -16,9 +20,9 @@ class SettingViewController: UIViewController {
         )
 
         alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
-//        alert.addAction(UIAlertAction(title: "초기화", style: .destructive, handler: { _ in
-//            self.preferenceManager.resetPreferences()
-//        }))
+        alert.addAction(UIAlertAction(title: "초기화", style: .destructive, handler: { _ in
+            self.preferenceManager.resetAllPreferences()
+        }))
 
         present(alert, animated: true, completion: nil)
 
