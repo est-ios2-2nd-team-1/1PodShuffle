@@ -98,31 +98,36 @@ final class PlayerManager {
     /// 플레이리스트에서 곡을 제거합니다.
     func removeSong(at index: Int) {
         guard index >= 0 && index < playlist.count else { return }
-
-        // 현재 재생 중인 곡이 삭제되는 경우
-        if index == currentIndex {
-            pause()
-            if playlist.count > 1 {
-                // 다음 곡으로 이동 (마지막 곡이면 이전 곡으로)
-                if index == playlist.count - 1 {
-                    currentIndex = max(0, currentIndex - 1)
-                }
-            } else {
-                currentIndex = 0
-            }
-        } else if index < currentIndex {
-            // 현재 곡보다 앞의 곡이 삭제되면 인덱스 조정
-            currentIndex -= 1
-        }
-
+        
         DataManager.shared.deleteSongData(to: playlist[index])
         playlist.remove(at: index)
 
         if playlist.isEmpty {
             pause()
             cleanupPlayer()
+            onSongChanged?()
         } else if index == currentIndex {
-            // 현재 곡이 삭제되었으면 새로운 곡을 현재 곡으로 변경
+            // 현재 재생 중인 곡이 삭제되는 경우
+            if playlist.count > 1 {
+                // 다음 곡으로 이동 (마지막 곡이면 이전 곡으로)
+                if index == playlist.count {
+                    currentIndex = max(0, playlist.count - 1)
+                } else {
+                    currentIndex = index
+                }
+            } else {
+                currentIndex = 0
+            }
+            
+            onSongChanged?()
+            if isPlaying {
+                play()
+            } else {
+                player = nil
+            }
+        } else if index < currentIndex {
+            // 현재 곡보다 앞의 곡이 삭제되면 인덱스 조정
+            currentIndex -= 1
             onSongChanged?()
         }
     }
