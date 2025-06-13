@@ -33,22 +33,12 @@ class SongService {
 
         // 음악 정보 호출. playList 에 이미 있는 곡이라면 재요청.
         var response: SongResponse
-        var tryCount = 0
-        let maxTryCount = 5
-        repeat {
-            response = try await fetchRandomMusic(genre: realGenre)
-            tryCount += 1
-
-            if tryCount >= maxTryCount {
-                print("5번 연속 리스트에 있는 곡 호출. 무한루프 방지를 위해 루프 종료")
-                break
-            }
-        } while currentSongIdArr.contains(response.id)
+        response = try await fetchRandomMusic(genre: realGenre)
 
         // 썸네일 호출
         var thumbnailData: Data? = nil
 
-        if response.thumbnail == 1 {
+        if response.thumbnail == .exists {
             do {
                 thumbnailData = try await fetchThumbnailImage(from: response.streamUrl)
             } catch {

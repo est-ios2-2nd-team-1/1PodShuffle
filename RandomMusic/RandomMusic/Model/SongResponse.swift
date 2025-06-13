@@ -9,5 +9,5 @@ struct SongResponse: Codable {
     let genre: Genre.RawValue
     let id: Int
     let streamUrl: String
-    let thumbnail: Int
+    let thumbnail: ThumbnailResponseType
 }
