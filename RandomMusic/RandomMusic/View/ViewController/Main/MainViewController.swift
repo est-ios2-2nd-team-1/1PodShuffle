@@ -378,11 +378,18 @@ class MainViewController: UIViewController {
 
     /// 재생속도 변경 함수
     private func changePlaybackSpeed(_ speed: Float) {
-        PlayerManager.shared.currentPlaybackSpeed = speed
+        let pm = PlayerManager.shared
+        pm.currentPlaybackSpeed = speed
+        let isPlaying = pm.isPlaying
 
-        // AVAudioPlayer에 배속 적용
         if let player = PlayerManager.shared.player {
-            player.rate = speed
+            if isPlaying {
+                // 재생 중이었다면 새로운 배속으로 재생
+                player.rate = speed
+            } else {
+                // 일시정지 상태였다면 배속만 저장하고 일시정지 유지
+                player.rate = 0.0
+            }
         }
 
         // 배속에 따른 아이콘만 변경
