@@ -71,6 +71,7 @@ final class PlayerManager {
 
         setupPlayer(with: asset)
         player?.play()
+//        player?.rate = currentPlaybackSpeed
         updatePlayingState(true)
         UserDefaults.standard.set(currentIndex, forKey: "heardLastSong")
     }
