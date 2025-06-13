@@ -23,19 +23,9 @@ class MainViewController: UIViewController {
     @IBOutlet weak var playlistThumbnail: UIImageView!
     @IBOutlet weak var playlistTitleLabel: UILabel!
     @IBOutlet weak var playlistSingerLabel: UILabel!
-    @IBOutlet weak var mostTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var thumbnailImageWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var playlistBackgroundHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var playlistContentHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var playlistThumbnailWidthConstraint: NSLayoutConstraint!
-    @IBOutlet weak var topStackViewTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var topStackViewLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var progressStackViewLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var progressStackViewTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var buttonStackViewLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var buttonStackViewTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var playlistStackViewLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var playlistStackViewTrailingConstraint: NSLayoutConstraint!
 
     // MARK: - Properties
 
@@ -428,15 +418,26 @@ class MainViewController: UIViewController {
         present(alert, animated: true)
     }
 
-    /// 재생속도를 변경합니다.
+    /// 재생속도를 변경하고 UI를 업데이트합니다.
     ///
-    /// - Parameter speed: 새로운 재생 속도 (0.5 ~ 1.5)
+    /// 이 메서드는 현재 재생 상태를 고려하여 배속을 적용합니다:
+    /// - 재생 중인 경우: 즉시 새로운 배속으로 재생 계속
+    /// - 일시정지 상태인 경우: 배속 설정만 저장하고 일시정지 상태 유지
+    ///
+    /// 배속 변경 후 속도 버튼의 아이콘도 새로운 배속에 맞게 자동으로 업데이트됩니다.
+    ///
+    /// - Parameter speed: 새로운 재생 속도 (0.5 ~ 1.5 범위의 배속 값)
+    ///
+    /// - Note: 지원되는 재생 속도는 0.5x, 0.75x, 1.0x, 1.25x, 1.5x입니다.
     private func changePlaybackSpeed(_ speed: Float) {
         PlayerManager.shared.currentPlaybackSpeed = speed
 
-        // AVAudioPlayer에 배속 적용
         if let player = PlayerManager.shared.player {
-            player.rate = speed
+            if PlayerManager.shared.isPlaying {
+                player.rate = speed
+            } else {
+                player.rate = 0.0
+            }
         }
 
         // 배속에 따른 아이콘 변경
@@ -506,46 +507,22 @@ extension MainViewController {
 
     /// 아이패드용 레이아웃을 설정합니다.
     ///
-    /// 큰 화면에 맞춰 썸네일 크기, 버튼 크기, 여백을 조정합니다.
+    /// 큰 화면에 맞춰 썸네일 크기, 버튼 크기를 조정합니다.
     @MainActor
     private func setupLayoutForPad() {
-		// 최상단 여백
-        mostTopConstraint.constant = 40
-
-        // 메인 썸네일
-        thumbnailImageWidthConstraint.constant = 500
-
-        // 버튼 크기 업데이트
         updateButtonSizes(subPointSize: 30, mainPointSize: 60)
 
-        // 좌우 여백
-        let sidePadding: CGFloat = 40
-        updateConstraints(padding: sidePadding)
-
-        // 하단 재생목록
         let contentHeight: CGFloat = 120
         updatePlaylistLayout(contentHeight: contentHeight)
     }
 
     /// 아이폰용 레이아웃을 설정합니다.
     ///
-    /// 작은 화면에 맞춰 썸네일 크기, 버튼 크기, 여백을 조정합니다.
+    /// 작은 화면에 맞춰 썸네일 크기, 버튼 크기를 조정합니다.
     @MainActor
     private func setupLayoutForPhone() {
-        // 최상단 여백
-        mostTopConstraint.constant = 20
-
-        // 메인 썸네일
-        thumbnailImageWidthConstraint.constant = 300
-
-        // 버튼 크기 업데이트
         updateButtonSizes(subPointSize: 20, mainPointSize: 50)
 
-        // 좌우 여백
-        let sidePadding: CGFloat = 20
-        updateConstraints(padding: sidePadding)
-
-        // 하단 재생목록
         let contentHeight: CGFloat = 80
         updatePlaylistLayout(contentHeight: contentHeight)
     }
@@ -569,26 +546,6 @@ extension MainViewController {
         guard var mainConfig = playPauseButton.configuration else { return }
         mainConfig.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: mainPointSize)
         playPauseButton.configuration = mainConfig
-    }
-
-    /// 모든 스택뷰의 좌우 여백 제약조건을 업데이트합니다.
-    ///
-    /// - Parameter padding: 적용할 여백 크기 (포인트 단위)
-    private func updateConstraints(padding: CGFloat) {
-        let targetConstraints = [
-            topStackViewTrailingConstraint,
-            topStackViewLeadingConstraint,
-            progressStackViewLeadingConstraint,
-            progressStackViewTrailingConstraint,
-            buttonStackViewLeadingConstraint,
-            buttonStackViewTrailingConstraint,
-            playlistStackViewLeadingConstraint,
-            playlistStackViewTrailingConstraint
-        ]
-
-        for constraint in targetConstraints {
-            constraint?.constant = padding
-        }
     }
 
     /// 하단 재생목록 영역의 레이아웃을 업데이트합니다.
