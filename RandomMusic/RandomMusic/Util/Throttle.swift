@@ -2,7 +2,7 @@ import Foundation
 
 
 final class Throttle {
-    var isBlocking: Bool = false
+    private var isBlocking: Bool = false
 
     /// Throttle을 적용합니다.
     /// - Parameters:
