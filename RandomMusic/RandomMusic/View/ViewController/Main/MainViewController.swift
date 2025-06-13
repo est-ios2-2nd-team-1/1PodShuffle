@@ -365,7 +365,11 @@ class MainViewController: UIViewController {
     /// 재생목록에서 이전 곡으로 이동합니다.
     @IBAction func backwardTapped(_ sender: UIButton) {
         throttle.run {
-            PlayerManager.shared.moveBackward()
+            let canMoveToPrevious = PlayerManager.shared.moveBackward()
+
+            if !canMoveToPrevious {
+                self.showFirstSongAlert()
+            }
         }
     }
 

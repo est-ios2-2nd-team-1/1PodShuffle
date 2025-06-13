@@ -9,9 +9,12 @@ class PlayListViewController: UIViewController {
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var forButton: UIButton!
 
+    /// Throttle 객체
+    private let throttle = Throttle()
+
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
-    let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
-    let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
+    private let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
+    private let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,7 +86,13 @@ class PlayListViewController: UIViewController {
     
     /// 이전곡 버튼 터치
     @IBAction func backwardButton(_ sender: Any) {
-        PlayerManager.shared.moveBackward()
+        throttle.run {
+            let canMoveToPrevious = PlayerManager.shared.moveBackward()
+
+            if !canMoveToPrevious {
+                self.showFirstSongAlert()
+            }
+        }
     }
     
     /// 재생 버튼 터치
@@ -94,8 +103,10 @@ class PlayListViewController: UIViewController {
     
     /// 다음곡 버튼 터치
     @IBAction func forwardButton(_ sender: Any) {
-        Task { await PlayerManager.shared.moveForward() }
-        setPlayPauseButton()
+        throttle.run {
+            Task { await PlayerManager.shared.moveForward() }
+            self.setPlayPauseButton()
+        }
     }
     
     deinit {

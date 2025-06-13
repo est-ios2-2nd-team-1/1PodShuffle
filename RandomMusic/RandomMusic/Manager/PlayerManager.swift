@@ -97,11 +97,20 @@ final class PlayerManager {
         isRepeatEnabled.toggle()
     }
 
-    func moveBackward() {
-        if let playBackTime, playBackTime < 3.0 {
-            setCurrentIndex(currentIndex - 1)
-        }
-        play()
+    func moveBackward() -> Bool {
+        if playBackTime ?? 0 < 3.0 {
+            if currentIndex == 0 {
+                return false
+            } else {
+                setCurrentIndex(currentIndex - 1)
+            	play()
+            	return true
+        	}
+    	} else {
+        	seek(to: 0)
+            play()
+            return true
+    	}
     }
 
     func moveForward() async {
