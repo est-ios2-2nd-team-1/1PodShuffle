@@ -56,7 +56,7 @@ class PlayListViewController: UIViewController {
             self?.playProgressView.progress = Float(seconds / duration)
         }
 
-        PlayerManager.shared.onPlayList = { [weak self] in
+        PlayerManager.shared.onPlayListChanged = { [weak self] in
             Task { @MainActor in
                 self?.playListTableView.reloadData()
                 try? await Task.sleep(nanoseconds: 20_000_000) // 0.2초 = 2,00,000,000ns
@@ -64,7 +64,7 @@ class PlayListViewController: UIViewController {
             }
         }
         
-        PlayerManager.shared.onSongChangedToPlayListView = { [weak self] in
+        PlayerManager.shared.onSongChangedToPlaylistView = { [weak self] in
             Task { @MainActor in
                 self?.playListTableView.reloadData()
                 try? await Task.sleep(nanoseconds: 1_000_000)
