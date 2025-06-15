@@ -242,7 +242,9 @@ class MainViewController: UIViewController {
         updateMainViewUI(with: currentSong)
         updatePlaylistViewUI(with: currentSong)
         updateFeedbackState()
-        loadAndUpdateDuration()
+        Task {
+            await loadAndUpdateDuration()
+        }
     }
 
     /// 메인 재생 화면의 UI를 업데이트합니다.
@@ -286,15 +288,12 @@ class MainViewController: UIViewController {
     /// 현재 곡의 총 재생 시간을 로드하고 UI를 업데이트합니다.
     ///
     /// 비동기적으로 곡의 길이를 가져와 슬라이더의 최대값과 총 시간 레이블을 설정합니다.
-    private func loadAndUpdateDuration() {
-        PlayerManager.shared.loadDuration() { [weak self] seconds in
-            Task { @MainActor in
-                guard let self, let duration = seconds else { return }
+    @MainActor
+    private func loadAndUpdateDuration() async {
+        guard let duration = await PlayerManager.shared.loadDuration() else { return }
 
-                self.progressSlider.maximumValue = Float(duration)
-                self.totalTimeLabel.text = TimeFormatter.formatTime(duration)
-            }
-        }
+        progressSlider.maximumValue = Float(duration)
+        totalTimeLabel.text = TimeFormatter.formatTime(duration)
     }
 
     // MARK: - Action Methods
