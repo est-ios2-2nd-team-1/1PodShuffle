@@ -20,6 +20,7 @@ class PlayListViewController: UIViewController {
         super.viewDidLoad()
         setConfigureUI()
         bindPlayerCallbacks()
+        setDismissImageButton()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -42,8 +43,6 @@ class PlayListViewController: UIViewController {
         flowLayout.minimumInteritemSpacing = 30
         flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         collectionView.collectionViewLayout = flowLayout
-        
-        setDismissImageButton()
     }
 
     /// 재생/일시정지 버튼 UI
@@ -67,13 +66,16 @@ class PlayListViewController: UIViewController {
 
         PlayerManager.shared.onPlayListChanged = { [weak self] in
             Task { @MainActor in
-                self?.playListTableView.reloadData()
+                UIView.performWithoutAnimation {
+                    self?.playListTableView.reloadData()
+                }
             }
         }
         
         PlayerManager.shared.onSongChangedToPlaylistView = { [weak self] in
             Task { @MainActor in
                 self?.playListTableView.reloadData()
+                self?.setDismissImageButton()
                 try? await Task.sleep(nanoseconds: 1_000_000)
                 self?.scrollSelectPlaySong()
             }
@@ -94,8 +96,8 @@ class PlayListViewController: UIViewController {
     /// Dismiss Image Button 이미지 세팅
     private func setDismissImageButton() {
         guard let song = PlayerManager.shared.currentSong,
-              let thumanilData = song.thumbnailData,
-              let image = UIImage(data: thumanilData) else { return }
+              let thumbnailData = song.thumbnailData,
+              let image = UIImage(data: thumbnailData) else { return }
         
         dismissImageButton.clipsToBounds = true
         dismissImageButton.layer.cornerRadius = dismissImageButton.bounds.height / 3
