@@ -390,6 +390,7 @@ class MainViewController: UIViewController {
     /// 이전 곡 버튼이 탭되었을 때 호출됩니다.
     ///
     /// 재생목록에서 이전 곡으로 이동합니다.
+    /// 첫 번째 곡인 경우 알림을 표시합니다.
     @IBAction func backwardTapped(_ sender: UIButton) {
         throttle.run {
             let canMoveToPrevious = PlayerManager.shared.moveBackward()
@@ -409,7 +410,7 @@ class MainViewController: UIViewController {
         }
     }
 
-    /// 반복 버튼을 탭했을 때 반복 모드를 토글합니다.
+    /// 반복 버튼을 탭했을 때 호출됩니다.
     ///
     /// 반복 재생 모드를 토글하고 버튼 아이콘을 업데이트합니다.
     @IBAction func repeatTapped(_ sender: UIButton) {
@@ -431,6 +432,7 @@ class MainViewController: UIViewController {
     /// 재생속도 버튼을 탭했을 때 호출됩니다.
     ///
     /// 재생 속도 선택을 위한 액션 시트를 표시합니다.
+    /// iPad에서는 popover로 표시됩니다.
     @IBAction func speedTapped(_ sender: UIButton) {
         let alert = UIAlertController(title: "재생 속도", message: nil, preferredStyle: .actionSheet)
 
