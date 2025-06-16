@@ -2,6 +2,7 @@ import UIKit
 
 class PlayListViewController: UIViewController {
     @IBOutlet weak var playListTableView: UITableView!
+    @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var playProgressView: UIProgressView!
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var playButton: UIButton!
@@ -16,12 +17,12 @@ class PlayListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setButtonUI()
+        setConfigureUI()
         bindPlayerCallbacks()
     }
 
     /// 재생, 이전곡, 다음곡 버튼 UI Setting
-    private func setButtonUI() {
+    private func setConfigureUI() {
         let backImage = UIImage(systemName: "backward.frame.fill", withConfiguration: backforConfig)
         let forImage = UIImage(systemName: "forward.frame.fill", withConfiguration: backforConfig)
 
@@ -29,6 +30,12 @@ class PlayListViewController: UIViewController {
         forButton.setImage(forImage, for: .normal)
 
         setPlayPauseButton()
+
+        let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.scrollDirection = .horizontal
+        flowLayout.minimumInteritemSpacing = 30
+        flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        collectionView.collectionViewLayout = flowLayout
     }
 
     /// 재생/일시정지 버튼 UI
@@ -158,5 +165,23 @@ extension PlayListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         PlayerManager.shared.setCurrentIndex(indexPath.row)
         PlayerManager.shared.play()
+    }
+}
+
+extension PlayListViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return Genre.allCases.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: CategoryCell.self), for: indexPath) as! CategoryCell
+        cell.configureUI(with: Genre.allCases[indexPath.item])
+        return cell
+    }
+}
+
+extension PlayListViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
     }
 }
