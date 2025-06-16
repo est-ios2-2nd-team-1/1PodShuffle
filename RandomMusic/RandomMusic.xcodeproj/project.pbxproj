@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		26C6C8BE2DF6C7DA000B2DEA /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 26C6C8BD2DF6C7DA000B2DEA /* Secrets.xcconfig */; };
+		78398F162DFFED4800FAF534 /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 78398F152DFFED4800FAF534 /* MarqueeLabel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78398F162DFFED4800FAF534 /* MarqueeLabel in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -52,6 +54,7 @@
 			children = (
 				26C6C8BD2DF6C7DA000B2DEA /* Secrets.xcconfig */,
 				26BBC5862DF460B900699799 /* RandomMusic */,
+				78398F132DFFECC400FAF534 /* Frameworks */,
 				26BBC5852DF460B900699799 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,6 +65,13 @@
 				26BBC5842DF460B900699799 /* RandomMusic.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		78398F132DFFECC400FAF534 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -84,6 +94,7 @@
 			);
 			name = RandomMusic;
 			packageProductDependencies = (
+				78398F152DFFED4800FAF534 /* MarqueeLabel */,
 			);
 			productName = RandomMusic;
 			productReference = 26BBC5842DF460B900699799 /* RandomMusic.app */;
@@ -113,6 +124,9 @@
 			);
 			mainGroup = 26BBC57B2DF460B900699799;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				78398F142DFFED4800FAF534 /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 26BBC5852DF460B900699799 /* Products */;
 			projectDirPath = "";
@@ -352,6 +366,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		78398F142DFFED4800FAF534 /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/cbpowell/MarqueeLabel";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		78398F152DFFED4800FAF534 /* MarqueeLabel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 78398F142DFFED4800FAF534 /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
+			productName = MarqueeLabel;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 26BBC57C2DF460B900699799 /* Project object */;
 }
