@@ -1,6 +1,4 @@
 import UIKit
-import CoreData
-import AVKit
 
 class PlayListViewController: UIViewController {
     @IBOutlet weak var playListTableView: UITableView!
@@ -18,10 +16,6 @@ class PlayListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-    }
-
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
         setButtonUI()
         bindPlayerCallbacks()
     }
@@ -85,7 +79,7 @@ class PlayListViewController: UIViewController {
     }
     
     /// 이전곡 버튼 터치
-    @IBAction func backwardButton(_ sender: Any) {
+    @IBAction func backwardButton(_ sender: UIButton) {
         throttle.run {
             let canMoveToPrevious = PlayerManager.shared.moveBackward()
 
@@ -96,22 +90,29 @@ class PlayListViewController: UIViewController {
     }
     
     /// 재생 버튼 터치
-    @IBAction func playButton(_ sender: Any) {
+    @IBAction func playButton(_ sender: UIButton) {
         PlayerManager.shared.togglePlayPause()
-        setPlayPauseButton()
     }
     
     /// 다음곡 버튼 터치
-    @IBAction func forwardButton(_ sender: Any) {
+    @IBAction func forwardButton(_ sender: UIButton) {
         throttle.run {
             Task { await PlayerManager.shared.moveForward() }
-            self.setPlayPauseButton()
         }
+    }
+    
+    /// edit 버튼 터치
+    /// Edit Mode로 전환되어 삭제 맟 플레이리스트 순서 변경이 가능합니다
+    @IBAction func editButton(_ sender: UIBarButtonItem) {
+        playListTableView.setEditing(!playListTableView.isEditing, animated: true)
+        sender.title = playListTableView.isEditing ? "Done" : "Edit"
     }
     
     deinit {
         PlayerManager.shared.onTimeUpdateToPlaylistView = nil
         PlayerManager.shared.onPlayStateChangedToPlaylistView = nil
+        PlayerManager.shared.onPlayListChanged = nil
+        PlayerManager.shared.onSongChangedToPlaylistView = nil
     }
 }
 
@@ -137,10 +138,23 @@ extension PlayListViewController: UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
+    
+    /// 행이동 가능하도록 설정
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        PlayerManager.shared.updateOrder(from: sourceIndexPath.row, to: destinationIndexPath.row)
+    }
 }
 
 // MARK: - TableView Delegate
 extension PlayListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 80
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         PlayerManager.shared.setCurrentIndex(indexPath.row)
         PlayerManager.shared.play()

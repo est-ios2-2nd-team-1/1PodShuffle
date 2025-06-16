@@ -14,12 +14,12 @@ class SongTableViewCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         isPlaying = false
-        setContentViewBgColor()
+        setCellBgColor()
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        setContentViewBgColor()
+        setCellBgColor()
     }
     
     func setUI(model: SongModel, isPlaying: Bool) {
@@ -34,10 +34,11 @@ class SongTableViewCell: UITableViewCell {
         titleLabel.text = model.title
         
         self.isPlaying = isPlaying
-        setContentViewBgColor()
+        setCellBgColor()
     }
     
-    func setContentViewBgColor() {
+    /// select cell backgroundColor setting
+    func setCellBgColor() {
         UIView.animate(withDuration: 0.4) {
             self.backgroundColor = self.isPlaying ? .main : .clear
         }

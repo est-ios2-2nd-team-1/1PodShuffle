@@ -26,8 +26,8 @@ final class DataManager {
     /// - Returns: 음악 데이터를 날짜순으로 반환합니다.
     func fetchSongData() -> [SongModel] {
         let request = Song.fetchRequest()
-        let sortedByDateDesc = NSSortDescriptor(key: "insertDate", ascending: true)
-        request.sortDescriptors = [sortedByDateDesc]
+        let sortedByOrderDesc = NSSortDescriptor(key: "order", ascending: true)
+        request.sortDescriptors = [sortedByOrderDesc]
 
         do {
             let songList = try mainContext.fetch(request)
@@ -54,6 +54,9 @@ final class DataManager {
 
         let thumbnailFileName = String(newSong.id) + ".jpg"
         newSong.thumbnail = thumbnailFileName
+        
+        let maxOrderValue = fetchMaxOrderValue()
+        newSong.order = maxOrderValue + 1
 
         insertImageFile(fileName: thumbnailFileName, data: song.thumbnailData)
         saveContext()
@@ -75,6 +78,24 @@ final class DataManager {
             }
         } catch {
             print(error)
+        }
+    }
+    
+    /// 음악 데이터 순서를 영구적으로 변경합니다.
+    /// (PlayManager로부터 호출받습니다.)
+    /// - Parameter model: 순서를 변경할 음악 데이터를 받습니다
+    func updateOrder(for models: [SongModel]) {
+        let request = Song.fetchRequest()
+        do {
+            let songs = try mainContext.fetch(request)
+            for (index, model) in models.enumerated() {
+                if let song = songs.first(where: { $0.id == Int64(model.id) }) {
+                    song.setValue(Int64(index), forKey: "order")
+                }
+            }
+            saveContext()
+        } catch {
+            print("Order update failed: \(error)")
         }
     }
 
@@ -122,5 +143,25 @@ private extension DataManager {
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    func fetchMaxOrderValue() -> Int64 {
+        let request = NSFetchRequest<NSDictionary>(entityName: "Song")
+        request.resultType = .dictionaryResultType
+        let expressionDesc = NSExpressionDescription()
+        expressionDesc.name = "maxOrder"
+        expressionDesc.expression = NSExpression(forFunction: "max:", arguments: [NSExpression(forKeyPath: "order")])
+        expressionDesc.expressionResultType = .integer64AttributeType
+        request.propertiesToFetch = [expressionDesc]
+        
+        do {
+            if let result = try mainContext.fetch(request).first,
+               let maxValue = result["maxOrder"] as? Int64 {
+                return maxValue
+            }
+        } catch {
+            print("fetchMaxOrderValue 에러: \(error)")
+        }
+        return 0
     }
 }

@@ -163,6 +163,33 @@ final class PlayerManager {
             handleSongRemoval(at: index)
         }
     }
+    
+    /// 플레이리스트 순서를 업데이트합니다
+    func updateOrder(from sourceIndex: Int, to destinationIndex: Int) {
+        guard sourceIndex != destinationIndex,
+              sourceIndex >= 0, sourceIndex < playlist.count,
+              destinationIndex >= 0, destinationIndex <= playlist.count else { return }
+        
+        var newList = playlist
+        let movedSong = newList.remove(at: sourceIndex)
+        newList.insert(movedSong, at: destinationIndex)
+        setPlaylist(newList)
+        
+        // CoreData 반영 (DataManager가 영구저장 책임)
+        DataManager.shared.updateOrder(for: playlist)
+        
+        /// 현재 재생 중인 곡 인덱스 보정
+        if currentIndex == sourceIndex {
+            // 이동된 곡이 현재 재생 중인 곡인 경우
+            setCurrentIndex(destinationIndex > sourceIndex ? destinationIndex - 1 : destinationIndex)
+        } else if sourceIndex < currentIndex && destinationIndex >= currentIndex {
+            // 현재 곡보다 앞에서 뒤로 이동한 경우
+            setCurrentIndex(currentIndex - 1)
+        } else if sourceIndex > currentIndex && destinationIndex <= currentIndex {
+            // 현재 곡보다 뒤에서 앞으로 이동한 경우
+            setCurrentIndex(currentIndex + 1)
+        }
+    }
 
     /// 플레이리스트를 초기화합니다.
     func clearPlaylist() {
