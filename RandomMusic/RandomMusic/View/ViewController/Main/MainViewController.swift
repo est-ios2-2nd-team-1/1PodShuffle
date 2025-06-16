@@ -1,5 +1,6 @@
 import UIKit
 import AVFoundation
+import MarqueeLabel
 
 class MainViewController: UIViewController {
 
@@ -7,8 +8,6 @@ class MainViewController: UIViewController {
 
     @IBOutlet weak var dislikeButton: UIButton!
     @IBOutlet weak var likeButton: UIButton!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var singerLabel: UILabel!
     @IBOutlet weak var thumbnailImageView: UIImageView!
     @IBOutlet weak var currentTimeLabel: UILabel!
     @IBOutlet weak var totalTimeLabel: UILabel!
@@ -26,6 +25,9 @@ class MainViewController: UIViewController {
     @IBOutlet weak var playlistBackgroundHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var playlistContentHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var playlistThumbnailWidthConstraint: NSLayoutConstraint!
+
+    @IBOutlet weak var titleLabel: MarqueeLabel!
+    @IBOutlet weak var singerLabel: MarqueeLabel!
 
     // MARK: - Properties
 
@@ -52,6 +54,7 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
 
         setupInitialButtonConfigurations()
+        setupMarqueeLabels()
         setupSlider()
         updateSongUI()
         bindPlayerCallbacks()
@@ -133,6 +136,26 @@ class MainViewController: UIViewController {
         }
 
         button.configuration = config
+    }
+
+    /// MarqueeLabel들의 초기 설정을 수행합니다.
+    ///
+    /// 곡 제목과 아티스트명이 표시되는 레이블들을 MarqueeLabel로 설정하여,
+    /// 텍스트가 레이블 영역을 넘어갈 때 자동으로 가로 스크롤 애니메이션이 적용되도록 합니다.
+    private func setupMarqueeLabels() {
+        titleLabel.type = .continuous
+        titleLabel.speed = .duration(15.0)
+        titleLabel.fadeLength = 10.0
+        titleLabel.leadingBuffer = 20.0
+        titleLabel.trailingBuffer = 20.0
+        titleLabel.animationDelay = 1.0
+
+        singerLabel.type = .continuous
+        singerLabel.speed = .duration(12.0)
+        singerLabel.fadeLength = 8.0
+        singerLabel.leadingBuffer = 15.0
+        singerLabel.trailingBuffer = 15.0
+        singerLabel.animationDelay = 1.5
     }
 
     /// 진행률 슬라이더의 초기 설정을 수행합니다.
@@ -255,6 +278,9 @@ class MainViewController: UIViewController {
     private func updateMainViewUI(with song: SongModel) {
         titleLabel.text = song.title
         singerLabel.text = song.artist
+
+        titleLabel.restartLabel()
+        singerLabel.restartLabel()
 
         guard let thumbnailData = song.thumbnailData,
               let image = UIImage(data: thumbnailData) else { return }
