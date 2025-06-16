@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="eLK-HM-NZt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="eLK-HM-NZt">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -61,6 +61,18 @@
                                             <constraint firstAttribute="height" constant="50" id="OgE-U1-c8f"/>
                                         </constraints>
                                     </stackView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qsu-nl-TTv">
+                                        <rect key="frame" x="313" y="37.666666666666629" width="45" height="45"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="Qsu-nl-TTv" secondAttribute="height" multiplier="1:1" id="MyV-pv-YLj"/>
+                                            <constraint firstAttribute="height" constant="45" id="iI9-It-pwz"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="photo" catalog="system"/>
+                                        <connections>
+                                            <action selector="dismissButton:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="4bh-AX-dcX"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
@@ -68,12 +80,14 @@
                                     <constraint firstAttribute="height" constant="120" id="6m5-zI-ELA"/>
                                     <constraint firstAttribute="trailing" secondItem="m5B-e2-0hz" secondAttribute="trailing" id="6uS-g4-Mcm"/>
                                     <constraint firstItem="m5B-e2-0hz" firstAttribute="top" secondItem="uxS-el-Qhh" secondAttribute="top" id="7Jx-F4-wOR"/>
+                                    <constraint firstItem="Qsu-nl-TTv" firstAttribute="centerY" secondItem="uxS-el-Qhh" secondAttribute="centerY" id="9Hy-xj-Rsw"/>
+                                    <constraint firstAttribute="trailing" secondItem="Qsu-nl-TTv" secondAttribute="trailing" constant="35" id="FQZ-Yd-zzr"/>
                                     <constraint firstItem="LV8-q0-7Dy" firstAttribute="centerY" secondItem="uxS-el-Qhh" secondAttribute="centerY" id="LNa-UA-1Wl"/>
                                     <constraint firstItem="m5B-e2-0hz" firstAttribute="leading" secondItem="uxS-el-Qhh" secondAttribute="leading" id="bax-dI-0Xq"/>
                                 </constraints>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="ad3-hD-kng">
-                                <rect key="frame" x="0.0" y="153" width="393" height="579"/>
+                                <rect key="frame" x="0.0" y="212" width="393" height="520"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SongTableViewCell" id="ntD-lu-3Gm" customClass="SongTableViewCell" customModule="RandomMusic" customModuleProvider="target">
@@ -94,13 +108,13 @@
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="XSV-i7-biX">
                                                     <rect key="frame" x="95.333333333333343" y="20.000000000000004" width="277.66666666666663" height="40.333333333333343"/>
                                                     <subviews>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6yF-0v-LmJ">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6yF-0v-LmJ" customClass="MarqueeLabel" customModule="MarqueeLabel">
                                                             <rect key="frame" x="0.0" y="0.0" width="277.66666666666669" height="20.333333333333332"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nez-rk-aRf">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nez-rk-aRf" customClass="MarqueeLabel" customModule="MarqueeLabel">
                                                             <rect key="frame" x="0.0" y="20.333333333333336" width="277.66666666666669" height="20"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                             <color key="textColor" systemColor="secondaryLabelColor"/>
@@ -132,7 +146,7 @@
                                 </connections>
                             </tableView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="HqW-tb-mRZ">
-                                <rect key="frame" x="0.0" y="103" width="393" height="50"/>
+                                <rect key="frame" x="0.0" y="162" width="393" height="50"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Z6I-M8-mL1"/>
@@ -205,7 +219,13 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Playlist" id="Paf-uj-sfr">
-                        <barButtonItem key="rightBarButtonItem" title="edit" id="hmL-Ya-fP4">
+                        <barButtonItem key="leftBarButtonItem" title="Item" image="chevron.down" catalog="system" id="YUb-H2-N2C">
+                            <color key="tintColor" systemColor="secondaryLabelColor"/>
+                            <connections>
+                                <action selector="dismissButton:" destination="Y6W-OH-hqX" id="aVP-YN-ktb"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="edit" image="ellipsis" catalog="system" id="hmL-Ya-fP4">
                             <color key="tintColor" systemColor="secondaryLabelColor"/>
                             <connections>
                                 <action selector="editButton:" destination="Y6W-OH-hqX" id="n1i-5R-aJN"/>
@@ -215,6 +235,7 @@
                     <connections>
                         <outlet property="backButton" destination="dQo-7a-B3E" id="PdY-CK-rmE"/>
                         <outlet property="collectionView" destination="HqW-tb-mRZ" id="9hV-nd-dpq"/>
+                        <outlet property="dismissImageButton" destination="Qsu-nl-TTv" id="0cy-Pg-2sa"/>
                         <outlet property="forButton" destination="mrz-yj-NHT" id="TmM-zp-BGY"/>
                         <outlet property="playButton" destination="VLJ-GC-UZL" id="YNN-Mw-E2R"/>
                         <outlet property="playListTableView" destination="ad3-hD-kng" id="KVm-5d-fNm"/>
@@ -231,7 +252,7 @@
                 <navigationController storyboardIdentifier="PlayListView" title="PlayListView" automaticallyAdjustsScrollViewInsets="NO" id="eLK-HM-NZt" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="j5f-by-1bS">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <rect key="frame" x="0.0" y="118" width="393" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -246,7 +267,10 @@
     </scenes>
     <resources>
         <image name="backward.frame.fill" catalog="system" width="128" height="87"/>
+        <image name="chevron.down" catalog="system" width="128" height="70"/>
+        <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="forward.frame.fill" catalog="system" width="128" height="87"/>
+        <image name="photo" catalog="system" width="128" height="93"/>
         <image name="play.circle.fill" catalog="system" width="128" height="123"/>
         <namedColor name="MainColor">
             <color red="0.78799998760223389" green="0.9100000262260437" blue="0.31000000238418579" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

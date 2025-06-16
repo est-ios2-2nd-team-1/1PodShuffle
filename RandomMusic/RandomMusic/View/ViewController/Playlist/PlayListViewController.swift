@@ -7,21 +7,28 @@ class PlayListViewController: UIViewController {
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var forButton: UIButton!
+    @IBOutlet weak var dismissImageButton: UIButton!
 
     /// Throttle 객체
     private let throttle = Throttle()
 
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
-    private let playConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular, scale: .large)
-    private let backforConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .regular, scale: .large)
+    private let playConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .regular, scale: .large)
+    private let backforConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .regular, scale: .large)
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setConfigureUI()
         bindPlayerCallbacks()
+        setDismissImageButton()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        scrollSelectPlaySong()
     }
 
-    /// 재생, 이전곡, 다음곡 버튼 UI Setting
+    /// UI Setting
     private func setConfigureUI() {
         let backImage = UIImage(systemName: "backward.frame.fill", withConfiguration: backforConfig)
         let forImage = UIImage(systemName: "forward.frame.fill", withConfiguration: backforConfig)
@@ -59,15 +66,16 @@ class PlayListViewController: UIViewController {
 
         PlayerManager.shared.onPlayListChanged = { [weak self] in
             Task { @MainActor in
-                self?.playListTableView.reloadData()
-                try? await Task.sleep(nanoseconds: 20_000_000) // 0.2초 = 2,00,000,000ns
-                self?.scrollSelectPlaySong()
+                UIView.performWithoutAnimation {
+                    self?.playListTableView.reloadData()
+                }
             }
         }
         
         PlayerManager.shared.onSongChangedToPlaylistView = { [weak self] in
             Task { @MainActor in
                 self?.playListTableView.reloadData()
+                self?.setDismissImageButton()
                 try? await Task.sleep(nanoseconds: 1_000_000)
                 self?.scrollSelectPlaySong()
             }
@@ -83,6 +91,47 @@ class PlayListViewController: UIViewController {
         
         let indexPath = IndexPath(row: index, section: 0)
         playListTableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+    }
+    
+    /// Dismiss Image Button 이미지 세팅
+    private func setDismissImageButton() {
+        guard let song = PlayerManager.shared.currentSong,
+              let thumbnailData = song.thumbnailData,
+              let image = UIImage(data: thumbnailData) else { return }
+        
+        dismissImageButton.clipsToBounds = true
+        dismissImageButton.layer.cornerRadius = dismissImageButton.bounds.height / 3
+        
+        let buttonSize = dismissImageButton.bounds.size
+        let resizedImage = resizeImage(image: image, targetSize: buttonSize)
+        dismissImageButton.setImage(resizedImage, for: .normal)
+    }
+    
+    /// image resize
+    /// - targetSize에 맞게 이미지 사이즈를 조정합니다
+    private func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage? {
+        let size = image.size
+        
+        let widthRatio  = targetSize.width  / size.width
+        let heightRatio = targetSize.height / size.height
+        
+        // 비율을 유지하면서 크기 조정
+        let newSize: CGSize
+        if widthRatio > heightRatio {
+            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
+        } else {
+            newSize = CGSize(width: size.width * widthRatio, height: size.height * widthRatio)
+        }
+        
+        // 실제 이미지 리사이즈
+        let rect = CGRect(origin: .zero, size: newSize)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        image.draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage
     }
     
     /// 이전곡 버튼 터치
@@ -112,7 +161,14 @@ class PlayListViewController: UIViewController {
     /// Edit Mode로 전환되어 삭제 맟 플레이리스트 순서 변경이 가능합니다
     @IBAction func editButton(_ sender: UIBarButtonItem) {
         playListTableView.setEditing(!playListTableView.isEditing, animated: true)
-        sender.title = playListTableView.isEditing ? "Done" : "Edit"
+    }
+    
+    /// dismiss 버튼, 이미지 버튼 터치
+    /// 플레이리스트 화면은 dismiss되고 재생화면으로 돌아갑니다
+    /// - dismiss 버튼: 화면 좌측 상단
+    /// - 이미지 버튼: 화면 우측 하단의 이미지로 현재 재생중인 곡의 thumailImage가 표시됩니다
+    @IBAction func dismissButton(_ sender: Any) {
+        dismiss(animated: true)
     }
     
     deinit {
