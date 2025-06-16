@@ -10,6 +10,16 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--SettingView-->
+        <scene sceneID="pW5-rQ-4yi">
+            <objects>
+                <viewControllerPlaceholder storyboardIdentifier="SettingView" storyboardName="SettingView" referencedIdentifier="SettingView" id="HVO-Lc-RNc" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Item" id="fS2-7Y-lwn"/>
+                </viewControllerPlaceholder>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Mbf-AC-unB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1984" y="61"/>
+        </scene>
         <!--메인-->
         <scene sceneID="O4Q-Cx-Ami">
             <objects>
@@ -322,85 +332,16 @@
                     </tabBar>
                     <connections>
                         <segue destination="oUJ-Ad-HvN" kind="relationship" relationship="viewControllers" id="TYK-LE-VRW"/>
-                        <segue destination="SHB-df-90X" kind="relationship" relationship="viewControllers" id="PZj-aC-pbn"/>
+                        <segue destination="HVO-Lc-RNc" kind="relationship" relationship="viewControllers" id="7J6-8t-bmE"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1Dh-ki-oyh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2013" y="-756"/>
         </scene>
-        <!--Setting-->
-        <scene sceneID="RWa-aM-HHW">
-            <objects>
-                <viewController id="ncp-RX-u9U" customClass="SettingViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="AKq-MR-kV5">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ngv-yp-JMR">
-                                <rect key="frame" x="20" y="634" width="353" height="35"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="추천 알고리즘 초기화">
-                                    <color key="baseForegroundColor" red="0.78823529410000004" green="0.0" blue="0.047058823530000002" alpha="1" colorSpace="calibratedRGB"/>
-                                </buttonConfiguration>
-                                <connections>
-                                    <action selector="resetButtonTapped:" destination="ncp-RX-u9U" eventType="touchUpInside" id="hjM-lU-YCf"/>
-                                </connections>
-                            </button>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hpm-zS-mma">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="220"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="220" id="IB6-0R-XdO"/>
-                                </constraints>
-                            </view>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="PqN-Tj-J9f"/>
-                        <color key="backgroundColor" systemColor="systemGray6Color"/>
-                        <constraints>
-                            <constraint firstItem="Ngv-yp-JMR" firstAttribute="leading" secondItem="PqN-Tj-J9f" secondAttribute="leading" constant="20" id="31K-HS-Ulq"/>
-                            <constraint firstItem="PqN-Tj-J9f" firstAttribute="trailing" secondItem="Ngv-yp-JMR" secondAttribute="trailing" constant="20" id="LlW-EG-lSO"/>
-                            <constraint firstItem="hpm-zS-mma" firstAttribute="top" secondItem="AKq-MR-kV5" secondAttribute="top" id="Lz5-ZY-ZrD"/>
-                            <constraint firstItem="hpm-zS-mma" firstAttribute="leading" secondItem="PqN-Tj-J9f" secondAttribute="leading" id="jNU-PI-1lF"/>
-                            <constraint firstItem="hpm-zS-mma" firstAttribute="trailing" secondItem="PqN-Tj-J9f" secondAttribute="trailing" id="p44-1a-TgT"/>
-                            <constraint firstItem="PqN-Tj-J9f" firstAttribute="bottom" secondItem="Ngv-yp-JMR" secondAttribute="bottom" constant="100" id="wKq-5p-Acx"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" title="Setting" id="UNc-at-UET">
-                        <barButtonItem key="backBarButtonItem" title="Back" id="qba-Lm-OpR"/>
-                    </navigationItem>
-                    <connections>
-                        <outlet property="resetButton" destination="Ngv-yp-JMR" id="AQN-gm-bsE"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Aad-zz-jpq" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1908" y="880"/>
-        </scene>
-        <!--설정-->
-        <scene sceneID="mhc-w7-RKN">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="SHB-df-90X" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="설정" image="ellipsis" catalog="system" id="7QT-aS-1J7"/>
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="BLL-aZ-lTW">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="ncp-RX-u9U" kind="relationship" relationship="rootViewController" id="RMa-5t-ZBY"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="I9b-lV-Zab" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1908" y="18"/>
-        </scene>
     </scenes>
     <resources>
         <image name="backward.frame.fill" catalog="system" width="128" height="87"/>
-        <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="forward.frame.fill" catalog="system" width="128" height="87"/>
         <image name="gauge.with.dots.needle.50percent" catalog="system" width="128" height="123"/>
         <image name="hand.thumbsdown" catalog="system" width="123" height="128"/>
@@ -416,9 +357,6 @@
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemGray6Color">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
