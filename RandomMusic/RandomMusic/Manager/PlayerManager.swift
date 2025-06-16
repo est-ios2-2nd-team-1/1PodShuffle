@@ -134,8 +134,9 @@ final class PlayerManager {
         onSongChangedToPlaylistView?()
     }
 
-    // TODO: 작업
-    func addSongs(genre: Genre) {
+    /// 장르별로 10곡을 추가합니다.
+    /// - Parameter genre: 장르를 받습니다.
+    func addSongs(from genre: Genre) {
         Task {
             let songs = try await songService.getMusics(genre: genre)
             songs.forEach { DataManager.shared.insertSongData(from: $0) }

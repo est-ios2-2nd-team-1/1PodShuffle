@@ -54,7 +54,10 @@ class SongService {
         return songModel
     }
 
-    // TODO: 작업
+    // MARK: 추가된 메소드입니다. (장르별 10곡)
+    /// 장르별로 10곡을 가져오는 메소드입니다.
+    /// - Parameter genre: 선택된 장르를 받습니다.
+    /// - Returns: 해당 장르의 10곡을 반환합니다.
     func getMusics(genre: Genre? = nil) async throws -> [SongModel] {
         var realGenre: Genre
 

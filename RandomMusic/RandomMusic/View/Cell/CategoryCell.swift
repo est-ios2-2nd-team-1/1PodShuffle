@@ -1,7 +1,6 @@
 import UIKit
 
 class CategoryCell: UICollectionViewCell {
-
     @IBOutlet weak var mainView: UIView!
     @IBOutlet weak var mainLabel: UILabel!
 
