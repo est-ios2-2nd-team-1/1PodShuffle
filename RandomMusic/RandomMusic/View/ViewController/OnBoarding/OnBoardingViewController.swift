@@ -18,6 +18,11 @@ class OnBoardingViewController: UIViewController {
         setupCollectionView()
         setupTitleLabel()
         adjustLayoutForDevice()
+
+        if UIDevice.current.userInterfaceIdiom != .pad {
+                // iPhone일 때만 높이 고정
+                collectionView.heightAnchor.constraint(equalToConstant: 300).isActive = true
+            }
     }
     
     private func setupCollectionView() {
@@ -125,43 +130,32 @@ extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
         let screenHeight = UIScreen.main.bounds.height
         let screenWidth = UIScreen.main.bounds.width
         let isPad = UIDevice.current.userInterfaceIdiom == .pad
-        let isLandscape = view.frame.width > view.frame.height
-        
-        let numberOfColumns: CGFloat = {
-            if isPad {
-                return isLandscape ? 5 : 4
-            } else {
-                return screenHeight <= 568 ? 2 : 3
-            }
-        }()
-        let spacing: CGFloat = screenHeight <= 568 ? 6 : 8
-        let totalSpacing = spacing * (numberOfColumns + 1)
-        let width = (collectionView.bounds.width - totalSpacing) / numberOfColumns
-        let cellHeight = min(width, screenHeight * 0.12)
-        return CGSize(width: width, height: cellHeight)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        let screenHeight = UIScreen.main.bounds.height
-        let isPad = UIDevice.current.userInterfaceIdiom == .pad
+
+        let spacing: CGFloat = 8
 
         if isPad {
-            return UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
-        } else {
-            let spacing: CGFloat = screenHeight <= 568 ? 4 : 6
-            return UIEdgeInsets(top: spacing, left: spacing, bottom: spacing, right: spacing)
-        }
+            // iPad에서는 가로 셀 수를 해상도에 따라 유동적으로 결정
+            let isLandscape = view.frame.width > view.frame.height
+            let numberOfColumns: CGFloat = isLandscape ? 5 : 4
+            let totalSpacing = spacing * (numberOfColumns + 1)
+            let width = (collectionView.bounds.width - totalSpacing) / numberOfColumns
+            let cellHeight = min(width, screenHeight * 0.12)
+            return CGSize(width: width, height: cellHeight)
 
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        let screenHeight = UIScreen.main.bounds.height
-        let isPad = UIDevice.current.userInterfaceIdiom == .pad
-        
-        if isPad {
-            return 6
         } else {
-            return screenHeight <= 568 ? 3 : 5
+            // iPhone은 무조건 3 x 2 고정
+            let numberOfColumns: CGFloat = 3
+            let numberOfRows: CGFloat = 2
+
+            let totalHorizontalSpacing = spacing * (numberOfColumns + 1)
+            let width = (collectionView.bounds.width - totalHorizontalSpacing) / numberOfColumns
+
+            // ⚠️ CollectionView 높이도 2줄에 맞게 고정해줘야 함!
+            let totalVerticalSpacing = spacing * (numberOfRows + 1)
+            let height = (collectionView.bounds.height - totalVerticalSpacing) / numberOfRows
+
+            return CGSize(width: width, height: height)
         }
     }
 }
+
