@@ -1,9 +1,7 @@
 import UIKit
 
 class SettingViewController: UIViewController {
-
     @IBOutlet weak var resetButton: UIButton!
-
 
     private let preferenceManager = PreferenceManager()
 

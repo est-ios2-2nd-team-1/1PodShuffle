@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="oUJ-Ad-HvN">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="3Pb-ze-kdT">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Main View Controller-->
+        <!--메인-->
         <scene sceneID="O4Q-Cx-Ami">
             <objects>
                 <viewController storyboardIdentifier="MainVC" id="oUJ-Ad-HvN" customClass="MainViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
@@ -19,10 +19,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="60" translatesAutoresizingMaskIntoConstraints="NO" id="csQ-jE-PJx">
-                                <rect key="frame" x="0.0" y="138" width="393" height="714"/>
+                                <rect key="frame" x="0.0" y="79" width="393" height="773"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="1uq-HC-Gcy">
-                                        <rect key="frame" x="0.0" y="0.0" width="393" height="714"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="773"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="KkE-tO-Z9x">
                                                 <rect key="frame" x="20" y="0.0" width="353" height="50.666666666666664"/>
@@ -51,7 +51,7 @@
                                                                 </variation>
                                                             </label>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Singer" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i0s-Ti-8Zv" customClass="MarqueeLabel" customModule="MarqueeLabel">
-                                                                <rect key="frame" x="0.0" y="30.333333333333343" width="225.66666666666666" height="20.333333333333329"/>
+                                                                <rect key="frame" x="0.0" y="30.333333333333329" width="225.66666666666666" height="20.333333333333329"/>
                                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                                 <color key="textColor" systemColor="secondaryLabelColor"/>
                                                                 <nil key="highlightedColor"/>
@@ -75,7 +75,7 @@
                                                 </subviews>
                                             </stackView>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zyz-oi-m8T">
-                                                <rect key="frame" x="46.666666666666657" y="76.333333333333343" width="300" height="300"/>
+                                                <rect key="frame" x="46.666666666666657" y="91" width="300" height="300"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="300" id="16K-XG-QZP">
                                                         <variation key="widthClass=regular" constant="500"/>
@@ -84,7 +84,7 @@
                                                 </constraints>
                                             </imageView>
                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="uqY-cv-jzx">
-                                                <rect key="frame" x="20" y="402" width="353" height="30"/>
+                                                <rect key="frame" x="20" y="431.33333333333331" width="353" height="30"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="500" horizontalCompressionResistancePriority="1000" text="00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yTE-gk-zc6">
                                                         <rect key="frame" x="0.0" y="0.0" width="46" height="30"/>
@@ -106,7 +106,7 @@
                                                 <variation key="widthClass=regular" spacing="20"/>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="idR-k5-etR">
-                                                <rect key="frame" x="20" y="457.33333333333337" width="353" height="75"/>
+                                                <rect key="frame" x="20" y="501.66666666666663" width="353" height="75"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IGc-Tg-0S2">
                                                         <rect key="frame" x="0.0" y="0.0" width="54.333333333333336" height="75"/>
@@ -171,7 +171,7 @@
                                                 </subviews>
                                             </stackView>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vzb-Vd-KfB">
-                                                <rect key="frame" x="0.0" y="558" width="393" height="156"/>
+                                                <rect key="frame" x="0.0" y="617" width="393" height="156"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mjQ-B2-lQE">
                                                         <rect key="frame" x="0.0" y="0.0" width="393" height="80"/>
@@ -273,6 +273,7 @@
                             <constraint firstAttribute="trailing" secondItem="csQ-jE-PJx" secondAttribute="trailing" id="hl8-qb-Bbt"/>
                         </constraints>
                     </view>
+                    <tabBarItem key="tabBarItem" title="메인" image="play.fill" catalog="system" id="ugg-hT-TFU"/>
                     <navigationItem key="navigationItem" id="Y2J-Hm-K2a"/>
                     <connections>
                         <outlet property="backwardButton" destination="Yxe-Hu-wav" id="OUf-uy-0Ve"/>
@@ -300,7 +301,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cLW-Kc-rBY" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1904.5801526717557" y="17.605633802816904"/>
+            <point key="canvasLocation" x="3758.0152671755723" y="17.605633802816904"/>
         </scene>
         <!--PlayListView-->
         <scene sceneID="dUg-a0-S37">
@@ -308,16 +309,104 @@
                 <viewControllerPlaceholder storyboardIdentifier="PlayListView" storyboardName="PlayListView" referencedIdentifier="PlayListView" id="8wS-cc-rHn" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZMz-Mx-vTZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2754.1984732824426" y="17.605633802816904"/>
+            <point key="canvasLocation" x="4607.6335877862593" y="17.605633802816904"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="f5a-tS-p4a">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="3Pb-ze-kdT" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="QDI-Ua-NXC">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="oUJ-Ad-HvN" kind="relationship" relationship="viewControllers" id="TYK-LE-VRW"/>
+                        <segue destination="SHB-df-90X" kind="relationship" relationship="viewControllers" id="PZj-aC-pbn"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1Dh-ki-oyh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2013" y="-756"/>
+        </scene>
+        <!--Setting-->
+        <scene sceneID="RWa-aM-HHW">
+            <objects>
+                <viewController id="ncp-RX-u9U" customClass="SettingViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="AKq-MR-kV5">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ngv-yp-JMR">
+                                <rect key="frame" x="20" y="634" width="353" height="35"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="추천 알고리즘 초기화">
+                                    <color key="baseForegroundColor" red="0.78823529410000004" green="0.0" blue="0.047058823530000002" alpha="1" colorSpace="calibratedRGB"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="resetButtonTapped:" destination="ncp-RX-u9U" eventType="touchUpInside" id="hjM-lU-YCf"/>
+                                </connections>
+                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hpm-zS-mma">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="220"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="220" id="IB6-0R-XdO"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="PqN-Tj-J9f"/>
+                        <color key="backgroundColor" systemColor="systemGray6Color"/>
+                        <constraints>
+                            <constraint firstItem="Ngv-yp-JMR" firstAttribute="leading" secondItem="PqN-Tj-J9f" secondAttribute="leading" constant="20" id="31K-HS-Ulq"/>
+                            <constraint firstItem="PqN-Tj-J9f" firstAttribute="trailing" secondItem="Ngv-yp-JMR" secondAttribute="trailing" constant="20" id="LlW-EG-lSO"/>
+                            <constraint firstItem="hpm-zS-mma" firstAttribute="top" secondItem="AKq-MR-kV5" secondAttribute="top" id="Lz5-ZY-ZrD"/>
+                            <constraint firstItem="hpm-zS-mma" firstAttribute="leading" secondItem="PqN-Tj-J9f" secondAttribute="leading" id="jNU-PI-1lF"/>
+                            <constraint firstItem="hpm-zS-mma" firstAttribute="trailing" secondItem="PqN-Tj-J9f" secondAttribute="trailing" id="p44-1a-TgT"/>
+                            <constraint firstItem="PqN-Tj-J9f" firstAttribute="bottom" secondItem="Ngv-yp-JMR" secondAttribute="bottom" constant="100" id="wKq-5p-Acx"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Setting" id="UNc-at-UET">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="qba-Lm-OpR"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="resetButton" destination="Ngv-yp-JMR" id="AQN-gm-bsE"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Aad-zz-jpq" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1908" y="880"/>
+        </scene>
+        <!--설정-->
+        <scene sceneID="mhc-w7-RKN">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="SHB-df-90X" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="설정" image="ellipsis" catalog="system" id="7QT-aS-1J7"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="BLL-aZ-lTW">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="ncp-RX-u9U" kind="relationship" relationship="rootViewController" id="RMa-5t-ZBY"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="I9b-lV-Zab" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1908" y="18"/>
         </scene>
     </scenes>
     <resources>
         <image name="backward.frame.fill" catalog="system" width="128" height="87"/>
+        <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="forward.frame.fill" catalog="system" width="128" height="87"/>
         <image name="gauge.with.dots.needle.50percent" catalog="system" width="128" height="123"/>
         <image name="hand.thumbsdown" catalog="system" width="123" height="128"/>
         <image name="hand.thumbsup" catalog="system" width="123" height="128"/>
         <image name="play.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="play.fill" catalog="system" width="120" height="128"/>
         <image name="repeat.1.circle" catalog="system" width="128" height="123"/>
         <namedColor name="MainColor">
             <color red="0.78799998760223389" green="0.9100000262260437" blue="0.31000000238418579" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -327,6 +416,9 @@
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray6Color">
+            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
