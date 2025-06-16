@@ -225,7 +225,7 @@
                                 <action selector="dismissButton:" destination="Y6W-OH-hqX" id="aVP-YN-ktb"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="edit" image="ellipsis" catalog="system" id="hmL-Ya-fP4">
+                        <barButtonItem key="rightBarButtonItem" image="slider.horizontal.3" catalog="system" id="hmL-Ya-fP4">
                             <color key="tintColor" systemColor="secondaryLabelColor"/>
                             <connections>
                                 <action selector="editButton:" destination="Y6W-OH-hqX" id="n1i-5R-aJN"/>
@@ -268,10 +268,10 @@
     <resources>
         <image name="backward.frame.fill" catalog="system" width="128" height="87"/>
         <image name="chevron.down" catalog="system" width="128" height="70"/>
-        <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="forward.frame.fill" catalog="system" width="128" height="87"/>
         <image name="photo" catalog="system" width="128" height="93"/>
         <image name="play.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="slider.horizontal.3" catalog="system" width="128" height="99"/>
         <namedColor name="MainColor">
             <color red="0.78799998760223389" green="0.9100000262260437" blue="0.31000000238418579" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
