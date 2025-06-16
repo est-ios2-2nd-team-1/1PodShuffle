@@ -57,7 +57,7 @@ final class Toast {
         UIView.animate(withDuration: 0.3, animations: {
             toastContainer.alpha = 1.0
         }, completion: { _ in
-            UIView.animate(withDuration: 0.3, delay: 10.0, animations: {
+            UIView.animate(withDuration: 0.3, delay: 1.0, animations: {
                 toastContainer.alpha = 0.0
             }, completion: { _ in
                 toastContainer.removeFromSuperview()
