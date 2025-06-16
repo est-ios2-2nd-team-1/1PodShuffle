@@ -141,6 +141,7 @@ final class PlayerManager {
             let songs = try await songService.getMusics(genre: genre)
             songs.forEach { DataManager.shared.insertSongData(from: $0) }
             playlist.append(contentsOf: songs)
+            await Toast.shared.showToast(message: "\(genre.rawValue) \(songs.count)곡이 추가되었습니다.")
         }
     }
 

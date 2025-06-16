@@ -396,7 +396,7 @@ class MainViewController: UIViewController {
             let canMoveToPrevious = PlayerManager.shared.moveBackward()
 
             if !canMoveToPrevious {
-                self.showFirstSongAlert()
+                Toast.shared.showToast(message: "가장 최신 곡입니다.")
             }
         }
     }
