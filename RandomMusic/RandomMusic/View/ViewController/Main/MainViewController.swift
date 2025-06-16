@@ -366,15 +366,17 @@ class MainViewController: UIViewController {
 
     /// 좋아요 버튼이 탭되었을 때 호출됩니다.
     ///
-    /// 현재 곡에 대한 좋아요 피드백을 PlayerManager에 전달합니다.
+    /// 탭 애니메이션을 실행한 후 현재 곡에 대한 좋아요 피드백을 PlayerManager에 전달합니다.
     @IBAction func likeTapped(_ sender: UIButton) {
+        animateButtonTap(sender)
         PlayerManager.shared.likeSong()
     }
 
     /// 싫어요 버튼이 탭되었을 때 호출됩니다.
     ///
-    /// 현재 곡에 대한 싫어요 피드백을 PlayerManager에 전달합니다.
+    /// 탭 애니메이션을 실행한 후 현재 곡에 대한 싫어요 피드백을 PlayerManager에 전달합니다.
     @IBAction func dislikeTapped(_ sender: UIButton) {
+        animateButtonTap(sender)
         PlayerManager.shared.dislikeSong()
     }
 
@@ -499,6 +501,33 @@ class MainViewController: UIViewController {
             return "gauge.with.dots.needle.100percent"
         default:
             return "gauge.with.dots.needle.50percent"
+        }
+    }
+
+    // MARK: - Animation Methods
+
+    /// 버튼 탭 애니메이션을 실행합니다.
+    ///
+    /// 버튼을 잠깐 확대했다가 원래 크기로 돌아오는 스케일 애니메이션을 적용합니다.
+    ///
+    /// - Parameter button: 애니메이션을 적용할 버튼
+    private func animateButtonTap(_ button: UIButton) {
+        UIView.animate(
+            withDuration: 0.1,
+            delay: 0,
+            options: [.curveEaseInOut],
+            animations: {
+                button.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+            }
+        ) { _ in
+            UIView.animate(
+                withDuration: 0.1,
+                delay: 0,
+                options: [.curveEaseInOut],
+                animations: {
+                    button.transform = CGAffineTransform.identity
+                }
+            )
         }
     }
 }
