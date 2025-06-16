@@ -278,7 +278,9 @@ private extension PlayerManager {
         } else if index < currentIndex {
             // 현재 곡보다 앞의 곡이 삭제되면 인덱스 조정
             currentIndex -= 1
-            notifySongChanged()
+            onPlayListChanged?()
+        } else {
+            onPlayListChanged?()
         }
     }
 
