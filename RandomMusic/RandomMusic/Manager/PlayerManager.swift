@@ -138,7 +138,8 @@ final class PlayerManager {
     func addSongs(genre: Genre) {
         Task {
             let songs = try await songService.getMusics(genre: genre)
-			dump(songs)
+            songs.forEach { DataManager.shared.insertSongData(from: $0) }
+            playlist.append(contentsOf: songs)
         }
     }
 

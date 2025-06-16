@@ -44,7 +44,7 @@ final class RemoteManager {
         }
 
         commandCenter.previousTrackCommand.addTarget { [weak self] _ in
-            self?.playerManager.moveBackward()
+            _ = self?.playerManager.moveBackward()
             return .success
         }
 

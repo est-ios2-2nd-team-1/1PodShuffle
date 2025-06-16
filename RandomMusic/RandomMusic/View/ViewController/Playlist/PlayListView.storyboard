@@ -145,30 +145,41 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="CategoryCell" id="8So-lK-BhF" customClass="CategoryCell" customModule="RandomMusic" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="75" height="34.333333333333336"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="61.333333333333343" height="30.333333333333332"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Nxe-NG-Lmf">
-                                            <rect key="frame" x="0.0" y="0.0" width="75" height="34.333333333333336"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="61.333333333333343" height="30.333333333333332"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B6B-xD-1Y9">
-                                                    <rect key="frame" x="0.0" y="0.0" width="75" height="34.333333333333336"/>
-                                                    <inset key="contentEdgeInsets" minX="5" minY="0.0" maxX="5" maxY="0.0"/>
-                                                    <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="5" maxY="0.0"/>
-                                                    <inset key="imageEdgeInsets" minX="5" minY="0.0" maxX="5" maxY="0.0"/>
-                                                    <state key="normal" title="Button"/>
-                                                    <buttonConfiguration key="configuration" style="plain" title="Button"/>
-                                                </button>
+                                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="f3E-Ti-CLb">
+                                                    <rect key="frame" x="0.0" y="0.0" width="61.333333333333336" height="30.333333333333332"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lzJ-cv-tdV">
+                                                            <rect key="frame" x="10" y="5" width="41.333333333333336" height="20.333333333333332"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="trailing" secondItem="lzJ-cv-tdV" secondAttribute="trailing" constant="10" id="86n-pL-ODZ"/>
+                                                        <constraint firstAttribute="bottom" secondItem="lzJ-cv-tdV" secondAttribute="bottom" constant="5" id="PHm-B8-YOz"/>
+                                                        <constraint firstItem="lzJ-cv-tdV" firstAttribute="leading" secondItem="f3E-Ti-CLb" secondAttribute="leading" constant="10" id="YhN-p2-2bp"/>
+                                                        <constraint firstItem="lzJ-cv-tdV" firstAttribute="top" secondItem="f3E-Ti-CLb" secondAttribute="top" constant="5" id="s8w-0D-b6Z"/>
+                                                    </constraints>
+                                                </view>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="B6B-xD-1Y9" secondAttribute="bottom" id="2QB-dz-Nwi"/>
-                                                <constraint firstItem="B6B-xD-1Y9" firstAttribute="leading" secondItem="Nxe-NG-Lmf" secondAttribute="leading" id="LmI-Od-gjT"/>
-                                                <constraint firstAttribute="trailing" secondItem="B6B-xD-1Y9" secondAttribute="trailing" id="dNa-tC-7M7"/>
-                                                <constraint firstItem="B6B-xD-1Y9" firstAttribute="top" secondItem="Nxe-NG-Lmf" secondAttribute="top" id="dsf-dl-ST2"/>
+                                                <constraint firstItem="f3E-Ti-CLb" firstAttribute="leading" secondItem="Nxe-NG-Lmf" secondAttribute="leading" id="gQa-VV-Z4T"/>
+                                                <constraint firstAttribute="bottom" secondItem="f3E-Ti-CLb" secondAttribute="bottom" id="k0v-9H-6Go"/>
+                                                <constraint firstItem="f3E-Ti-CLb" firstAttribute="top" secondItem="Nxe-NG-Lmf" secondAttribute="top" id="ueG-iL-Vj9"/>
+                                                <constraint firstAttribute="trailing" secondItem="f3E-Ti-CLb" secondAttribute="trailing" id="w1A-KE-p3u"/>
                                             </constraints>
                                         </collectionViewCellContentView>
                                         <connections>
-                                            <outlet property="categoryButton" destination="B6B-xD-1Y9" id="j2H-94-uk2"/>
+                                            <outlet property="mainLabel" destination="lzJ-cv-tdV" id="bsV-zD-T23"/>
+                                            <outlet property="mainView" destination="f3E-Ti-CLb" id="b8m-Vz-OdF"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>

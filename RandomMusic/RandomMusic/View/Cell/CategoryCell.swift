@@ -1,15 +1,17 @@
 import UIKit
 
 class CategoryCell: UICollectionViewCell {
-    @IBOutlet weak var categoryButton: UIButton!
+
+    @IBOutlet weak var mainView: UIView!
+    @IBOutlet weak var mainLabel: UILabel!
 
     var genre: Genre?
 
     func configureUI(with genre: Genre) {
         self.genre = genre
-        categoryButton.setTitle(genre.rawValue, for: .normal)
-        categoryButton.layer.cornerRadius = categoryButton.frame.height / 2
-        categoryButton.layer.borderWidth = 1
-        categoryButton.layer.borderColor = UIColor.red.cgColor
+        mainLabel.text = "+ \(genre.rawValue)"
+        mainView.layer.cornerRadius = mainView.frame.height / 2
+        mainView.layer.borderWidth = 1
+        mainView.layer.borderColor = genre.color.cgColor
     }
 }

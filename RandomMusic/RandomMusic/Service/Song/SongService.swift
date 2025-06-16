@@ -71,7 +71,7 @@ class SongService {
             var thumbnailData: Data? = nil
 
             if response.thumbnail == .exists {
-                let thumbnailData = try await fetchThumbnailImage(from: response.streamUrl)
+                thumbnailData = try await fetchThumbnailImage(from: response.streamUrl)
             }
 
             songModelList.append(SongModel(from: response, thumbnailData: thumbnailData))
