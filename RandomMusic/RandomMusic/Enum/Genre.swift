@@ -1,4 +1,4 @@
-import Foundation
+import UIKit
 
 /// 장르
 enum Genre: String, CaseIterable, Codable {
@@ -18,6 +18,23 @@ enum Genre: String, CaseIterable, Codable {
         case "RnB": self = .rnb
         case "Hiphop": self = .hiphop
         default: self = .pop
+        }
+    }
+
+    var color: UIColor {
+        switch self {
+        case .classic:
+            return .purple
+        case .hiphop:
+            return .orange
+        case .jazz:
+            return .green
+        case .pop:
+            return .systemPink
+        case .rnb:
+            return .blue
+        case .rock:
+            return .red
         }
     }
 }

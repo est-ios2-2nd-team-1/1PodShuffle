@@ -54,6 +54,35 @@ class SongService {
         return songModel
     }
 
+    // MARK: 추가된 메소드입니다. (장르별 10곡)
+    /// 장르별로 10곡을 가져오는 메소드입니다.
+    /// - Parameter genre: 선택된 장르를 받습니다.
+    /// - Returns: 해당 장르의 10곡을 반환합니다.
+    func getMusics(genre: Genre? = nil) async throws -> [SongModel] {
+        var realGenre: Genre
+
+        if let genre {
+            realGenre = genre
+        } else {
+            let pm = PreferenceManager()
+            realGenre = pm.selectRandomGenre()
+        }
+
+        let responseList = try await fetchRandomMusics(genre: realGenre)
+        var songModelList: [SongModel] = []
+        for	response in responseList {
+            var thumbnailData: Data? = nil
+
+            if response.thumbnail == .exists {
+                thumbnailData = try await fetchThumbnailImage(from: response.streamUrl)
+            }
+
+            songModelList.append(SongModel(from: response, thumbnailData: thumbnailData))
+        }
+
+        return songModelList
+    }
+
     /// 헤더가 포함된 Asset 생성
     func createAssetWithHeaders(url: String) throws -> AVURLAsset? {
         let request = try networkService.makeRequest(endpoint: url)
@@ -68,6 +97,15 @@ class SongService {
     /// - Returns: api 응답형식. SongModel 로 변환 후 사용해야함
     private func fetchRandomMusic(genre: Genre? = nil) async throws -> SongResponse {
         var endpoint = "/api/music/random"
+        if let genre = genre {
+            endpoint += "?genre=\(genre.rawValue)"
+        }
+
+        return try await networkService.fetch(endpoint: endpoint)
+    }
+
+    private func fetchRandomMusics(genre: Genre? = nil) async throws -> [SongResponse] {
+        var endpoint = "/api/music/randomMany/10"
         if let genre = genre {
             endpoint += "?genre=\(genre.rawValue)"
         }

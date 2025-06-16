@@ -134,6 +134,16 @@ final class PlayerManager {
         onSongChangedToPlaylistView?()
     }
 
+    /// 장르별로 10곡을 추가합니다.
+    /// - Parameter genre: 장르를 받습니다.
+    func addSongs(from genre: Genre) {
+        Task {
+            let songs = try await songService.getMusics(genre: genre)
+            songs.forEach { DataManager.shared.insertSongData(from: $0) }
+            playlist.append(contentsOf: songs)
+        }
+    }
+
     /// 랜덤 곡을 가져와서 플레이리스트에 추가합니다.
     func addRandomSong() async {
         do {
