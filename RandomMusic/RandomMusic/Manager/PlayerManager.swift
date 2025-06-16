@@ -134,6 +134,14 @@ final class PlayerManager {
         onSongChangedToPlaylistView?()
     }
 
+    // TODO: 작업
+    func addSongs(genre: Genre) {
+        Task {
+            let songs = try await songService.getMusics(genre: genre)
+			dump(songs)
+        }
+    }
+
     /// 랜덤 곡을 가져와서 플레이리스트에 추가합니다.
     func addRandomSong() async {
         do {

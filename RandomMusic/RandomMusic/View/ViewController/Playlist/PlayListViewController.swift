@@ -168,6 +168,7 @@ extension PlayListViewController: UITableViewDelegate {
     }
 }
 
+// MARK: - CollectionView Delegate
 extension PlayListViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return Genre.allCases.count
@@ -182,6 +183,13 @@ extension PlayListViewController: UICollectionViewDataSource {
 
 extension PlayListViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        if let cell = collectionView.cellForItem(at: indexPath) as? CategoryCell {
+            // 해당 장르를 사용해서 10곡을 추가하는 것을 PlayerManager에게 보낸다.
+            // PlayerManager는 이것을 통해서 NetworkManager에 호출한다.
+            // 추가된 곡은 playlist에 추가한다.
+            if let genre = cell.genre {
+                PlayerManager.shared.addSongs(genre: genre)
+            }
+        }
     }
 }
