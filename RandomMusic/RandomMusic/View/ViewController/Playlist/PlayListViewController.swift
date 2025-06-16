@@ -76,7 +76,9 @@ class PlayListViewController: UIViewController {
             Task { @MainActor in
                 self?.playListTableView.reloadData()
                 self?.setDismissImageButton()
-                try? await Task.sleep(nanoseconds: 1_000_000)
+                
+                self?.playListTableView.layoutIfNeeded()
+                try? await Task.sleep(nanoseconds: 4_000_000)
                 self?.scrollSelectPlaySong()
             }
         }
@@ -90,7 +92,9 @@ class PlayListViewController: UIViewController {
         guard index >= 0 && index < rowCount else { return }
         
         let indexPath = IndexPath(row: index, section: 0)
-        playListTableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+        Task { @MainActor in
+            playListTableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+        }
     }
     
     /// Dismiss Image Button 이미지 세팅
@@ -161,6 +165,7 @@ class PlayListViewController: UIViewController {
     /// Edit Mode로 전환되어 삭제 맟 플레이리스트 순서 변경이 가능합니다
     @IBAction func editButton(_ sender: UIBarButtonItem) {
         playListTableView.setEditing(!playListTableView.isEditing, animated: true)
+        sender.image = playListTableView.isEditing ? UIImage(systemName: "checkmark") : UIImage(systemName: "slider.horizontal.3")
     }
     
     /// dismiss 버튼, 이미지 버튼 터치
