@@ -91,7 +91,7 @@ class PlayListViewController: UIViewController {
             let canMoveToPrevious = PlayerManager.shared.moveBackward()
 
             if !canMoveToPrevious {
-                self.showFirstSongAlert()
+                Toast.shared.showToast(message: "가장 최신곡입니다.")
             }
         }
     }
