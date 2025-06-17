@@ -1,25 +1,15 @@
-//
-//  HomeCell.swift
-//  RandomMusic
-//
-//  Created by 강대훈 on 6/16/25.
-//
-
 import UIKit
 
+/// HomeView에서 사용하는 셀입니다. 장르를 표현합니다.
 final class HomeCell: UICollectionViewCell {
     @IBOutlet weak var mainImageView: UIImageView!
 
     var genre: Genre?
 
-    func setTitle(genre: Genre) {
-        DispatchQueue.global().async {
-            let image = genre.image
-            Task { @MainActor in
-                self.mainImageView.image = image
-            }
-        }
-        
+    /// 장르를 통해 UI를 구성합니다.
+    /// - Parameter genre: 어떤 장르인지 받습니다.
+    func configureUI(genre: Genre) {
+        mainImageView.image = genre.image
         mainImageView.layer.cornerRadius = 10
         self.genre = genre
     }

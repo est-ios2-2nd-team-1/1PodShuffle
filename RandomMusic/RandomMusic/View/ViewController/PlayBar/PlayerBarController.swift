@@ -93,8 +93,13 @@ final class PlayerBarController: UITabBarController {
         return sv
     }()
 
+    /// 현재 곡 변경 알림 옵저버
     private var currentSongObserver: NSObjectProtocol?
+
+    /// 재생 상태 변경 옵저버
     private var playStateObserver: NSObjectProtocol?
+
+    /// Throttle 객체
     private let throttle = Throttle()
 
     override func viewDidLoad() {
@@ -102,22 +107,19 @@ final class PlayerBarController: UITabBarController {
         configureUI()
         updatePlayerBar()
         setupTapGestureForPlaylist()
-
-        currentSongObserver = NotificationCenter.default.addObserver(
-            forName: .currentSongChanged,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.updatePlayerBar()
+        setupNotificationObservers()
+    }
+    
+    /// 메모리에서 해제될 때 호출됩니다.
+    ///
+    /// 등록된 모든 NotificationCenter 옵저버를 제거하여 메모리 누수를 방지합니다.
+    deinit {
+        if let observer = currentSongObserver {
+            NotificationCenter.default.removeObserver(observer)
         }
 
-        playStateObserver = NotificationCenter.default.addObserver(
-            forName: .playStateChanged,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            guard let isPlaying = notification.object as? Bool else { return }
-            self?.updatePlayPauseButton(isPlaying)
+        if let observer = playStateObserver {
+            NotificationCenter.default.removeObserver(observer)
         }
     }
 
@@ -170,6 +172,9 @@ final class PlayerBarController: UITabBarController {
         ])
     }
 
+    /// 플레이어 바의 UI를 업데이트 합니다.
+    ///
+    /// 현재 음악이 변경될 때와 뷰가 처음으로 초기화될 때 실행됩니다.
     private func updatePlayerBar() {
         guard let currentSong = PlayerManager.shared.currentSong else { return }
         Task { @MainActor in
@@ -188,6 +193,26 @@ final class PlayerBarController: UITabBarController {
         playerBar.addGestureRecognizer(tapGesture)
     }
 
+    /// 변화를 감지할 Notification을 등록합니다.
+    private func setupNotificationObservers() {
+        currentSongObserver = NotificationCenter.default.addObserver(
+            forName: .currentSongChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updatePlayerBar()
+        }
+
+        playStateObserver = NotificationCenter.default.addObserver(
+            forName: .playStateChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let isPlaying = notification.object as? Bool else { return }
+            self?.updatePlayPauseButton(isPlaying)
+        }
+    }
+
     /// 재생/일시정지 버튼의 아이콘을 현재 재생 상태에 따라 업데이트합니다.
     ///
     /// 재생 중일 때는 일시정지 아이콘을, 일시정지 상태일 때는 재생 아이콘을 표시합니다.
@@ -197,7 +222,8 @@ final class PlayerBarController: UITabBarController {
         let image = UIImage(systemName: iconName, withConfiguration: config)
         playPauseButton.setImage(image, for: .normal)
     }
-
+    
+    /// 플레이어 바가 클릭됐을 때 호출하고, 플레이리스트 화면을 모달로 띄웁니다.
     @objc private func playerBarTapped() {
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "PlayListView") else {
             return
@@ -206,16 +232,27 @@ final class PlayerBarController: UITabBarController {
         present(vc, animated: true)
     }
 
+    /// 재생/일시정지 버튼이 탭되었을 때 호출됩니다.
+    ///
+    /// 현재 재생 상태를 토글합니다.
     @objc private func playPauseTapped() {
         PlayerManager.shared.togglePlayPause()
     }
 
+    /// 다음 곡 버튼이 탭되었을 때 호출됩니다.
+    ///
+    /// 재생목록에서 다음 곡으로 이동합니다.
+    /// 마지막 곡인 경우 새로운 곡을 비동기적으로 로드합니다.
     @objc private func forwardTapped() {
         throttle.run {
             Task { await PlayerManager.shared.moveForward() }
         }
     }
 
+    /// 이전 곡 버튼이 탭되었을 때 호출됩니다.
+    ///
+    /// 재생목록에서 이전 곡으로 이동합니다.
+    /// 현재 곡이 첫 번째 곡인 경우 토스트 메시지로 사용자에게 알립니다.
     @objc private func backwardTapped() {
         throttle.run {
             let canMoveToPrevious = PlayerManager.shared.moveBackward()

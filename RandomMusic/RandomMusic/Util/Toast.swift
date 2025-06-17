@@ -17,7 +17,11 @@ final class Toast {
             }
         }
     }
-
+    
+    /// UI를 구성하는 메소드입니다.
+    /// - Parameters:
+    ///   - window: 화면에 띄울 UIWindow타입의 객체를 받습니다.
+    ///   - message: 띄울 메세지를 받습니다.
     private func configureUI(_ window: UIWindow, message: String) {
         let toastContainer: UIView = {
             let v = UIView()

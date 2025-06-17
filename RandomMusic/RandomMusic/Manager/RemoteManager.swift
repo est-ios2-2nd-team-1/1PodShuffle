@@ -1,6 +1,6 @@
-import UIKit
 import MediaPlayer
 
+/// MPRemoteCommandCenter를 관리하는 객체입니다.
 final class RemoteManager {
     static let shared = RemoteManager()
 
@@ -38,7 +38,7 @@ final class RemoteManager {
 
         commandCenter.nextTrackCommand.addTarget { [weak self] _ in
             Task {
-                await self?.playerManager.moveForward()
+            	await self?.playerManager.moveForward()
             }
             return .success
         }
