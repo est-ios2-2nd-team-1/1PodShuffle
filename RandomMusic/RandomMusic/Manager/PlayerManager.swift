@@ -1,5 +1,10 @@
 import AVFoundation
 
+extension Notification.Name {
+    static let feedbackChanged = Notification.Name("FeedbackChanged")
+    static let playerStateChanged = Notification.Name("PlayerStateChanged")
+}
+
 /// AVPlayer 기반의 오디오 재생을 관리하는 클래스입니다.
 final class PlayerManager {
     static let shared = PlayerManager()
@@ -31,11 +36,8 @@ final class PlayerManager {
         didSet { onTimeUpdateToPlaylistView?(currentPlaybackTime ?? 0.0) }
     }
     var onTimeUpdateToMainView: ((Double) -> Void)?
-    var onPlayStateChangedToMainView: ((Bool) -> Void)?
-    var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
     var onSongChangedToMainView: (() -> Void)?
     var onSongChangedToPlaylistView: (() -> Void)?
-    var onFeedbackChanged: ((FeedbackType) -> Void)?
     var onRemote: ((SongModel?) -> Void)?
     var onPlayListChanged: (() -> Void)?
 
@@ -275,13 +277,13 @@ private extension PlayerManager {
     }
 
     /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
-    private func loadPlaylistFromDB() {
+    func loadPlaylistFromDB() {
         let savedSongs = DataManager.shared.fetchSongData()
         playlist = savedSongs
         currentIndex = UserDefaults.standard.integer(forKey: Constants.lastSongKey)
     }
 
-    private func moveToPreviousSong() -> Bool {
+    func moveToPreviousSong() -> Bool {
         guard currentIndex > 0 else { return false }
 
         setCurrentIndex(currentIndex - 1)
@@ -289,27 +291,27 @@ private extension PlayerManager {
         return true
     }
 
-    private func saveLastPlayedSong() {
+    func saveLastPlayedSong() {
         UserDefaults.standard.set(currentIndex, forKey: Constants.lastSongKey)
     }
 
-    private func isValidIndex(_ index: Int) -> Bool {
+    func isValidIndex(_ index: Int) -> Bool {
         return index >= 0 && index < playlist.count
     }
 
-    private func isValidOrderUpdate(sourceIndex: Int, destinationIndex: Int) -> Bool {
+    func isValidOrderUpdate(sourceIndex: Int, destinationIndex: Int) -> Bool {
         return sourceIndex != destinationIndex &&
                isValidIndex(sourceIndex) &&
                destinationIndex >= 0 && destinationIndex <= playlist.count
     }
 
-    private func handleEmptyPlaylist() {
+    func handleEmptyPlaylist() {
         pause()
         cleanupPlayer()
         notifySongChanged()
     }
 
-    private func handleSongRemoval(at index: Int) {
+    func handleSongRemoval(at index: Int) {
         if index == currentIndex {
             // 현재 재생 중인 곡이 삭제되는 경우
             handleCurrentSongRemoval(at: index)
@@ -322,7 +324,7 @@ private extension PlayerManager {
         }
     }
 
-    private func handleCurrentSongRemoval(at index: Int) {
+    func handleCurrentSongRemoval(at index: Int) {
         updateCurrentIndexAfterRemoval(at: index)
         notifySongChanged()
 
@@ -333,7 +335,7 @@ private extension PlayerManager {
         }
     }
 
-    private func updateCurrentIndexAfterRemoval(at index: Int) {
+    func updateCurrentIndexAfterRemoval(at index: Int) {
         if playlist.count > 1 {
             currentIndex = (index == playlist.count) ? max(0, playlist.count - 1) : index
         } else {
@@ -341,7 +343,7 @@ private extension PlayerManager {
         }
     }
 
-    private func updateCurrentIndexAfterReorder(sourceIndex: Int, destinationIndex: Int) {
+    func updateCurrentIndexAfterReorder(sourceIndex: Int, destinationIndex: Int) {
         if currentIndex == sourceIndex {
             // 이동된 곡이 현재 재생 중인 곡인 경우
             setCurrentIndex(destinationIndex > sourceIndex ? destinationIndex - 1 : destinationIndex)
@@ -379,11 +381,10 @@ private extension PlayerManager {
             newFeedback = targetFeedback
         }
 
-        // UI 업데이트를 위한 콜백 호출
-        onFeedbackChanged?(newFeedback)
+        NotificationCenter.default.post(name: .feedbackChanged, object: newFeedback)
     }
 
-    private func notifySongChanged() {
+    func notifySongChanged() {
         onSongChangedToMainView?()
         onSongChangedToPlaylistView?()
     }
@@ -431,8 +432,8 @@ private extension PlayerManager {
 
     func updatePlayingState(_ playing: Bool) {
         isPlaying = playing
-        onPlayStateChangedToMainView?(playing)
-        onPlayStateChangedToPlaylistView?(playing)
+
+        NotificationCenter.default.post(name: .playerStateChanged, object: playing)
     }
 
     /// 재생 시간 정보를 주기적으로 업데이트합니다.

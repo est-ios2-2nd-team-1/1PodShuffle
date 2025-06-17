@@ -45,6 +45,9 @@ class MainViewController: UIViewController {
     /// 이 플래그는 사용자가 슬라이더를 조작하는 동안 자동 시간 업데이트와의 충돌을 방지합니다.
     private var isSliderDragging = false
 
+    private var feedbackObserver: NSObjectProtocol?
+    private var playStateObserver: NSObjectProtocol?
+
     // MARK: - Lifecycle
 
     /// 뷰가 메모리에 로드된 후 호출됩니다.
@@ -57,6 +60,7 @@ class MainViewController: UIViewController {
         setupMarqueeLabels()
         setupSlider()
         updateSongUI()
+        setupNotificationObservers()
         bindPlayerCallbacks()
         setupTapGestureForPlaylist()
 
@@ -96,6 +100,15 @@ class MainViewController: UIViewController {
         thumbnailImageView.layer.cornerRadius = thumbnailImageView.frame.width / 2
     }
 
+    deinit {
+        if let observer = feedbackObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = playStateObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
+
     // MARK: - Setup Methods
 
     /// 모든 버튼의 초기 Configuration을 설정합니다.
@@ -112,7 +125,7 @@ class MainViewController: UIViewController {
         setupButtonConfiguration(speedButton, imageName: "gauge.with.dots.needle.50percent", pointSize: 20)
 
         // 초기 상태 업데이트
-        updatePlayPauseButton()
+        updatePlayPauseButton(PlayerManager.shared.isPlaying)
         updateLikeDislikeButtons()
         updateRepeatButton()
     }
@@ -181,6 +194,27 @@ class MainViewController: UIViewController {
         playlistContent.addGestureRecognizer(tapGesture)
     }
 
+    private func setupNotificationObservers() {
+        feedbackObserver = NotificationCenter.default.addObserver(
+            forName: .feedbackChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let feedbackType = notification.object as? FeedbackType else { return }
+            self?.currentFeedbackType = feedbackType
+            self?.updateLikeDislikeButtons()
+        }
+
+        playStateObserver = NotificationCenter.default.addObserver(
+            forName: .playerStateChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let isPlaying = notification.object as? Bool else { return }
+            self?.updatePlayPauseButton(isPlaying)
+        }
+    }
+
     /// PlayerManager의 콜백 이벤트들을 바인딩합니다.
     ///
     /// 시간 업데이트, 재생 상태 변경, 곡 변경, 피드백 변경 이벤트를 처리합니다.
@@ -192,22 +226,9 @@ class MainViewController: UIViewController {
             }
         }
 
-        PlayerManager.shared.onPlayStateChangedToMainView = { [weak self] isPlaying in
-            Task { @MainActor in
-                self?.updatePlayPauseButton()
-            }
-        }
-
         PlayerManager.shared.onSongChangedToMainView = { [weak self] in
             Task { @MainActor in
                 self?.updateSongUI()
-            }
-        }
-
-        PlayerManager.shared.onFeedbackChanged = { [weak self] feedbackType in
-            Task { @MainActor in
-                self?.currentFeedbackType = feedbackType
-                self?.updateLikeDislikeButtons()
             }
         }
     }
@@ -217,8 +238,8 @@ class MainViewController: UIViewController {
     /// 재생/일시정지 버튼의 아이콘을 현재 재생 상태에 따라 업데이트합니다.
     ///
     /// 재생 중일 때는 일시정지 아이콘을, 일시정지 상태일 때는 재생 아이콘을 표시합니다.
-    private func updatePlayPauseButton() {
-        let iconName = PlayerManager.shared.isPlaying ? "pause.circle.fill" : "play.circle.fill"
+    private func updatePlayPauseButton(_ isPlaying: Bool) {
+        let iconName = isPlaying ? "pause.circle.fill" : "play.circle.fill"
         guard var config = playPauseButton.configuration else { return }
         config.image = UIImage(systemName: iconName)
         playPauseButton.configuration = config
