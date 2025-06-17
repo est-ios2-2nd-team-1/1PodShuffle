@@ -41,13 +41,19 @@ final class PlayerBarController: UITabBarController {
         return sv
     }()
 
+    private var currentSongObserver: NSObjectProtocol?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         updatePlayerBar()
         setupTapGestureForPlaylist()
 
-        PlayerManager.shared.onSongChangedToPlayerBarView = { [weak self] in
+        currentSongObserver = NotificationCenter.default.addObserver(
+            forName: .currentSongChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
             self?.updatePlayerBar()
         }
     }
