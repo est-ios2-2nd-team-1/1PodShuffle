@@ -45,9 +45,10 @@ class MainViewController: UIViewController {
     /// 이 플래그는 사용자가 슬라이더를 조작하는 동안 자동 시간 업데이트와의 충돌을 방지합니다.
     private var isSliderDragging = false
 
+    private var currentSongObserver: NSObjectProtocol?
     private var feedbackObserver: NSObjectProtocol?
     private var playStateObserver: NSObjectProtocol?
-    private var currentSongObserver: NSObjectProtocol?
+    private var playlistObserver: NSObjectProtocol?
 
     // MARK: - Lifecycle
 
@@ -102,13 +103,16 @@ class MainViewController: UIViewController {
     }
 
     deinit {
+        if let observer = currentSongObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
         if let observer = feedbackObserver {
             NotificationCenter.default.removeObserver(observer)
         }
         if let observer = playStateObserver {
             NotificationCenter.default.removeObserver(observer)
         }
-        if let observer = currentSongObserver {
+        if let observer = playlistObserver {
             NotificationCenter.default.removeObserver(observer)
         }
     }
@@ -199,6 +203,14 @@ class MainViewController: UIViewController {
     }
 
     private func setupNotificationObservers() {
+        currentSongObserver = NotificationCenter.default.addObserver(
+            forName: .currentSongChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateSongUI()
+        }
+
         feedbackObserver = NotificationCenter.default.addObserver(
             forName: .feedbackChanged,
             object: nil,
@@ -210,16 +222,12 @@ class MainViewController: UIViewController {
         }
 
         playStateObserver = NotificationCenter.default.addObserver(
-            forName: .playerStateChanged,
+            forName: .playStateChanged,
             object: nil,
             queue: .main
         ) { [weak self] notification in
             guard let isPlaying = notification.object as? Bool else { return }
             self?.updatePlayPauseButton(isPlaying)
-        }
-
-        currentSongObserver = NotificationCenter.default.addObserver(forName: .currentSongChanged, object: nil, queue: .main) { [weak self] _ in
-            self?.updateSongUI()
         }
     }
 
