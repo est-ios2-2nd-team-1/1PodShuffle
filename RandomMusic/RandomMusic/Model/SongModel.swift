@@ -2,7 +2,7 @@ import Foundation
 
 /// 앱 내부 사용 모델
 /// thumbnail의 실제 이미지 데이터가 있음
-struct SongModel {
+struct SongModel: Equatable {
     let title: String
     let album: String
     let artist: String

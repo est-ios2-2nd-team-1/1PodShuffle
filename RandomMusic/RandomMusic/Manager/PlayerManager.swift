@@ -246,6 +246,14 @@ final class PlayerManager {
     func removeSong(at index: Int) {
         guard isValidIndex(index) else { return }
 
+        // 현재 재생 중인 곡은 삭제하지 않음
+        if index == currentIndex {
+            Task {
+                await Toast.shared.showToast(message: "현재 재생 중인 곡은 삭제할 수 없습니다.")
+            }
+            return
+        }
+
         DataManager.shared.deleteSongData(to: playlist[index])
         playlist.remove(at: index)
 
@@ -283,13 +291,18 @@ final class PlayerManager {
     ///
     /// 모든 곡을 제거하고, 재생을 중지하며, 저장된 마지막 재생 곡 정보도 초기화합니다.
     func clearPlaylist() {
-        pause()
-        cleanupPlayer()
+        let preservedSong = currentSong // 현재 재상중
+        playlist.enumerated().forEach { index, song in
+            if song != preservedSong {
+                DataManager.shared.deleteSongData(to: song)
+            }
+        }
 
-        playlist.forEach { DataManager.shared.deleteSongData(to: $0) }
-        playlist.removeAll()
-        UserDefaults.standard.set(0, forKey: "heardLastSong")
+        playlist = preservedSong.map { [$0] } ?? []
         currentIndex = 0
+        UserDefaults.standard.set(currentIndex, forKey: "heardLastSong")
+
+        NotificationCenter.default.post(name: .playlistChanaged, object: nil)
     }
 
     // MARK: - Feedback Management
