@@ -14,6 +14,7 @@ class PlayListViewController: UIViewController {
 
     private var currentSongObserver: NSObjectProtocol?
     private var playStateObserver: NSObjectProtocol?
+    private var playbackTimeObserver: NSObjectProtocol?
     private var playlistObserver: NSObjectProtocol?
 
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
@@ -24,7 +25,6 @@ class PlayListViewController: UIViewController {
         super.viewDidLoad()
         setConfigureUI()
         setupNotificationObservers()
-        bindPlayerCallbacks()
         setDismissImageButton()
     }
     
@@ -83,6 +83,17 @@ class PlayListViewController: UIViewController {
             self?.setPlayPauseButton(isPlaying)
         }
 
+        playbackTimeObserver = NotificationCenter.default.addObserver(
+            forName: .playbackTimeChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let seconds = notification.object as? Double,
+                  let duration = PlayerManager.shared.player?.currentItem?.duration.seconds,
+                  !duration.isNaN else { return }
+            self?.playProgressView.progress = Float(seconds / duration)
+        }
+
         playlistObserver = NotificationCenter.default.addObserver(
             forName: .playlistChanaged,
             object: nil,
@@ -91,14 +102,6 @@ class PlayListViewController: UIViewController {
             UIView.performWithoutAnimation {
                 self?.playListTableView.reloadData()
             }
-        }
-    }
-
-    /// 바인딩 메소드
-    private func bindPlayerCallbacks() {
-        PlayerManager.shared.onTimeUpdateToPlaylistView = { [weak self] seconds in
-            guard let duration = PlayerManager.shared.player?.currentItem?.duration.seconds, !duration.isNaN else { return }
-            self?.playProgressView.progress = Float(seconds / duration)
         }
     }
     
@@ -201,10 +204,12 @@ class PlayListViewController: UIViewController {
         if let observer = playStateObserver {
             NotificationCenter.default.removeObserver(observer)
         }
+        if let observer = playbackTimeObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
         if let observer = playlistObserver {
             NotificationCenter.default.removeObserver(observer)
         }
-        PlayerManager.shared.onTimeUpdateToPlaylistView = nil
     }
 }
 

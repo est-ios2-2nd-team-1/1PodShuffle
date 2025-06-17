@@ -48,7 +48,7 @@ class MainViewController: UIViewController {
     private var currentSongObserver: NSObjectProtocol?
     private var feedbackObserver: NSObjectProtocol?
     private var playStateObserver: NSObjectProtocol?
-    private var playlistObserver: NSObjectProtocol?
+    private var playbackTimeObserver: NSObjectProtocol?
 
     // MARK: - Lifecycle
 
@@ -63,7 +63,6 @@ class MainViewController: UIViewController {
         setupSlider()
         updateSongUI()
         setupNotificationObservers()
-        bindPlayerCallbacks()
         setupTapGestureForPlaylist()
 
         Task { @MainActor in
@@ -112,7 +111,7 @@ class MainViewController: UIViewController {
         if let observer = playStateObserver {
             NotificationCenter.default.removeObserver(observer)
         }
-        if let observer = playlistObserver {
+        if let observer = playbackTimeObserver {
             NotificationCenter.default.removeObserver(observer)
         }
     }
@@ -229,17 +228,14 @@ class MainViewController: UIViewController {
             guard let isPlaying = notification.object as? Bool else { return }
             self?.updatePlayPauseButton(isPlaying)
         }
-    }
 
-    /// PlayerManager의 콜백 이벤트들을 바인딩합니다.
-    ///
-    /// 시간 업데이트, 재생 상태 변경, 곡 변경, 피드백 변경 이벤트를 처리합니다.
-    /// 모든 UI 업데이트는 메인 스레드에서 실행되도록 보장됩니다.
-    private func bindPlayerCallbacks() {
-        PlayerManager.shared.onTimeUpdateToMainView = { [weak self] seconds in
-            Task { @MainActor in
-                self?.updateProgressUI(seconds: seconds)
-            }
+        playbackTimeObserver = NotificationCenter.default.addObserver(
+            forName: .playbackTimeChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let seconds = notification.object as? Double else { return }
+            self?.updateProgressUI(seconds: seconds)
         }
     }
 

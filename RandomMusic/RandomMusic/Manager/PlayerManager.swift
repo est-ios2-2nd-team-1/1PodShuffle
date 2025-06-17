@@ -4,6 +4,7 @@ extension Notification.Name {
     static let currentSongChanged = Notification.Name("CurrentSongChanged")
     static let feedbackChanged = Notification.Name("FeedbackChanged")
     static let playStateChanged = Notification.Name("PlayStateChanged")
+    static let playbackTimeChanged = Notification.Name("PlaybackTimeChanged")
     static let playlistChanaged = Notification.Name("PlaylistChanaged")
 }
 
@@ -20,7 +21,7 @@ final class PlayerManager {
     }
     private(set) var currentIndex: Int = 0
     private(set) var isPlaying = false
-    private(set) var currentPlaybackTime: Double?
+    private(set) var currentPlaybackTime: Double = 0.0
 
     private var timeObserverToken: Any?
 
@@ -38,12 +39,6 @@ final class PlayerManager {
         loadPlaylistFromDB()
     }
 
-    // MARK: - Callbacks
-
-    var onTimeUpdateToPlaylistView: ((Double) -> Void)? {
-        didSet { onTimeUpdateToPlaylistView?(currentPlaybackTime ?? 0.0) }
-    }
-    var onTimeUpdateToMainView: ((Double) -> Void)?
     var onRemote: ((SongModel?) -> Void)?
 
     /// 플레이리스트 초기화를 완료합니다. UI가 준비된 후 호출해야 합니다.
@@ -103,9 +98,7 @@ final class PlayerManager {
     }
 
     func moveBackward() -> Bool {
-        let currentTime = currentPlaybackTime ?? 0
-
-        if currentTime < 3.0 {
+        if currentPlaybackTime < 3.0 {
             return moveToPreviousSong()
     	} else {
         	seek(to: 0)
@@ -444,9 +437,9 @@ private extension PlayerManager {
 
             let seconds = CMTimeGetSeconds(time)
             currentPlaybackTime = Double(seconds)
-            onTimeUpdateToMainView?(seconds)
-            onTimeUpdateToPlaylistView?(seconds)
             onRemote?(currentSong)
+
+            NotificationCenter.default.post(name: .playbackTimeChanged, object: seconds)
         }
     }
 
