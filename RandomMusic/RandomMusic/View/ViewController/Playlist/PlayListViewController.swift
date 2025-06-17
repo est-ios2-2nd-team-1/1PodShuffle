@@ -129,6 +129,8 @@ class PlayListViewController: UIViewController {
     }
     
     /// Dismiss Image Button 이미지 세팅
+    ///
+    /// 화면 우측 하단 이미지로 현재 재생중인 곡의 썸네일로 표시하며 터치시 dismiss됩니다
     private func setDismissImageButton() {
         guard let song = PlayerManager.shared.currentSong,
               let thumbnailData = song.thumbnailData,
