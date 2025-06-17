@@ -13,6 +13,7 @@ class PlayListViewController: UIViewController {
     private let throttle = Throttle()
 
     private var playStateObserver: NSObjectProtocol?
+    private var currentSongObserver: NSObjectProtocol?
 
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
     private let playConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .regular, scale: .large)
@@ -81,13 +82,13 @@ class PlayListViewController: UIViewController {
                 }
             }
         }
-        
-        PlayerManager.shared.onSongChangedToPlaylistView = { [weak self] in
+
+        currentSongObserver = NotificationCenter.default.addObserver(forName: .currentSongChanged, object: nil, queue: .main) { [weak self] _ in
+            self?.playListTableView.reloadData()
+            self?.setDismissImageButton()
+            self?.playListTableView.layoutIfNeeded()
+
             Task { @MainActor in
-                self?.playListTableView.reloadData()
-                self?.setDismissImageButton()
-                
-                self?.playListTableView.layoutIfNeeded()
                 try? await Task.sleep(nanoseconds: 4_000_000)
                 self?.scrollSelectPlaySong()
             }
@@ -190,9 +191,11 @@ class PlayListViewController: UIViewController {
         if let observer = playStateObserver {
             NotificationCenter.default.removeObserver(observer)
         }
+        if let observer = currentSongObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
         PlayerManager.shared.onTimeUpdateToPlaylistView = nil
         PlayerManager.shared.onPlayListChanged = nil
-        PlayerManager.shared.onSongChangedToPlaylistView = nil
     }
 }
 

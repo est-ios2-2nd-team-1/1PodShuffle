@@ -3,6 +3,7 @@ import AVFoundation
 extension Notification.Name {
     static let feedbackChanged = Notification.Name("FeedbackChanged")
     static let playerStateChanged = Notification.Name("PlayerStateChanged")
+    static let currentSongChanged = Notification.Name("currentSongChanged")
 }
 
 /// AVPlayer 기반의 오디오 재생을 관리하는 클래스입니다.
@@ -36,8 +37,6 @@ final class PlayerManager {
         didSet { onTimeUpdateToPlaylistView?(currentPlaybackTime ?? 0.0) }
     }
     var onTimeUpdateToMainView: ((Double) -> Void)?
-    var onSongChangedToMainView: (() -> Void)?
-    var onSongChangedToPlaylistView: (() -> Void)?
     var onRemote: ((SongModel?) -> Void)?
     var onPlayListChanged: (() -> Void)?
 
@@ -385,8 +384,7 @@ private extension PlayerManager {
     }
 
     func notifySongChanged() {
-        onSongChangedToMainView?()
-        onSongChangedToPlaylistView?()
+        NotificationCenter.default.post(name: .currentSongChanged, object: nil)
     }
 
     func setupPlayer(with asset: AVURLAsset) {
