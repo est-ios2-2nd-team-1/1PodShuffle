@@ -5,7 +5,7 @@ final class PlayerBarController: UITabBarController {
     let playerBar: UIView = {
         let v = UIView()
         v.translatesAutoresizingMaskIntoConstraints = false
-        v.backgroundColor = .player.withAlphaComponent(0.9)
+        v.backgroundColor = .player
         v.clipsToBounds = true
         return v
     }()
@@ -56,6 +56,8 @@ final class PlayerBarController: UITabBarController {
         ) { [weak self] _ in
             self?.updatePlayerBar()
         }
+
+        tabBar.tintColor = .player
     }
     
     /// UI를 구성합니다.
