@@ -177,10 +177,6 @@ private extension PreferenceManager {
     private func selectByWeight(weights: [Genre: Double]) -> Genre {
         let totalWeight = weights.values.reduce(0, +)
 
-        for (genre, weight) in weights {
-            let probability = totalWeight > 0 ? (weight / totalWeight) * 100 : 0
-        }
-
         let random = Double.random(in: 0...totalWeight)
         var currentWeight: Double = 0
 
