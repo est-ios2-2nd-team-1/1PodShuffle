@@ -187,6 +187,9 @@ class PlayListViewController: UIViewController {
     }
     
     deinit {
+        if let observer = playStateObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
         PlayerManager.shared.onTimeUpdateToPlaylistView = nil
         PlayerManager.shared.onPlayListChanged = nil
         PlayerManager.shared.onSongChangedToPlaylistView = nil

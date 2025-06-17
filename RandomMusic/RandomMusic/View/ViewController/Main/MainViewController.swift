@@ -100,6 +100,15 @@ class MainViewController: UIViewController {
         thumbnailImageView.layer.cornerRadius = thumbnailImageView.frame.width / 2
     }
 
+    deinit {
+        if let observer = feedbackObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = playStateObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
+
     // MARK: - Setup Methods
 
     /// 모든 버튼의 초기 Configuration을 설정합니다.
