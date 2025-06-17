@@ -4,6 +4,7 @@ class SettingViewController: UIViewController {
     @IBOutlet weak var resetPreferenceButton: UIButton!
     @IBOutlet weak var resetPlaylistButton: UIButton!
     @IBOutlet weak var themeSwitch: UISwitch!
+    @IBOutlet weak var statsStackView: UIStackView!
 
     private let preferenceManager = PreferenceManager()
 
@@ -16,6 +17,9 @@ class SettingViewController: UIViewController {
             themeSwitch.isOn = false
         }
         themeSwitch.addTarget(self, action: #selector(themeSwitchChanged), for: .valueChanged)
+
+        // 선호도 통계
+        showGenreStatistics()
     }
 
     // 선호도 데이터 초기화
@@ -48,6 +52,7 @@ class SettingViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
 
+    // 다크모드 설정
     @IBAction func themeSwitchChanged(_ sender: UISwitch) {
         if #available(iOS 16.0, *) {
             if let windowScene = UIApplication.shared.connectedScenes
@@ -58,7 +63,23 @@ class SettingViewController: UIViewController {
             }
         }
     }
-}
 
+    // 선호도 통계 나타내는 스택뷰: 바 + 선호도 퍼센트
+    private func showGenreStatistics() {
+        let percentages = preferenceManager.getGenrePercentage()
+
+        statsStackView.arrangedSubviews.forEach{ $0.removeFromSuperview() }
+
+        for (genre, percent) in percentages {
+            let barCount = Int(percent / 10)
+            let bar = String(repeating: "▓", count: barCount)
+            let percentString = String(format: "%.2f", percent)
+            let label = UILabel()
+            label.font = UIFont.monospacedSystemFont(ofSize: 16, weight: .regular)
+            label.text = "[\(genre.rawValue): \(bar) \(percentString)%]"
+            statsStackView.addArrangedSubview(label)
+        }
+    }
+}
 
 
