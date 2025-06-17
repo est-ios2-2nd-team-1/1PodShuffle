@@ -12,8 +12,9 @@ class PlayListViewController: UIViewController {
     /// Throttle 객체
     private let throttle = Throttle()
 
-    private var playStateObserver: NSObjectProtocol?
     private var currentSongObserver: NSObjectProtocol?
+    private var playStateObserver: NSObjectProtocol?
+    private var playlistObserver: NSObjectProtocol?
 
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
     private let playConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .regular, scale: .large)
@@ -58,32 +59,11 @@ class PlayListViewController: UIViewController {
     }
 
     private func setupNotificationObservers() {
-        playStateObserver = NotificationCenter.default.addObserver(
-            forName: .playerStateChanged,
+        currentSongObserver = NotificationCenter.default.addObserver(
+            forName: .currentSongChanged,
             object: nil,
             queue: .main
-        ) { [weak self] notification in
-            guard let isPlaying = notification.object as? Bool else { return }
-            self?.setPlayPauseButton(isPlaying)
-        }
-    }
-
-    /// 바인딩 메소드
-    private func bindPlayerCallbacks() {
-        PlayerManager.shared.onTimeUpdateToPlaylistView = { [weak self] seconds in
-            guard let duration = PlayerManager.shared.player?.currentItem?.duration.seconds, !duration.isNaN else { return }
-            self?.playProgressView.progress = Float(seconds / duration)
-        }
-
-        PlayerManager.shared.onPlayListChanged = { [weak self] in
-            Task { @MainActor in
-                UIView.performWithoutAnimation {
-                    self?.playListTableView.reloadData()
-                }
-            }
-        }
-
-        currentSongObserver = NotificationCenter.default.addObserver(forName: .currentSongChanged, object: nil, queue: .main) { [weak self] _ in
+        ) { [weak self] _ in
             self?.playListTableView.reloadData()
             self?.setDismissImageButton()
             self?.playListTableView.layoutIfNeeded()
@@ -92,6 +72,33 @@ class PlayListViewController: UIViewController {
                 try? await Task.sleep(nanoseconds: 4_000_000)
                 self?.scrollSelectPlaySong()
             }
+        }
+
+        playStateObserver = NotificationCenter.default.addObserver(
+            forName: .playStateChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let isPlaying = notification.object as? Bool else { return }
+            self?.setPlayPauseButton(isPlaying)
+        }
+
+        playlistObserver = NotificationCenter.default.addObserver(
+            forName: .playlistChanaged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            UIView.performWithoutAnimation {
+                self?.playListTableView.reloadData()
+            }
+        }
+    }
+
+    /// 바인딩 메소드
+    private func bindPlayerCallbacks() {
+        PlayerManager.shared.onTimeUpdateToPlaylistView = { [weak self] seconds in
+            guard let duration = PlayerManager.shared.player?.currentItem?.duration.seconds, !duration.isNaN else { return }
+            self?.playProgressView.progress = Float(seconds / duration)
         }
     }
     
@@ -188,14 +195,16 @@ class PlayListViewController: UIViewController {
     }
     
     deinit {
-        if let observer = playStateObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
         if let observer = currentSongObserver {
             NotificationCenter.default.removeObserver(observer)
         }
+        if let observer = playStateObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = playlistObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
         PlayerManager.shared.onTimeUpdateToPlaylistView = nil
-        PlayerManager.shared.onPlayListChanged = nil
     }
 }
 
