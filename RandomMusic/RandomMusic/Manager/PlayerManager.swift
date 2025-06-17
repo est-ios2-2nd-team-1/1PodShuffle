@@ -209,13 +209,18 @@ final class PlayerManager {
 
     /// 플레이리스트를 초기화합니다.
     func clearPlaylist() {
-        pause()
-        cleanupPlayer()
+        let preservedSong = currentSong // 현재 재상중
+        playlist.enumerated().forEach { index, song in
+            if song != preservedSong {
+                DataManager.shared.deleteSongData(to: song)
+            }
+        }
 
-        playlist.forEach { DataManager.shared.deleteSongData(to: $0) }
-        playlist.removeAll()
-        UserDefaults.standard.set(0, forKey: "heardLastSong")
+        playlist = preservedSong.map { [$0] } ?? []
         currentIndex = 0
+        UserDefaults.standard.set(currentIndex, forKey: "heardLastSong")
+
+        NotificationCenter.default.post(name: .playlistChanaged, object: nil)
     }
 
     // MARK: - Feedback Management
