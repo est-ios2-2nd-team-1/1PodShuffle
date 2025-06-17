@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="0ad-7W-m3u">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="0ad-7W-m3u">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Setting-->
+        <!--설정-->
         <scene sceneID="aHW-Ac-rAq">
             <objects>
                 <viewController id="bdG-as-3ZO" customClass="SettingViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
@@ -17,41 +17,87 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aYp-9b-u8a">
-                                <rect key="frame" x="20" y="634" width="353" height="35"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TvH-PI-Vq4">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="200"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Setting" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YRb-oF-N5N">
+                                        <rect key="frame" x="10" y="141" width="138.33333333333334" height="49"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="41"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="YRb-oF-N5N" secondAttribute="bottom" constant="10" id="Hbs-ha-Zle"/>
+                                    <constraint firstAttribute="height" constant="200" id="Io1-EA-yqB"/>
+                                    <constraint firstItem="YRb-oF-N5N" firstAttribute="leading" secondItem="TvH-PI-Vq4" secondAttribute="leading" constant="10" id="Lq5-GT-G0L"/>
+                                </constraints>
+                            </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="C9M-j7-lWj">
+                                <rect key="frame" x="20" y="230" width="353" height="31"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="다크모드 적용 on / off" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g59-cS-Swu">
+                                        <rect key="frame" x="0.0" y="0.0" width="304" height="31"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="R3I-YS-9Ov">
+                                        <rect key="frame" x="304" y="0.0" width="51" height="31"/>
+                                        <connections>
+                                            <action selector="themeSwitchChanged:" destination="bdG-as-3ZO" eventType="valueChanged" id="wyt-BG-bzV"/>
+                                        </connections>
+                                    </switch>
+                                </subviews>
+                            </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aKJ-vB-5jT">
+                                <rect key="frame" x="20" y="536.33333333333337" width="353" height="34.333333333333371"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="추천 알고리즘 초기화">
+                                <buttonConfiguration key="configuration" style="plain" title="재생목록 초기화">
                                     <color key="baseForegroundColor" red="0.78823529410000004" green="0.0" blue="0.047058823530000002" alpha="1" colorSpace="calibratedRGB"/>
                                 </buttonConfiguration>
                                 <connections>
-                                    <action selector="resetButtonTapped:" destination="bdG-as-3ZO" eventType="touchUpInside" id="HaF-S5-C8J"/>
+                                    <action selector="resetPlaylistButtonTapped:" destination="bdG-as-3ZO" eventType="touchUpInside" id="xxe-ll-0V9"/>
                                 </connections>
                             </button>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TvH-PI-Vq4">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="220"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="220" id="Io1-EA-yqB"/>
-                                </constraints>
-                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aYp-9b-u8a">
+                                <rect key="frame" x="20" y="600.66666666666663" width="353" height="34.333333333333371"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="선호도 데이터 초기화">
+                                    <color key="baseForegroundColor" red="0.78823529410000004" green="0.0" blue="0.047058823530000002" alpha="1" colorSpace="calibratedRGB"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="resetPreferenceButtonTapped:" destination="bdG-as-3ZO" eventType="touchUpInside" id="4x5-1H-YWu"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="qBB-yJ-siF"/>
                         <color key="backgroundColor" systemColor="systemGray6Color"/>
                         <constraints>
                             <constraint firstItem="qBB-yJ-siF" firstAttribute="trailing" secondItem="aYp-9b-u8a" secondAttribute="trailing" constant="20" id="6BF-Dc-RcJ"/>
                             <constraint firstItem="TvH-PI-Vq4" firstAttribute="trailing" secondItem="qBB-yJ-siF" secondAttribute="trailing" id="8ic-ux-8eB"/>
+                            <constraint firstItem="qBB-yJ-siF" firstAttribute="trailing" secondItem="aKJ-vB-5jT" secondAttribute="trailing" constant="20" id="AGO-or-QcV"/>
                             <constraint firstItem="TvH-PI-Vq4" firstAttribute="leading" secondItem="qBB-yJ-siF" secondAttribute="leading" id="DEK-fd-OVf"/>
                             <constraint firstItem="TvH-PI-Vq4" firstAttribute="top" secondItem="hzs-EX-McS" secondAttribute="top" id="Edp-Jd-Vov"/>
+                            <constraint firstItem="aKJ-vB-5jT" firstAttribute="leading" secondItem="qBB-yJ-siF" secondAttribute="leading" constant="20" id="Ikv-yg-6y0"/>
+                            <constraint firstItem="C9M-j7-lWj" firstAttribute="trailing" secondItem="qBB-yJ-siF" secondAttribute="trailing" constant="-20" id="MKF-sw-iLR"/>
+                            <constraint firstItem="C9M-j7-lWj" firstAttribute="leading" secondItem="qBB-yJ-siF" secondAttribute="leading" constant="20" id="Q0v-vx-x9a"/>
                             <constraint firstItem="aYp-9b-u8a" firstAttribute="leading" secondItem="qBB-yJ-siF" secondAttribute="leading" constant="20" id="TZH-kc-VkO"/>
                             <constraint firstItem="qBB-yJ-siF" firstAttribute="bottom" secondItem="aYp-9b-u8a" secondAttribute="bottom" constant="100" id="X6g-vp-YKF"/>
+                            <constraint firstItem="aYp-9b-u8a" firstAttribute="top" secondItem="aKJ-vB-5jT" secondAttribute="bottom" constant="30" id="XFJ-ZF-Oax"/>
+                            <constraint firstItem="C9M-j7-lWj" firstAttribute="top" secondItem="TvH-PI-Vq4" secondAttribute="bottom" constant="30" id="r0Q-tc-Xsa"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Setting" id="VmW-wG-Rkc">
+                    <navigationItem key="navigationItem" title="설정" id="VmW-wG-Rkc">
                         <barButtonItem key="backBarButtonItem" title="Back" id="1uM-xk-ljh"/>
                     </navigationItem>
                     <connections>
-                        <outlet property="resetButton" destination="aYp-9b-u8a" id="Bfa-dg-U6s"/>
+                        <outlet property="resetPlaylistButton" destination="aKJ-vB-5jT" id="5hb-dK-S3b"/>
+                        <outlet property="resetPreferenceButton" destination="aYp-9b-u8a" id="JkO-8f-IaL"/>
+                        <outlet property="themeSwitch" destination="R3I-YS-9Ov" id="VOk-5W-zMU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ohE-DQ-aYO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -66,7 +112,7 @@
                     <toolbarItems/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="zyd-Ok-QsP">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <rect key="frame" x="0.0" y="118" width="393" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -85,7 +131,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
