@@ -142,7 +142,7 @@ final class PlayerManager {
     func addSong(_ song: SongModel) {
         playlist.append(song)
         Task {
-            await Toast.shared.showToast(message: "\(song.title)이 추가되었습니다.")
+            await Toast.shared.showToast(message: "선택하신 음악이 추가되었습니다.")
         }
     }
 
