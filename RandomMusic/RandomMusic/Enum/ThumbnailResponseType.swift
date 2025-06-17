@@ -1,10 +1,4 @@
-//
-//  Untitled.swift
-//  RandomMusic
-//
-//  Created by drfranken on 6/13/25.
-//
-
+/// 곡정보 api 응답받을 때 thumbanil 항목의 값
 enum ThumbnailResponseType: Int, CaseIterable, Codable {
     case exists = 1
     case pending = 0

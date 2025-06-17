@@ -1,5 +1,13 @@
 import AVFoundation
 
+extension Notification.Name {
+    static let currentSongChanged = Notification.Name("CurrentSongChanged")
+    static let feedbackChanged = Notification.Name("FeedbackChanged")
+    static let playStateChanged = Notification.Name("PlayStateChanged")
+    static let playbackTimeChanged = Notification.Name("PlaybackTimeChanged")
+    static let playlistChanaged = Notification.Name("PlaylistChanaged")
+}
+
 /// AVPlayer 기반의 오디오 재생을 관리하는 클래스입니다.
 final class PlayerManager {
     static let shared = PlayerManager()
@@ -9,42 +17,29 @@ final class PlayerManager {
 
     private(set) var player: AVPlayer?
     private(set) var playlist: [SongModel] = [] {
-        didSet { onPlayListChanged?() }
+        didSet { NotificationCenter.default.post(name: .playlistChanaged, object: nil) }
     }
     private(set) var currentIndex: Int = 0
     private(set) var isPlaying = false
-    private(set) var currentPlaybackTime: Double?
+    private(set) var currentPlaybackTime: Double = 0.0
+
+    private var timeObserverToken: Any?
 
     var isRepeatEnabled = false
     var currentPlaybackSpeed: Float = 1.0
 
-    private var timeObserverToken: Any?
-
     var currentSong: SongModel? {
-        guard !playlist.isEmpty && currentIndex >= 0 && currentIndex < playlist.count else { return nil }
+        guard !playlist.isEmpty && isValidIndex(currentIndex) else { return nil }
         return playlist[currentIndex]
     }
-
-    // MARK: - Callbacks
-
-    var onTimeUpdateToPlaylistView: ((Double) -> Void)? {
-        didSet { onTimeUpdateToPlaylistView?(currentPlaybackTime ?? 0.0) }
-    }
-    var onTimeUpdateToMainView: ((Double) -> Void)?
-    var onPlayStateChangedToMainView: ((Bool) -> Void)?
-    var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
-    var onSongChangedToMainView: (() -> Void)?
-    var onSongChangedToPlaylistView: (() -> Void)?
-    var onSongChangedToPlayerBarView: (() -> Void)?
-    var onFeedbackChanged: ((FeedbackType) -> Void)?
-    var onRemote: ((SongModel?) -> Void)?
-    var onPlayListChanged: (() -> Void)?
 
     private init(songService: SongService = SongService(), preferenceManager: PreferenceManager = PreferenceManager()) {
         self.songService = songService
         self.preferenceManager = preferenceManager
         loadPlaylistFromDB()
     }
+
+    var onRemote: ((SongModel?) -> Void)?
 
     /// 플레이리스트 초기화를 완료합니다. UI가 준비된 후 호출해야 합니다.
     func initializePlaylistIfNeeded() async {
@@ -58,7 +53,7 @@ final class PlayerManager {
     // MARK: - Playback Controls
 
     func play() {
-        guard let currentSong = currentSong else {
+        guard let currentSong else {
             print("No current song available")
             return
         }
@@ -103,9 +98,7 @@ final class PlayerManager {
     }
 
     func moveBackward() -> Bool {
-        let currentTime = currentPlaybackTime ?? 0
-
-        if currentTime < 3.0 {
+        if currentPlaybackTime < 3.0 {
             return moveToPreviousSong()
     	} else {
         	seek(to: 0)
@@ -229,7 +222,7 @@ final class PlayerManager {
 
     /// 현재 곡의 피드백 상태를 가져옵니다.
     func getCurrentSongFeedback() -> FeedbackType {
-        guard let currentSong = currentSong else { return .none }
+        guard let currentSong else { return .none }
         return preferenceManager.getUserFeedback(for: currentSong.id)
     }
 
@@ -276,13 +269,13 @@ private extension PlayerManager {
     }
 
     /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
-    private func loadPlaylistFromDB() {
+    func loadPlaylistFromDB() {
         let savedSongs = DataManager.shared.fetchSongData()
         playlist = savedSongs
         currentIndex = UserDefaults.standard.integer(forKey: Constants.lastSongKey)
     }
 
-    private func moveToPreviousSong() -> Bool {
+    func moveToPreviousSong() -> Bool {
         guard currentIndex > 0 else { return false }
 
         setCurrentIndex(currentIndex - 1)
@@ -290,40 +283,40 @@ private extension PlayerManager {
         return true
     }
 
-    private func saveLastPlayedSong() {
+    func saveLastPlayedSong() {
         UserDefaults.standard.set(currentIndex, forKey: Constants.lastSongKey)
     }
 
-    private func isValidIndex(_ index: Int) -> Bool {
+    func isValidIndex(_ index: Int) -> Bool {
         return index >= 0 && index < playlist.count
     }
 
-    private func isValidOrderUpdate(sourceIndex: Int, destinationIndex: Int) -> Bool {
+    func isValidOrderUpdate(sourceIndex: Int, destinationIndex: Int) -> Bool {
         return sourceIndex != destinationIndex &&
                isValidIndex(sourceIndex) &&
                destinationIndex >= 0 && destinationIndex <= playlist.count
     }
 
-    private func handleEmptyPlaylist() {
+    func handleEmptyPlaylist() {
         pause()
         cleanupPlayer()
         notifySongChanged()
     }
 
-    private func handleSongRemoval(at index: Int) {
+    func handleSongRemoval(at index: Int) {
         if index == currentIndex {
             // 현재 재생 중인 곡이 삭제되는 경우
             handleCurrentSongRemoval(at: index)
         } else if index < currentIndex {
             // 현재 곡보다 앞의 곡이 삭제되면 인덱스 조정
             currentIndex -= 1
-            onPlayListChanged?()
+            NotificationCenter.default.post(name: .playlistChanaged, object: nil)
         } else {
-            onPlayListChanged?()
+            NotificationCenter.default.post(name: .playlistChanaged, object: nil)
         }
     }
 
-    private func handleCurrentSongRemoval(at index: Int) {
+    func handleCurrentSongRemoval(at index: Int) {
         updateCurrentIndexAfterRemoval(at: index)
         notifySongChanged()
 
@@ -334,7 +327,7 @@ private extension PlayerManager {
         }
     }
 
-    private func updateCurrentIndexAfterRemoval(at index: Int) {
+    func updateCurrentIndexAfterRemoval(at index: Int) {
         if playlist.count > 1 {
             currentIndex = (index == playlist.count) ? max(0, playlist.count - 1) : index
         } else {
@@ -342,7 +335,7 @@ private extension PlayerManager {
         }
     }
 
-    private func updateCurrentIndexAfterReorder(sourceIndex: Int, destinationIndex: Int) {
+    func updateCurrentIndexAfterReorder(sourceIndex: Int, destinationIndex: Int) {
         if currentIndex == sourceIndex {
             // 이동된 곡이 현재 재생 중인 곡인 경우
             setCurrentIndex(destinationIndex > sourceIndex ? destinationIndex - 1 : destinationIndex)
@@ -380,14 +373,11 @@ private extension PlayerManager {
             newFeedback = targetFeedback
         }
 
-        // UI 업데이트를 위한 콜백 호출
-        onFeedbackChanged?(newFeedback)
+        NotificationCenter.default.post(name: .feedbackChanged, object: newFeedback)
     }
 
-    private func notifySongChanged() {
-        onSongChangedToMainView?()
-        onSongChangedToPlaylistView?()
-        onSongChangedToPlayerBarView?()
+    func notifySongChanged() {
+        NotificationCenter.default.post(name: .currentSongChanged, object: nil)
     }
 
     func setupPlayer(with asset: AVURLAsset) {
@@ -433,8 +423,8 @@ private extension PlayerManager {
 
     func updatePlayingState(_ playing: Bool) {
         isPlaying = playing
-        onPlayStateChangedToMainView?(playing)
-        onPlayStateChangedToPlaylistView?(playing)
+
+        NotificationCenter.default.post(name: .playStateChanged, object: playing)
     }
 
     /// 재생 시간 정보를 주기적으로 업데이트합니다.
@@ -443,13 +433,13 @@ private extension PlayerManager {
             forInterval: CMTime(seconds: 1, preferredTimescale: 1),
             queue: .main
         ) { [weak self] time in
-            guard let self = self else { return }
+            guard let self else { return }
 
             let seconds = CMTimeGetSeconds(time)
             currentPlaybackTime = Double(seconds)
-            onTimeUpdateToMainView?(seconds)
-            onTimeUpdateToPlaylistView?(seconds)
             onRemote?(currentSong)
+
+            NotificationCenter.default.post(name: .playbackTimeChanged, object: seconds)
         }
     }
 
