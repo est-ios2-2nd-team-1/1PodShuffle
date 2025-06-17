@@ -12,9 +12,16 @@ class PlayListViewController: UIViewController {
     /// Throttle 객체
     private let throttle = Throttle()
 
+    /// 곡 변경 옵저버
     private var currentSongObserver: NSObjectProtocol?
+    
+    /// 재생 상태 변경 옵저버
     private var playStateObserver: NSObjectProtocol?
+    
+    /// 재생 시간 변경 옵저버
     private var playbackTimeObserver: NSObjectProtocol?
+    
+    /// 플레이리스트 변경 알림 옵저버
     private var playlistObserver: NSObjectProtocol?
 
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
@@ -50,7 +57,9 @@ class PlayListViewController: UIViewController {
         collectionView.collectionViewLayout = flowLayout
     }
 
-    /// 재생/일시정지 버튼 UI
+    /// 재생/일시정지 버튼 UI setting
+    ///
+    /// - Parameter isPlaying: 재생 상태를 Bool 타입으로 받습니다
     private func setPlayPauseButton(_ isPlaying: Bool) {
         let playImage = isPlaying
         ? UIImage(systemName: "pause.circle", withConfiguration: playConfig)
@@ -58,6 +67,7 @@ class PlayListViewController: UIViewController {
         playButton.setImage(playImage, for: .normal)
     }
 
+    /// Notification Observer Set Method
     private func setupNotificationObservers() {
         currentSongObserver = NotificationCenter.default.addObserver(
             forName: .currentSongChanged,
@@ -69,7 +79,7 @@ class PlayListViewController: UIViewController {
             self?.playListTableView.layoutIfNeeded()
 
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 4_000_000)
+                try? await Task.sleep(for: .milliseconds(10))
                 self?.scrollSelectPlaySong()
             }
         }
@@ -99,13 +109,13 @@ class PlayListViewController: UIViewController {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            UIView.performWithoutAnimation {
-                self?.playListTableView.reloadData()
-            }
+            self?.playListTableView.reloadData()
         }
     }
     
-    /// 재생곡 select 및 위치로 스크롤 이동
+    /// 재생곡 위치로 스크롤 이동
+    ///
+    /// 플레이리스트 화면 진입 또는 곡 변경시 현재 재생중인 곡의 위치로 스크롤이 이동하게 됩니다
     private func scrollSelectPlaySong() {
         let index = PlayerManager.shared.currentIndex
         let rowCount = PlayerManager.shared.playlist.count
@@ -133,7 +143,9 @@ class PlayListViewController: UIViewController {
     }
     
     /// image resize
-    /// - targetSize에 맞게 이미지 사이즈를 조정합니다
+    ///
+    /// - Parameter image: 사이즈를 변경할 이미지
+    /// - Parameter targetSize: 변경하려는 사이즈
     private func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage? {
         let size = image.size
         
@@ -190,7 +202,9 @@ class PlayListViewController: UIViewController {
     }
     
     /// dismiss 버튼, 이미지 버튼 터치
+    ///
     /// 플레이리스트 화면은 dismiss되고 재생화면으로 돌아갑니다
+    ///
     /// - dismiss 버튼: 화면 좌측 상단
     /// - 이미지 버튼: 화면 우측 하단의 이미지로 현재 재생중인 곡의 thumailImage가 표시됩니다
     @IBAction func dismissButton(_ sender: Any) {
@@ -213,7 +227,7 @@ class PlayListViewController: UIViewController {
     }
 }
 
-// MARK: - TabelView DataSource
+// MARK: - TableView DataSource
 extension PlayListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return PlayerManager.shared.playlist.count
@@ -224,7 +238,7 @@ extension PlayListViewController: UITableViewDataSource {
         let model = PlayerManager.shared.playlist[indexPath.row]
         let isPlaying = indexPath.row == PlayerManager.shared.currentIndex
         cell.selectionStyle = .none
-        cell.setUI(model: model, isPlaying: isPlaying)
+        cell.configureCell(model: model, isPlaying: isPlaying)
         
         return cell
     }
