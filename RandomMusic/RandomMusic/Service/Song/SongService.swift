@@ -1,27 +1,21 @@
-//
-//  SongService.swift
-//  RandomMusic
-//
-//  Created by drfranken on 6/12/25.
-//
-
-
-//import UIKit       // Bundle.main (iOS 앱에서)
 import AVFoundation
 
-/// Song 관련 비지니스로직
+/// Song 관련 비지니스 로직
 class SongService {
 
+    // 상수들
+    private let LOAD_SONGS_COUNT = 10
+    private let M3U8_FILE_NAME = "output.m3u8"
+    private let THUMBNAIL_FILE_NAME = "cover.jpg"
+
     // 참조 객체 생성
-    let networkService = NetworkService()
+    private let networkService = NetworkService()
 
     /// 장르별 랜덤곡을 요청
     /// - Warning: 파라미터를 넣지 않으면 선호도에 기반해서 자동으로 랜덤장르를 요청함. 특수한 상황이 아니라면 파라미터 넣지 말고 쓰세요
     /// - Parameter genre: 장르.
     /// - Returns: 바로 쓸 수 있는 SongModel. 썸네일 Data 와 곡정보가 모두 들어있다.
     func getMusic(genre: Genre? = nil) async throws -> SongModel {
-        let currentSongIdArr = PlayerManager.shared.playlist.map {$0.id} // 현재 플레이리스트에 있는 곡들의 id 배열
-
         var realGenre: Genre // 장르가 없으면 장르를 랜덤으로 뽑아서 넣어주기 위해서 새로 선언
 
         if let genre { // 장르 입력값이 있으면 그대로 사용
@@ -31,9 +25,8 @@ class SongService {
             realGenre = pm.selectRandomGenre()
         }
 
-        // 음악 정보 호출. playList 에 이미 있는 곡이라면 재요청.
-        var response: SongResponse
-        response = try await fetchRandomMusic(genre: realGenre)
+        // 음악 정보 호출
+        let response: SongResponse = try await fetchRandomMusic(genre: realGenre)
 
         // 썸네일 호출
         var thumbnailData: Data? = nil
@@ -44,8 +37,6 @@ class SongService {
             } catch {
                 print("썸네일 로드 실패: \(error)") // 썸네일 실패해도 음악은 재생 가능
             }
-        } else {
-            print("썸네일 없는 곡")
         }
 
         // 썸네일이 들어간 모델로 만들기
@@ -54,7 +45,6 @@ class SongService {
         return songModel
     }
 
-    // MARK: 추가된 메소드입니다. (장르별 10곡)
     /// 장르별로 10곡을 가져오는 메소드입니다.
     /// - Parameter genre: 선택된 장르를 받습니다.
     /// - Returns: 해당 장르의 10곡을 반환합니다.
@@ -74,7 +64,11 @@ class SongService {
             var thumbnailData: Data? = nil
 
             if response.thumbnail == .exists {
-                thumbnailData = try await fetchThumbnailImage(from: response.streamUrl)
+                do {
+                    thumbnailData = try await fetchThumbnailImage(from: response.streamUrl)
+                } catch {
+                    print("썸네일 로드 실패: \(error)")
+                }
             }
 
             songModelList.append(SongModel(from: response, thumbnailData: thumbnailData))
@@ -83,7 +77,12 @@ class SongService {
         return songModelList
     }
 
-    /// 헤더가 포함된 Asset 생성
+    /// API 요청 시 필요한 인증 헤더 등을 포함한 AVURLAsset을 생성하여,
+    /// 보안이 필요한 스트리밍 URL에도 접근 가능하도록 하는 메서드
+    /// - Parameter url: API의 상대 경로. 예: `"/api/music/stream/123"`
+    /// - Returns: 생성된 `AVURLAsset` 객체. 실패 시 nil이 아닌 예외를 throw
+    /// - Throws: 네트워크 요청 생성에 실패하거나 URL이 잘못된 경우 오류를 throw
+    /// - Note: 반환되는 AVURLAsset은 헤더가 필요한 m3u8 스트리밍 등에서 사용됨
     func createAssetWithHeaders(url: String) throws -> AVURLAsset? {
         let request = try networkService.makeRequest(endpoint: url)
         let headers = request.allHTTPHeaderFields ?? [:]
@@ -92,6 +91,9 @@ class SongService {
         return asset
     }
 
+}
+
+private extension SongService {
     /// 장르에 기반한 곡 메타정보(SongResponse)를 가져온다
     /// - Parameter genre: 장르. enum
     /// - Returns: api 응답형식. SongModel 로 변환 후 사용해야함
@@ -104,8 +106,11 @@ class SongService {
         return try await networkService.fetch(endpoint: endpoint)
     }
 
+    /// 장르에 기반한 곡 메타정보 가져오기 (여러곡)
+    /// - Parameter genre: 장르. enum
+    /// - Returns: api 응답형식. SongModel 로 변환 후 사용해야함
     private func fetchRandomMusics(genre: Genre? = nil) async throws -> [SongResponse] {
-        var endpoint = "/api/music/randomMany/10"
+        var endpoint = "/api/music/randomMany/\(LOAD_SONGS_COUNT)"
         if let genre = genre {
             endpoint += "?genre=\(genre.rawValue)"
         }
@@ -122,12 +127,11 @@ class SongService {
         return try await networkService.fetch(endpoint: endpoint)
     }
 
-
     /// 썸네일호출. streamUrl 을 변형해서 이미지경로를 생성하고 api 호출해 그 이미지의 바이너리 데이터를 가져온다
     /// - Parameter streamUrl: 음원경로. 음원과 같은 경로에서 파일명만 다른 jpg파일을 가져오기 때문
     /// - Returns: 이미지 Data 형식
     private func fetchThumbnailImage(from streamUrl: String) async throws -> Data {
-        let thumbnailUrl = streamUrl.replacingOccurrences(of: "output.m3u8", with: "cover.jpg")
+        let thumbnailUrl = streamUrl.replacingOccurrences(of: M3U8_FILE_NAME, with: THUMBNAIL_FILE_NAME)
         let data =  try await networkService.fetchData(endpoint: thumbnailUrl)
 
         return data
