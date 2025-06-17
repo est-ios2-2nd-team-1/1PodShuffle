@@ -18,7 +18,7 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1aT-3Y-0Xo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1086" y="-136"/>
+            <point key="canvasLocation" x="2012" y="-128"/>
         </scene>
         <!--SettingView-->
         <scene sceneID="pW5-rQ-4yi">
@@ -191,65 +191,9 @@
                                                 </subviews>
                                             </stackView>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vzb-Vd-KfB">
-                                                <rect key="frame" x="0.0" y="558" width="393" height="156"/>
-                                                <subviews>
-                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mjQ-B2-lQE">
-                                                        <rect key="frame" x="0.0" y="0.0" width="393" height="80"/>
-                                                        <subviews>
-                                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="HjH-Qj-q0K">
-                                                                <rect key="frame" x="20" y="10" width="353" height="60"/>
-                                                                <subviews>
-                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="r8s-cH-26F">
-                                                                        <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
-                                                                        <constraints>
-                                                                            <constraint firstAttribute="width" constant="60" id="9we-0S-Hhq"/>
-                                                                            <constraint firstAttribute="width" secondItem="r8s-cH-26F" secondAttribute="height" multiplier="1:1" id="n7N-HX-XGl"/>
-                                                                        </constraints>
-                                                                    </imageView>
-                                                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="k0B-gm-hQ4">
-                                                                        <rect key="frame" x="80" y="0.0" width="273" height="60"/>
-                                                                        <subviews>
-                                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZV5-OA-MLz">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="273" height="30"/>
-                                                                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
-                                                                                <nil key="textColor"/>
-                                                                                <nil key="highlightedColor"/>
-                                                                                <variation key="widthClass=regular">
-                                                                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="20"/>
-                                                                                </variation>
-                                                                            </label>
-                                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Singer" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3El-76-lfi">
-                                                                                <rect key="frame" x="0.0" y="30" width="273" height="30"/>
-                                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                                                <color key="textColor" systemColor="secondaryLabelColor"/>
-                                                                                <nil key="highlightedColor"/>
-                                                                                <variation key="widthClass=regular">
-                                                                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                                                                </variation>
-                                                                            </label>
-                                                                        </subviews>
-                                                                    </stackView>
-                                                                </subviews>
-                                                            </stackView>
-                                                        </subviews>
-                                                        <color key="backgroundColor" name="MainColor"/>
-                                                        <constraints>
-                                                            <constraint firstItem="HjH-Qj-q0K" firstAttribute="centerY" secondItem="mjQ-B2-lQE" secondAttribute="centerY" id="IM5-am-dvd"/>
-                                                            <constraint firstItem="HjH-Qj-q0K" firstAttribute="leading" secondItem="mjQ-B2-lQE" secondAttribute="leading" constant="20" id="awl-X9-l7r">
-                                                                <variation key="widthClass=regular" constant="40"/>
-                                                            </constraint>
-                                                            <constraint firstAttribute="trailing" secondItem="HjH-Qj-q0K" secondAttribute="trailing" constant="20" id="f2R-J1-xEp">
-                                                                <variation key="widthClass=regular" constant="40"/>
-                                                            </constraint>
-                                                            <constraint firstAttribute="height" constant="80" id="tnT-GC-xmF"/>
-                                                        </constraints>
-                                                    </view>
-                                                </subviews>
+                                                <rect key="frame" x="0.0" y="617" width="393" height="156"/>
                                                 <color key="backgroundColor" name="MainColor"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="trailing" secondItem="mjQ-B2-lQE" secondAttribute="trailing" id="APF-0F-Q0T"/>
-                                                    <constraint firstItem="mjQ-B2-lQE" firstAttribute="top" secondItem="Vzb-Vd-KfB" secondAttribute="top" id="R5I-5c-LxY"/>
-                                                    <constraint firstItem="mjQ-B2-lQE" firstAttribute="leading" secondItem="Vzb-Vd-KfB" secondAttribute="leading" id="ic6-Na-V7c"/>
                                                     <constraint firstAttribute="height" constant="156" id="yOy-ej-ans"/>
                                                 </constraints>
                                             </view>
@@ -304,12 +248,6 @@
                         <outlet property="playPauseButton" destination="kfD-3U-Pv5" id="QD6-Fd-437"/>
                         <outlet property="playlistBackground" destination="Vzb-Vd-KfB" id="CXU-fZ-sJi"/>
                         <outlet property="playlistBackgroundHeightConstraint" destination="yOy-ej-ans" id="rXF-zA-UE4"/>
-                        <outlet property="playlistContent" destination="mjQ-B2-lQE" id="alJ-k9-W9V"/>
-                        <outlet property="playlistContentHeightConstraint" destination="tnT-GC-xmF" id="TjI-DA-hRT"/>
-                        <outlet property="playlistSingerLabel" destination="3El-76-lfi" id="Uss-sC-cYR"/>
-                        <outlet property="playlistThumbnail" destination="r8s-cH-26F" id="Lzn-Os-C20"/>
-                        <outlet property="playlistThumbnailWidthConstraint" destination="9we-0S-Hhq" id="Jwb-Rk-Z7o"/>
-                        <outlet property="playlistTitleLabel" destination="ZV5-OA-MLz" id="FeD-vx-469"/>
                         <outlet property="progressSlider" destination="8fY-R8-EKh" id="6TG-Q0-fCv"/>
                         <outlet property="repeatButton" destination="IGc-Tg-0S2" id="CDu-uP-CBt"/>
                         <outlet property="singerLabel" destination="i0s-Ti-8Zv" id="0nd-rj-IR9"/>
@@ -321,7 +259,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cLW-Kc-rBY" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2060" y="72"/>
+            <point key="canvasLocation" x="1167" y="163"/>
         </scene>
         <!--PlayListView-->
         <scene sceneID="dUg-a0-S37">
@@ -329,22 +267,23 @@
                 <viewControllerPlaceholder storyboardIdentifier="PlayListView" storyboardName="PlayListView" referencedIdentifier="PlayListView" id="8wS-cc-rHn" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZMz-Mx-vTZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4607.6335877862593" y="17.605633802816904"/>
+            <point key="canvasLocation" x="3382" y="-128"/>
         </scene>
-        <!--Tab Bar Controller-->
+        <!--Player Bar Controller-->
         <scene sceneID="f5a-tS-p4a">
             <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="3Pb-ze-kdT" sceneMemberID="viewController">
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="3Pb-ze-kdT" customClass="PlayerBarController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="QDI-Ua-NXC">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="tintColor" name="MainColor"/>
                     </tabBar>
                     <connections>
-                        <segue destination="R9p-LP-w72" kind="relationship" relationship="viewControllers" id="hBI-ic-28e"/>
-                        <segue destination="oUJ-Ad-HvN" kind="relationship" relationship="viewControllers" id="QIt-Y5-iGQ"/>
-                        <segue destination="HVO-Lc-RNc" kind="relationship" relationship="viewControllers" id="x4J-iO-Fe6"/>
+                        <segue destination="oUJ-Ad-HvN" kind="relationship" relationship="viewControllers" id="uCt-se-umg"/>
+                        <segue destination="R9p-LP-w72" kind="relationship" relationship="viewControllers" id="ghN-9x-pD6"/>
+                        <segue destination="HVO-Lc-RNc" kind="relationship" relationship="viewControllers" id="MQV-o4-xsA"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1Dh-ki-oyh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

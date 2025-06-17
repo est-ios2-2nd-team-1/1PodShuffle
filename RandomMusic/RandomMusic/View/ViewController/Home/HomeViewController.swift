@@ -11,10 +11,12 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
 
     private var songs: [SongModel] = []
+    private let refreshControl = UIRefreshControl()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        setRefresh()
     }
 
     private func configureUI() {
@@ -22,6 +24,7 @@ class HomeViewController: UIViewController {
             return self.createSection(for: sectionIndex, environment)
         }
 
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 80, right: 0)
         collectionView.collectionViewLayout = layout
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         collectionView.register(UINib(nibName: "RecommendCell", bundle: nil), forCellWithReuseIdentifier: "RecommendCell")
@@ -30,6 +33,11 @@ class HomeViewController: UIViewController {
             let songModels = try await SongService().getMusics()
             loadSongs(from: songModels)
         }
+    }
+
+    private func setRefresh() {
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        collectionView.refreshControl = refreshControl
     }
 
     @MainActor
@@ -45,7 +53,7 @@ class HomeViewController: UIViewController {
         case 1:
             return createSecondSection(environment)
         default:
-            return createSingleColumnSection()
+            return createSecondSection(environment)
         }
     }
 
@@ -103,19 +111,13 @@ class HomeViewController: UIViewController {
         return section
     }
 
-    private func createSingleColumnSection() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(0.9))
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(0.1))
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-
-        let section = NSCollectionLayoutSection(group: group)
-
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5)
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
-
-        return section
+    @objc private func handleRefresh() {
+        Task {
+            try await Task.sleep(for: .seconds(1))
+            let songModels = try await SongService().getMusics()
+            loadSongs(from: songModels)
+            refreshControl.endRefreshing()
+        }
     }
 }
 
@@ -141,11 +143,11 @@ extension HomeViewController: UICollectionViewDataSource {
         switch indexPath.section {
         case 0:
             cell = setSectionZero(collectionView, indexPath: indexPath)
-
         case 1:
             cell = setSectionOne(collectionView, indexPath: indexPath)
         default:
             cell = UICollectionViewCell()
+            break
         }
 
         return cell

@@ -17,14 +17,8 @@ class MainViewController: UIViewController {
     @IBOutlet weak var playPauseButton: UIButton!
     @IBOutlet weak var forwardButton: UIButton!
     @IBOutlet weak var speedButton: UIButton!
-    @IBOutlet weak var playlistContent: UIView!
     @IBOutlet weak var playlistBackground: UIView!
-    @IBOutlet weak var playlistThumbnail: UIImageView!
-    @IBOutlet weak var playlistTitleLabel: UILabel!
-    @IBOutlet weak var playlistSingerLabel: UILabel!
     @IBOutlet weak var playlistBackgroundHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var playlistContentHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var playlistThumbnailWidthConstraint: NSLayoutConstraint!
 
     @IBOutlet weak var titleLabel: MarqueeLabel!
     @IBOutlet weak var singerLabel: MarqueeLabel!
@@ -63,7 +57,6 @@ class MainViewController: UIViewController {
         setupSlider()
         updateSongUI()
         setupNotificationObservers()
-        setupTapGestureForPlaylist()
 
         Task { @MainActor in
             await updateLayoutForCurrentTraitCollection()
@@ -192,15 +185,6 @@ class MainViewController: UIViewController {
         progressSlider.addTarget(self, action: #selector(sliderValueChangedDuringDrag), for: .valueChanged)
     }
 
-    /// 재생목록 영역에 탭 제스처를 설정합니다.
-    ///
-    /// 사용자가 재생목록 영역을 탭하면 재생목록 화면으로 전환됩니다.
-    private func setupTapGestureForPlaylist() {
-        playlistContent.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(playlistTapped))
-        playlistContent.addGestureRecognizer(tapGesture)
-    }
-
     private func setupNotificationObservers() {
         currentSongObserver = NotificationCenter.default.addObserver(
             forName: .currentSongChanged,
@@ -290,7 +274,6 @@ class MainViewController: UIViewController {
         }
 
         updateMainViewUI(with: currentSong)
-        updatePlaylistViewUI(with: currentSong)
         updateFeedbackState()
         Task {
             await loadAndUpdateDuration()
@@ -313,21 +296,6 @@ class MainViewController: UIViewController {
               let image = UIImage(data: thumbnailData) else { return }
 
         thumbnailImageView.image = image
-    }
-
-    /// 재생목록 영역의 UI를 업데이트합니다.
-    ///
-    /// 곡 제목, 아티스트, 썸네일 이미지를 설정합니다.
-    ///
-    /// - Parameter song: 표시할 곡 정보
-    private func updatePlaylistViewUI(with song: SongModel) {
-        playlistTitleLabel.text = song.title
-        playlistSingerLabel.text = song.artist
-
-        guard let thumbnailData = song.thumbnailData,
-              let image = UIImage(data: thumbnailData) else { return }
-
-        playlistThumbnail.image = image
     }
 
     /// 현재 곡의 피드백 상태를 업데이트합니다.
@@ -605,7 +573,7 @@ extension MainViewController {
         updateButtonSizes(subPointSize: 30, mainPointSize: 60)
 
         let contentHeight: CGFloat = 120
-        updatePlaylistLayout(contentHeight: contentHeight)
+        //updatePlaylistLayout(contentHeight: contentHeight)
     }
 
     /// 아이폰용 레이아웃을 설정합니다.
@@ -616,7 +584,7 @@ extension MainViewController {
         updateButtonSizes(subPointSize: 20, mainPointSize: 50)
 
         let contentHeight: CGFloat = 80
-        updatePlaylistLayout(contentHeight: contentHeight)
+        //updatePlaylistLayout(contentHeight: contentHeight)
     }
 
     /// 모든 버튼의 크기를 업데이트합니다.
@@ -645,10 +613,10 @@ extension MainViewController {
     /// Safe Area에 맞춰 높이를 조정하고 썸네일 크기를 설정합니다.
     ///
     /// - Parameter contentHeight: 재생목록 컨텐츠의 높이 (포인트 단위)
-    private func updatePlaylistLayout(contentHeight: CGFloat) {
-        let bottomInset = view.safeAreaInsets.bottom
-        playlistContentHeightConstraint.constant = contentHeight
-        playlistBackgroundHeightConstraint.constant = bottomInset + contentHeight
-        playlistThumbnailWidthConstraint.constant = contentHeight - (contentHeight > 100 ? 40 : 20)
-    }
+//    private func updatePlaylistLayout(contentHeight: CGFloat) {
+//        let bottomInset = view.safeAreaInsets.bottom
+//        playlistContentHeightConstraint.constant = contentHeight
+//        playlistBackgroundHeightConstraint.constant = bottomInset + contentHeight
+//        playlistThumbnailWidthConstraint.constant = contentHeight - (contentHeight > 100 ? 40 : 20)
+//    }
 }
