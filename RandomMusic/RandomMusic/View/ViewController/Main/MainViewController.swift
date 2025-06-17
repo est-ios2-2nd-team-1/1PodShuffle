@@ -2,6 +2,10 @@ import UIKit
 import AVFoundation
 import MarqueeLabel
 
+/// 음악 재생을 위한 메인 뷰 컨트롤러
+///
+/// `MainViewController`는 음악 재생, 일시정지, 곡 변경, 피드백 등의
+/// 핵심 음악 재생 기능을 제공하는 메인 화면입니다.
 class MainViewController: UIViewController {
 
     // MARK: - IBOutlets
@@ -28,27 +32,32 @@ class MainViewController: UIViewController {
     /// 곡 관련 서비스를 제공하는 객체
     private lazy var songService = SongService()
 
-    /// Throttle 객체
+    /// 버튼 중복 클릭을 방지하는 Throttle 객체
     private let throttle = Throttle()
 
     /// 현재 곡의 피드백 상태 (좋아요/싫어요/없음)
     private var currentFeedbackType: FeedbackType = .none
 
     /// 사용자가 슬라이더를 드래그 중인지 나타내는 플래그
-    ///
-    /// 이 플래그는 사용자가 슬라이더를 조작하는 동안 자동 시간 업데이트와의 충돌을 방지합니다.
     private var isSliderDragging = false
 
+    /// 현재 곡 변경 알림 옵저버
     private var currentSongObserver: NSObjectProtocol?
+
+    /// 피드백 변경 알림 옵저버
     private var feedbackObserver: NSObjectProtocol?
+
+    /// 재생 상태 변경 알림 옵저버
     private var playStateObserver: NSObjectProtocol?
+
+    /// 재생 시간 변경 알림 옵저버
     private var playbackTimeObserver: NSObjectProtocol?
 
     // MARK: - Lifecycle
 
     /// 뷰가 메모리에 로드된 후 호출됩니다.
     ///
-    /// 이 메서드에서는 UI 초기화, 콜백 바인딩, 제스처 설정 등의 초기 설정 작업을 수행합니다.
+    /// 이 메서드에서는 UI 초기화, 옵저버 등록 등의 초기 설정 작업을 수행합니다.
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -65,7 +74,7 @@ class MainViewController: UIViewController {
 
     /// 뷰가 나타나기 직전에 호출됩니다.
  	///
- 	/// 재생목록 초기화를 비동기적으로 수행합니다.
+ 	/// 재생목록이 초기화되지 않았다면 비동기적으로 초기화를 수행합니다.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
@@ -94,6 +103,9 @@ class MainViewController: UIViewController {
         thumbnailImageView.layer.cornerRadius = thumbnailImageView.frame.width / 2
     }
 
+    /// 메모리에서 해제될 때 호출됩니다.
+    ///
+    /// 등록된 모든 NotificationCenter 옵저버를 제거하여 메모리 누수를 방지합니다.
     deinit {
         if let observer = currentSongObserver {
             NotificationCenter.default.removeObserver(observer)
@@ -115,7 +127,6 @@ class MainViewController: UIViewController {
     ///
     /// 각 버튼의 기본 이미지, 크기, 색상을 설정하고 초기 상태를 업데이트합니다.
     private func setupInitialButtonConfigurations() {
-        // 각 버튼의 기본 이미지와 Configuration 설정
         setupButtonConfiguration(playPauseButton, imageName: "play.circle.fill", pointSize: 50)
         setupButtonConfiguration(backwardButton, imageName: "backward.frame.fill", pointSize: 20)
         setupButtonConfiguration(forwardButton, imageName: "forward.frame.fill", pointSize: 20)
@@ -124,13 +135,14 @@ class MainViewController: UIViewController {
         setupButtonConfiguration(repeatButton, imageName: "repeat.1.circle", pointSize: 20)
         setupButtonConfiguration(speedButton, imageName: "gauge.with.dots.needle.50percent", pointSize: 20)
 
-        // 초기 상태 업데이트
         updatePlayPauseButton(PlayerManager.shared.isPlaying)
         updateLikeDislikeButtons()
         updateRepeatButton()
     }
 
     /// 개별 버튼의 Configuration을 설정합니다.
+    ///
+    /// SF Symbol 이미지와 크기, 색상을 설정하여 일관된 버튼 스타일을 적용합니다.
     ///
     /// - Parameters:
     ///   - button: 설정할 버튼 객체
@@ -141,7 +153,6 @@ class MainViewController: UIViewController {
         config.image = UIImage(systemName: imageName)
         config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: pointSize)
 
-        // 색상 설정
         if button == playPauseButton {
             config.baseForegroundColor = UIColor(named: "MainColor")
         } else {
@@ -185,6 +196,9 @@ class MainViewController: UIViewController {
         progressSlider.addTarget(self, action: #selector(sliderValueChangedDuringDrag), for: .valueChanged)
     }
 
+    /// NotificationCenter 옵저버들을 설정합니다.
+    ///
+    /// PlayerManager와 관련된 상태 변경 알림들을 수신하여 UI들을 실시간으로 업데이트합니다.
     private func setupNotificationObservers() {
         currentSongObserver = NotificationCenter.default.addObserver(
             forName: .currentSongChanged,
@@ -385,7 +399,7 @@ class MainViewController: UIViewController {
     /// 이전 곡 버튼이 탭되었을 때 호출됩니다.
     ///
     /// 재생목록에서 이전 곡으로 이동합니다.
-    /// 첫 번째 곡인 경우 알림을 표시합니다.
+    /// 현재 곡이 첫 번째 곡인 경우 토스트 메시지로 사용자에게 알립니다.
     @IBAction func backwardTapped(_ sender: UIButton) {
         throttle.run {
             let canMoveToPrevious = PlayerManager.shared.moveBackward()
@@ -398,7 +412,8 @@ class MainViewController: UIViewController {
 
     /// 다음 곡 버튼이 탭되었을 때 호출됩니다.
     ///
-    /// 재생목록에서 다음 곡으로 이동합니다. 비동기적으로 처리됩니다.
+    /// 재생목록에서 다음 곡으로 이동합니다.
+    /// 마지막 곡인 경우 새로운 곡을 비동기적으로 로드합니다.
     @IBAction func forwardTapped(_ sender: UIButton) {
         throttle.run {
             Task { await PlayerManager.shared.moveForward() }
@@ -422,7 +437,6 @@ class MainViewController: UIViewController {
         config.image = UIImage(systemName: iconName)
         repeatButton.configuration = config
     }
-
 
     /// 재생속도 버튼을 탭했을 때 호출됩니다.
     ///
@@ -454,10 +468,6 @@ class MainViewController: UIViewController {
     /// 재생속도를 변경하고 UI를 업데이트합니다.
     ///
     /// 이 메서드는 현재 재생 상태를 고려하여 배속을 적용합니다:
-    /// - 재생 중인 경우: 즉시 새로운 배속으로 재생 계속
-    /// - 일시정지 상태인 경우: 배속 설정만 저장하고 일시정지 상태 유지
-    ///
-    /// 배속 변경 후 속도 버튼의 아이콘도 새로운 배속에 맞게 자동으로 업데이트됩니다.
     ///
     /// - Parameter speed: 새로운 재생 속도 (0.5 ~ 1.5 범위의 배속 값)
     ///
@@ -482,7 +492,7 @@ class MainViewController: UIViewController {
 
     /// 재생속도에 따른 적절한 SF Symbol 아이콘을 반환합니다.
     ///
-    /// - Parameter speed: 재생 속도
+    /// - Parameter speed: 재생 속도 (0.5 ~ 1.5)
     /// - Returns: 해당 속도에 맞는 SF Symbol 이름
     private func getSpeedIcon(for speed: Float) -> String {
         switch speed {
@@ -555,36 +565,14 @@ extension MainViewController {
     @MainActor
     private func updateLayoutForCurrentTraitCollection() async {
         if traitCollection.horizontalSizeClass == .regular {
-			setupLayoutForPad()
+            updateButtonSizes(subPointSize: 30, mainPointSize: 60)
         } else {
-            setupLayoutForPhone()
+            updateButtonSizes(subPointSize: 20, mainPointSize: 50)
         }
 
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
-    }
-
-    /// 아이패드용 레이아웃을 설정합니다.
-    ///
-    /// 큰 화면에 맞춰 썸네일 크기, 버튼 크기를 조정합니다.
-    @MainActor
-    private func setupLayoutForPad() {
-        updateButtonSizes(subPointSize: 30, mainPointSize: 60)
-
-        let contentHeight: CGFloat = 120
-        //updatePlaylistLayout(contentHeight: contentHeight)
-    }
-
-    /// 아이폰용 레이아웃을 설정합니다.
-    ///
-    /// 작은 화면에 맞춰 썸네일 크기, 버튼 크기를 조정합니다.
-    @MainActor
-    private func setupLayoutForPhone() {
-        updateButtonSizes(subPointSize: 20, mainPointSize: 50)
-
-        let contentHeight: CGFloat = 80
-        //updatePlaylistLayout(contentHeight: contentHeight)
     }
 
     /// 모든 버튼의 크기를 업데이트합니다.
@@ -607,16 +595,4 @@ extension MainViewController {
         mainConfig.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: mainPointSize)
         playPauseButton.configuration = mainConfig
     }
-
-    /// 하단 재생목록 영역의 레이아웃을 업데이트합니다.
-    ///
-    /// Safe Area에 맞춰 높이를 조정하고 썸네일 크기를 설정합니다.
-    ///
-    /// - Parameter contentHeight: 재생목록 컨텐츠의 높이 (포인트 단위)
-//    private func updatePlaylistLayout(contentHeight: CGFloat) {
-//        let bottomInset = view.safeAreaInsets.bottom
-//        playlistContentHeightConstraint.constant = contentHeight
-//        playlistBackgroundHeightConstraint.constant = bottomInset + contentHeight
-//        playlistThumbnailWidthConstraint.constant = contentHeight - (contentHeight > 100 ? 40 : 20)
-//    }
 }
