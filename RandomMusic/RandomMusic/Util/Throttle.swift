@@ -1,5 +1,6 @@
 import Foundation
 
+/// Throttle을 사용하기 위한 객체입니다.
 final class Throttle {
     private var isBlocking: Bool = false
 

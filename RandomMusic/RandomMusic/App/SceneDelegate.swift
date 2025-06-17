@@ -9,7 +9,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let isFirstLaunch = !UserDefaults.standard.bool(forKey: "isOnboardingCompleted")
         isFirstLaunch ? showScreen(to: "Onboarding") : showScreen(to: "Main")
     }
-
+    
+    /// 초기 화면을 정하는 메소드입니다.
+    /// - Parameter name: Entry Point로 들어갈 스토리보드 파일 이름을 받습니다.
     private func showScreen(to name: String) {
         let storyboard = UIStoryboard(name: name, bundle: nil)
 

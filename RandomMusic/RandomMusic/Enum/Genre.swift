@@ -1,6 +1,6 @@
 import UIKit
 
-/// 장르
+/// 장르를 표현하는 타입입니다.
 enum Genre: String, CaseIterable, Codable {
     case jazz = "Jazz"
     case pop = "Pop"

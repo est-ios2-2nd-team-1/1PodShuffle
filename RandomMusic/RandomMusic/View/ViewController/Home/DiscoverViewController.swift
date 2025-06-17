@@ -1,24 +1,22 @@
-//
-//  HomeViewController.swift
-//  RandomMusic
-//
-//  Created by 강대훈 on 6/16/25.
-//
-
 import UIKit
 
-class HomeViewController: UIViewController {
+/// 음악 취향에 맞춘 음악 제공 뷰 컨트롤러 객체입니다.
+class DiscoverViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
 
+    /// 추천할 음악을 저장하는 저장 프로퍼티입니다.
     private var songs: [SongModel] = []
+    /// Pull To Refresh를 제공하기 위한 저장 프로퍼티입니다.
     private let refreshControl = UIRefreshControl()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        setData()
         setRefresh()
     }
-
+    
+    /// UI를 구성하고 컬렉션뷰를 설정합니다.
     private func configureUI() {
         let layout = UICollectionViewCompositionalLayout { (sectionIndex, environment) -> NSCollectionLayoutSection? in
             return self.createSection(for: sectionIndex, environment)
@@ -28,24 +26,35 @@ class HomeViewController: UIViewController {
         collectionView.collectionViewLayout = layout
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         collectionView.register(UINib(nibName: "RecommendCell", bundle: nil), forCellWithReuseIdentifier: "RecommendCell")
-
+    }
+    
+    /// 추천할 음악 데이터를 불러옵니다.
+    private func setData() {
         Task {
             let songModels = try await SongService().getMusics()
             loadSongs(from: songModels)
         }
     }
 
+    /// Pull To Refresh를 위해 구성하는 메소드입니다.
     private func setRefresh() {
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         collectionView.refreshControl = refreshControl
     }
-
+    
+    /// 추천할 음악 데이터를 뷰에 띄웁니다.
+    /// - Parameter songModels: 추천할 음악 데이터들입니다.
     @MainActor
     private func loadSongs(from songModels: [SongModel]) {
         songs = songModels
         collectionView.reloadSections(IndexSet(integer: 1))
     }
-
+    
+    /// 섹션을 생성하는 메소드입니다.
+    /// - Parameters:
+    ///   - sectionIndex: 몇 번째 섹션인지 받습니다.
+    ///   - environment: Size Class에 대응하기 위한 파라미터입니다.
+    /// - Returns: 섹션을 반환합니다.
     private func createSection(for sectionIndex: Int, _ environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         switch sectionIndex {
         case 0:
@@ -56,7 +65,10 @@ class HomeViewController: UIViewController {
             return createSecondSection(environment)
         }
     }
-
+    
+    /// 첫 번째 섹션을 생성하는 메소드입니다.
+    /// - Parameter environment: Size Class에 대응하기 위한 파라미터입니다.
+    /// - Returns: 첫 번째 섹션을 반환합니다.
     private func createFirstSection(_ environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(50))
 
@@ -85,6 +97,9 @@ class HomeViewController: UIViewController {
         return section
     }
 
+    /// 두 번째 섹션을 생성하는 메소드입니다.
+    /// - Parameter environment: Size Class에 대응하기 위한 파라미터입니다.
+    /// - Returns: 두 번째 섹션을 반환합니다.
     private func createSecondSection(_ environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(50))
 
@@ -110,7 +125,8 @@ class HomeViewController: UIViewController {
 
         return section
     }
-
+    
+    /// Pull to Refresh에서 동작하는 메소드입니다.
     @objc private func handleRefresh() {
         Task {
             try await Task.sleep(for: .seconds(1))
@@ -121,7 +137,7 @@ class HomeViewController: UIViewController {
     }
 }
 
-extension HomeViewController: UICollectionViewDataSource {
+extension DiscoverViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
 		return 2
     }
@@ -142,9 +158,9 @@ extension HomeViewController: UICollectionViewDataSource {
 
         switch indexPath.section {
         case 0:
-            cell = setSectionZero(collectionView, indexPath: indexPath)
+            cell = setSectionFirst(collectionView, indexPath: indexPath)
         case 1:
-            cell = setSectionOne(collectionView, indexPath: indexPath)
+            cell = setSectionSecond(collectionView, indexPath: indexPath)
         default:
             cell = UICollectionViewCell()
             break
@@ -184,7 +200,7 @@ extension HomeViewController: UICollectionViewDataSource {
     }
 }
 
-extension HomeViewController: UICollectionViewDelegate {
+extension DiscoverViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         switch indexPath.section {
         case 0:
@@ -205,14 +221,24 @@ extension HomeViewController: UICollectionViewDelegate {
     }
 }
 
-private extension HomeViewController {
-    func setSectionZero(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+private extension DiscoverViewController {
+    /// 첫 번째 섹션에서 보여질 아이템(셀)을 구성합니다.
+    /// - Parameters:
+    ///   - collectionView: 루트 컬렉션뷰를 받습니다.
+    ///   - indexPath: 셀의 위치를 받습니다.
+    /// - Returns: 셀을 반환합니다.
+    func setSectionFirst(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: HomeCell.self), for: indexPath) as! HomeCell
-        cell.setTitle(genre: Genre.allCases[indexPath.item])
+        cell.configureUI(genre: Genre.allCases[indexPath.item])
         return cell
     }
 
-    func setSectionOne(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+    /// 두 번째 섹션에서 보여질 아이템(셀)을 구성합니다.
+    /// - Parameters:
+    ///   - collectionView: 루트 컬렉션뷰를 받습니다.
+    ///   - indexPath: 셀의 위치를 받습니다.
+    /// - Returns: 셀을 반환합니다.
+    func setSectionSecond(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: RecommendCell.self), for: indexPath) as! RecommendCell
         if songs.isEmpty { return cell }
         cell.configureUI(with: songs[indexPath.item])

@@ -1,6 +1,7 @@
 import Foundation
 import CoreData
 
+/// 음악 관련 데이터의 CRUD를 제공하는 객체입니다.
 final class DataManager {
     static let shared = DataManager()
 
@@ -145,6 +146,8 @@ private extension DataManager {
         }
     }
     
+    /// Song의 플레이리스트 순서를 반환하는 메소드입니다.
+    /// - Returns: 가장 마지막 순서에 있는 인덱스를 반환합니다.
     func fetchMaxOrderValue() -> Int64 {
         let request = NSFetchRequest<NSDictionary>(entityName: "Song")
         request.resultType = .dictionaryResultType
