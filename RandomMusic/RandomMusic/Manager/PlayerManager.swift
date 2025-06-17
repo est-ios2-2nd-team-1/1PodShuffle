@@ -35,6 +35,7 @@ final class PlayerManager {
     var onPlayStateChangedToPlaylistView: ((Bool) -> Void)?
     var onSongChangedToMainView: (() -> Void)?
     var onSongChangedToPlaylistView: (() -> Void)?
+    var onSongChangedToPlayerBarView: (() -> Void)?
     var onFeedbackChanged: ((FeedbackType) -> Void)?
     var onRemote: ((SongModel?) -> Void)?
     var onPlayListChanged: (() -> Void)?
@@ -386,6 +387,7 @@ private extension PlayerManager {
     private func notifySongChanged() {
         onSongChangedToMainView?()
         onSongChangedToPlaylistView?()
+        onSongChangedToPlayerBarView?()
     }
 
     func setupPlayer(with asset: AVURLAsset) {
