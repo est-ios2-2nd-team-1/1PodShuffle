@@ -47,6 +47,7 @@ class MainViewController: UIViewController {
 
     private var feedbackObserver: NSObjectProtocol?
     private var playStateObserver: NSObjectProtocol?
+    private var currentSongObserver: NSObjectProtocol?
 
     // MARK: - Lifecycle
 
@@ -105,6 +106,9 @@ class MainViewController: UIViewController {
             NotificationCenter.default.removeObserver(observer)
         }
         if let observer = playStateObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = currentSongObserver {
             NotificationCenter.default.removeObserver(observer)
         }
     }
@@ -213,6 +217,10 @@ class MainViewController: UIViewController {
             guard let isPlaying = notification.object as? Bool else { return }
             self?.updatePlayPauseButton(isPlaying)
         }
+
+        currentSongObserver = NotificationCenter.default.addObserver(forName: .currentSongChanged, object: nil, queue: .main) { [weak self] _ in
+            self?.updateSongUI()
+        }
     }
 
     /// PlayerManager의 콜백 이벤트들을 바인딩합니다.
@@ -223,12 +231,6 @@ class MainViewController: UIViewController {
         PlayerManager.shared.onTimeUpdateToMainView = { [weak self] seconds in
             Task { @MainActor in
                 self?.updateProgressUI(seconds: seconds)
-            }
-        }
-
-        PlayerManager.shared.onSongChangedToMainView = { [weak self] in
-            Task { @MainActor in
-                self?.updateSongUI()
             }
         }
     }
