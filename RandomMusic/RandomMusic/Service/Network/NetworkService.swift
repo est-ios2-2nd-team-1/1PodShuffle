@@ -1,10 +1,3 @@
-//
-//  NetworkManager.swift
-//  RandomMusic
-//
-//  Created by drfranken on 6/12/25.
-//
-
 import Foundation
 
 /// 네트워크 관련 기능 '만' 담당한다.
@@ -13,23 +6,30 @@ class NetworkService {
     private let name = Bundle.main.object(forInfoDictionaryKey: "NAME") as? String ?? ""
     private let token = Bundle.main.object(forInfoDictionaryKey: "TOKEN") as? String ?? ""
 
-    /// Decodable 인 데이터를 받아서 SongResponse 등으로 파싱하는 함수
+    /// json 디코딩할 때 쓰는 함수
+    /// - parameter endpoint: 베이스 URL 뒤에 붙일 상대경로
+    /// - returns: 제네릭 디코딩된 객체 리턴함
+    /// - throws: URL 잘못됐거나 통신 실패하면 오류 던짐
     func fetch<T: Decodable>(endpoint: String) async throws -> T {
         let request = try makeRequest(endpoint: endpoint)
         let (data, _) = try await URLSession.shared.data(for: request)
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-
-    /// 디코딩이 필요없는 Data 타입을 반환하는데 쓰는 함수
+    /// Data만 필요할 때 쓰는 함수
+    /// - parameter endpoint: 베이스 URL 뒤에 붙일 상대경로
+    /// - returns: 받아온 데이터 그대로 리턴함
+    /// - throws: URL 잘못됐거나 통신 실패하면 오류 던짐
     func fetchData(endpoint: String) async throws -> Data {
         let request = try makeRequest(endpoint: endpoint)
         let (data, _) = try await URLSession.shared.data(for: request)
         return data
     }
 
-
-    /// 공통 리퀘스트 생성
+    /// 공통 헤더 들어간 요청 만드는 함수
+    /// - parameter endpoint: 베이스 URL 뒤에 붙일 상대경로
+    /// - returns: 헤더 포함된 URLRequest 객체
+    /// - throws: URL 생성 안되면 오류 던짐
     func makeRequest(endpoint: String) throws -> URLRequest {
         guard let url = URL(string: "\(baseURL)\(endpoint)") else {
             throw NetworkError.invalidURL
@@ -39,6 +39,4 @@ class NetworkService {
         request.setValue(token, forHTTPHeaderField: "TOKEN")
         return request
     }
-
-
 }

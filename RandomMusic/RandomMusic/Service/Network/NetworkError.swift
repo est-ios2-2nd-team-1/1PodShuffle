@@ -1,10 +1,4 @@
-//
-//  NetworkError.swift
-//  RandomMusic
-//
-//  Created by drfranken on 6/9/25.
-//
-
+/// 네트워크 에러 타입
 enum NetworkError: Error {
     case invalidURL
     case noData
