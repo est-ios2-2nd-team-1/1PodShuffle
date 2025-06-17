@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Y6W-OH-hqX">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Find Your Music-->
+        <scene sceneID="s0d-6b-0kx">
+            <objects>
+                <viewController storyboardIdentifier="HomeView" id="Y6W-OH-hqX" customClass="HomeViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="NT7-Gw-3kZ">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="769"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="NBL-KN-mur">
+                                    <size key="itemSize" width="128" height="128"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="HomeCell" id="LHM-Rj-2Oo" customClass="HomeCell" customModule="RandomMusic" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="127.99999999999997" height="128"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="5gn-5a-HrL">
+                                            <rect key="frame" x="0.0" y="0.0" width="127.99999999999997" height="128"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UXJ-lW-Ms5">
+                                                    <rect key="frame" x="5" y="5" width="118" height="118"/>
+                                                    <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </imageView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="UXJ-lW-Ms5" firstAttribute="top" secondItem="5gn-5a-HrL" secondAttribute="top" constant="5" id="0ws-O4-MJH"/>
+                                                <constraint firstAttribute="trailing" secondItem="UXJ-lW-Ms5" secondAttribute="trailing" constant="5" id="FTX-o6-AMX"/>
+                                                <constraint firstItem="UXJ-lW-Ms5" firstAttribute="leading" secondItem="5gn-5a-HrL" secondAttribute="leading" constant="5" id="tJt-Ms-WED"/>
+                                                <constraint firstAttribute="bottom" secondItem="UXJ-lW-Ms5" secondAttribute="bottom" constant="5" id="vFf-bn-ZuG"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="mainImageView" destination="UXJ-lW-Ms5" id="ehH-as-xJc"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                                <connections>
+                                    <outlet property="dataSource" destination="Y6W-OH-hqX" id="tjM-l7-HZ1"/>
+                                    <outlet property="delegate" destination="Y6W-OH-hqX" id="uiQ-aE-ZDC"/>
+                                </connections>
+                            </collectionView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="NT7-Gw-3kZ" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="Gmg-E8-KeG"/>
+                            <constraint firstItem="NT7-Gw-3kZ" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="UAU-mZ-MbX"/>
+                            <constraint firstItem="NT7-Gw-3kZ" firstAttribute="bottom" secondItem="vDu-zF-Fre" secondAttribute="bottom" id="kVI-aY-e6t"/>
+                            <constraint firstItem="NT7-Gw-3kZ" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="z1v-S3-PeL"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Home" image="house.fill" catalog="system" id="5dk-Y5-WeZ"/>
+                    <navigationItem key="navigationItem" title="Find Your Music" largeTitleDisplayMode="always" id="dIW-U4-P1u"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="collectionView" destination="NT7-Gw-3kZ" id="qM9-GZ-ho0"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1052.6717557251909" y="-13.380281690140846"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="house.fill" catalog="system" width="128" height="104"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
