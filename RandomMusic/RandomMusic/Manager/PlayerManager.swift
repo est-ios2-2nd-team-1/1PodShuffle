@@ -57,13 +57,13 @@ final class PlayerManager {
         return playlist[currentIndex]
     }
 
+    var onRemote: ((SongModel?) -> Void)?
+
     private init(songService: SongService = SongService(), preferenceManager: PreferenceManager = PreferenceManager()) {
         self.songService = songService
         self.preferenceManager = preferenceManager
         loadPlaylistFromDB()
     }
-
-    var onRemote: ((SongModel?) -> Void)?
 
     /// 플레이리스트 초기화를 완료합니다.
     ///
@@ -237,10 +237,10 @@ final class PlayerManager {
         }
     }
 
-    /// 플레이리스트에서 곡을 제거합니다.
+    /// 플레이리스트에서 지정된 인덱스의 곡을 제거합니다.
     ///
-    /// 곡을 제거하면 데이터베이스에도 삭제되며, 현재 재생 중인 곡의 인덱스가 적절히 조정됩니다.
-    /// 플레이리스트가 비게 되면 재생을 중지합니다.
+    /// 플레이리스트에서 곡을 안전하게 제거하고 관련된 상태를 업데이트합니다.
+    /// 현재 재생 중인 곡은 제거할 수 없으며, 이 경우 사용자에게 토스트 메시지를 표시합니다.
     ///
     /// - Parameter index: 제거할 곡의 인덱스
     func removeSong(at index: Int) {
@@ -287,9 +287,10 @@ final class PlayerManager {
         updateCurrentIndexAfterReorder(sourceIndex: sourceIndex, destinationIndex: destinationIndex)
     }
 
-    /// 플레이리스트를 초기화합니다.
+    /// 플레이리스트의 모든 곡을 제거하고 초기화합니다.
     ///
-    /// 모든 곡을 제거하고, 재생을 중지하며, 저장된 마지막 재생 곡 정보도 초기화합니다.
+    /// 현재 재생 중인 곡을 제외한 모든 곡을 플레이리스트에서 제거합니다.
+    /// 현재 재생 중인 곡이 있는 경우 해당 곡만 남기고, 없는 경우 완전히 비웁니다.
     func clearPlaylist() {
         let preservedSong = currentSong // 현재 재상중
         playlist.enumerated().forEach { index, song in
