@@ -33,6 +33,7 @@ class SettingViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "초기화", style: .destructive) { _ in
             self.preferenceManager.resetAllPreferences()
+            self.showGenreStatistics()
         })
         present(alert, animated: true, completion: nil)
 
@@ -52,7 +53,7 @@ class SettingViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
 
-    // 다크모드 설정
+    // 앱 내 다크모드 설정
     @IBAction func themeSwitchChanged(_ sender: UISwitch) {
         if #available(iOS 16.0, *) {
             if let windowScene = UIApplication.shared.connectedScenes

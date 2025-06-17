@@ -1,9 +1,5 @@
-//
-//  GenreCell.swift
-//  RandomMusic
-//
-//  Created by 이유정 on 6/9/25.
-//
+// 온보딩 화면에서 선택하는 장르
+// 셀 사이즈 유동적이게 조절 가능하도록 설정
 
 import UIKit
 
