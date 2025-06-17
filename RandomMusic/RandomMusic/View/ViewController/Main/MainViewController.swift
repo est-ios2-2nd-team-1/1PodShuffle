@@ -1,6 +1,6 @@
-import UIKit
 import AVFoundation
 import MarqueeLabel
+import UIKit
 
 /// 음악 재생을 위한 메인 뷰 컨트롤러
 ///
@@ -73,8 +73,8 @@ class MainViewController: UIViewController {
     }
 
     /// 뷰가 나타나기 직전에 호출됩니다.
- 	///
- 	/// 재생목록이 초기화되지 않았다면 비동기적으로 초기화를 수행합니다.
+    ///
+    /// 재생목록이 초기화되지 않았다면 비동기적으로 초기화를 수행합니다.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 

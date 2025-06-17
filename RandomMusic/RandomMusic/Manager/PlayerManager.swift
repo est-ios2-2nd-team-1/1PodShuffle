@@ -2,7 +2,7 @@ import AVFoundation
 
 extension Notification.Name {
     /// 현재 재생 중인 곡이 변경되었을 때 발생하는 알림
-        static let currentSongChanged = Notification.Name("CurrentSongChanged")
+    static let currentSongChanged = Notification.Name("CurrentSongChanged")
     /// 피드백 상태가 변경되었을 때 발생하는 알림
     static let feedbackChanged = Notification.Name("FeedbackChanged")
     /// 재생 상태가 변경되었을 때 발생하는 알림
@@ -145,11 +145,11 @@ final class PlayerManager {
     func moveBackward() -> Bool {
         if currentPlaybackTime < 3.0 {
             return moveToPreviousSong()
-    	} else {
-        	seek(to: 0)
+        } else {
+            seek(to: 0)
             play()
             return true
-    	}
+        }
     }
 
     /// 다음 곡으로 이동합니다.
@@ -182,7 +182,7 @@ final class PlayerManager {
         playlist = value
     }
 
-	/// 현재 곡의 인덱스를 설정합니다.
+    /// 현재 곡의 인덱스를 설정합니다.
     ///
     /// - Parameter value: 새로운 인덱스 (0 이상의 값으로 제한됨)
     func setCurrentIndex(_ value: Int) {
@@ -255,7 +255,7 @@ final class PlayerManager {
             handleSongRemoval(at: index)
         }
     }
-    
+
     /// 플레이리스트 순서를 업데이트합니다.
     ///
     /// 곡의 순서를 변경하고 데이터베이스에 반영합니다.
@@ -271,10 +271,10 @@ final class PlayerManager {
         let movedSong = newList.remove(at: sourceIndex)
         newList.insert(movedSong, at: destinationIndex)
         setPlaylist(newList)
-        
+
         // CoreData 반영 (DataManager가 영구저장 책임)
         DataManager.shared.updateOrder(for: playlist)
-        
+
         /// 현재 재생 중인 곡 인덱스 보정
         updateCurrentIndexAfterReorder(sourceIndex: sourceIndex, destinationIndex: destinationIndex)
     }
@@ -393,11 +393,11 @@ private extension PlayerManager {
     /// - Parameters:
     ///     - sourceIndex: 출발 인덱스
     /// 	- destinationIndex: 목표 인덱스
- 	/// - Returns: 유효한 작업인지 여부
+    /// - Returns: 유효한 작업인지 여부
     func isValidOrderUpdate(sourceIndex: Int, destinationIndex: Int) -> Bool {
         return sourceIndex != destinationIndex &&
-               isValidIndex(sourceIndex) &&
-               destinationIndex >= 0 && destinationIndex <= playlist.count
+        isValidIndex(sourceIndex) &&
+        destinationIndex >= 0 && destinationIndex <= playlist.count
     }
 
     /// 플레이리스트가 비어있을 때의 처리를 수행합니다.
@@ -469,10 +469,10 @@ private extension PlayerManager {
     }
 
     /// 피드백 처리 (좋아요/싫어요/취소)를 수행합니다.
-	///
+    ///
     /// 같은 피드백이 이미 있는 경우 취소하고, 없는 경우 새로 등록합니다.
     /// 피드백 변경 후 `.feedbackChanged` 알림을 발생시킵니다.
-	///
+    ///
     /// - Parameter isLike: `true`면 좋아요, `false`면 싫어요
     func handleFeedback(isLike: Bool) {
         guard let currentSong else {
@@ -572,7 +572,7 @@ private extension PlayerManager {
     }
 
     /// 재생 시간 정보를 주기적으로 업데이트합니다.
-    /// 
+    ///
     /// 1초마다 현재 재생 시간을 업데이트하고 관련 알림을 발생시킵니다.
     func addPeriodicTimeObserver() {
         timeObserverToken = player?.addPeriodicTimeObserver(
