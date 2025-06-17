@@ -28,7 +28,7 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Mbf-AC-unB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1984" y="61"/>
+            <point key="canvasLocation" x="2937" y="-128"/>
         </scene>
         <!--메인-->
         <scene sceneID="O4Q-Cx-Ami">
@@ -321,7 +321,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cLW-Kc-rBY" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3758.0152671755723" y="17.605633802816904"/>
+            <point key="canvasLocation" x="2060" y="72"/>
         </scene>
         <!--PlayListView-->
         <scene sceneID="dUg-a0-S37">
@@ -342,9 +342,9 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="oUJ-Ad-HvN" kind="relationship" relationship="viewControllers" id="TYK-LE-VRW"/>
-                        <segue destination="HVO-Lc-RNc" kind="relationship" relationship="viewControllers" id="7J6-8t-bmE"/>
-                        <segue destination="R9p-LP-w72" kind="relationship" relationship="viewControllers" id="OuX-Iz-dXp"/>
+                        <segue destination="R9p-LP-w72" kind="relationship" relationship="viewControllers" id="hBI-ic-28e"/>
+                        <segue destination="oUJ-Ad-HvN" kind="relationship" relationship="viewControllers" id="QIt-Y5-iGQ"/>
+                        <segue destination="HVO-Lc-RNc" kind="relationship" relationship="viewControllers" id="x4J-iO-Fe6"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1Dh-ki-oyh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

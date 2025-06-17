@@ -134,6 +134,16 @@ final class PlayerManager {
         onSongChangedToPlaylistView?()
     }
 
+    
+    /// 노래를 한 곡 추가합니다.
+    /// - Parameter songModel: 추가할 노래를 받습니다.
+    func addSong(_ song: SongModel) {
+        playlist.append(song)
+        Task {
+            await Toast.shared.showToast(message: "\(song.title)이 추가되었습니다.")
+        }
+    }
+
     /// 장르별로 10곡을 추가합니다.
     /// - Parameter genre: 장르를 받습니다.
     func addSongs(from genre: Genre) {

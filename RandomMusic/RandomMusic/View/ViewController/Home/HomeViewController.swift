@@ -141,6 +141,7 @@ extension HomeViewController: UICollectionViewDataSource {
         switch indexPath.section {
         case 0:
             cell = setSectionZero(collectionView, indexPath: indexPath)
+
         case 1:
             cell = setSectionOne(collectionView, indexPath: indexPath)
         default:
@@ -182,7 +183,24 @@ extension HomeViewController: UICollectionViewDataSource {
 }
 
 extension HomeViewController: UICollectionViewDelegate {
-
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        switch indexPath.section {
+        case 0:
+            if let homeCell = collectionView.cellForItem(at: indexPath) as? HomeCell {
+                if let genre = homeCell.genre {
+                    PlayerManager.shared.addSongs(from: genre)
+                }
+            }
+        case 1:
+            if let recommendCell = collectionView.cellForItem(at: indexPath) as? RecommendCell {
+                if let song = recommendCell.songModel {
+                    PlayerManager.shared.addSong(song)
+                }
+            }
+        default:
+            break
+        }
+    }
 }
 
 private extension HomeViewController {
