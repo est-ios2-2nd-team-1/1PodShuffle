@@ -1,7 +1,7 @@
 import UIKit
 
 /// 음악 취향에 맞춘 음악 제공 뷰 컨트롤러 객체입니다.
-class HomeViewController: UIViewController {
+class DiscoverViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
 
     /// 추천할 음악을 저장하는 저장 프로퍼티입니다.
@@ -137,7 +137,7 @@ class HomeViewController: UIViewController {
     }
 }
 
-extension HomeViewController: UICollectionViewDataSource {
+extension DiscoverViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
 		return 2
     }
@@ -200,7 +200,7 @@ extension HomeViewController: UICollectionViewDataSource {
     }
 }
 
-extension HomeViewController: UICollectionViewDelegate {
+extension DiscoverViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         switch indexPath.section {
         case 0:
@@ -221,7 +221,7 @@ extension HomeViewController: UICollectionViewDelegate {
     }
 }
 
-private extension HomeViewController {
+private extension DiscoverViewController {
     /// 첫 번째 섹션에서 보여질 아이템(셀)을 구성합니다.
     /// - Parameters:
     ///   - collectionView: 루트 컬렉션뷰를 받습니다.

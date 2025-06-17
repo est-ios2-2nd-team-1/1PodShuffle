@@ -13,7 +13,7 @@
         <!--Find Your Music-->
         <scene sceneID="s0d-6b-0kx">
             <objects>
-                <viewController storyboardIdentifier="HomeView" id="Y6W-OH-hqX" customClass="HomeViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="DiscoverView" id="Y6W-OH-hqX" customClass="DiscoverViewController" customModule="RandomMusic" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -67,7 +67,7 @@
                             <constraint firstItem="NT7-Gw-3kZ" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="z1v-S3-PeL"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Home" image="house.fill" catalog="system" id="5dk-Y5-WeZ"/>
+                    <tabBarItem key="tabBarItem" title="Discover" image="safari.fill" catalog="system" id="5dk-Y5-WeZ"/>
                     <navigationItem key="navigationItem" title="Find Your Music" largeTitleDisplayMode="always" id="dIW-U4-P1u"/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
@@ -80,7 +80,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="house.fill" catalog="system" width="128" height="104"/>
+        <image name="safari.fill" catalog="system" width="128" height="123"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
