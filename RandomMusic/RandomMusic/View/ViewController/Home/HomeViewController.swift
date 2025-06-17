@@ -11,10 +11,12 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
 
     private var songs: [SongModel] = []
+    private let refreshControl = UIRefreshControl()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        setRefresh()
     }
 
     private func configureUI() {
@@ -31,6 +33,11 @@ class HomeViewController: UIViewController {
             let songModels = try await SongService().getMusics()
             loadSongs(from: songModels)
         }
+    }
+
+    private func setRefresh() {
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        collectionView.refreshControl = refreshControl
     }
 
     @MainActor
@@ -102,6 +109,15 @@ class HomeViewController: UIViewController {
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
+    }
+
+    @objc private func handleRefresh() {
+        Task {
+            try await Task.sleep(for: .seconds(1))
+            let songModels = try await SongService().getMusics()
+            loadSongs(from: songModels)
+            refreshControl.endRefreshing()
+        }
     }
 }
 
