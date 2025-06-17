@@ -181,6 +181,14 @@ final class PlayerManager {
     func removeSong(at index: Int) {
         guard isValidIndex(index) else { return }
 
+        // 현재 재생 중인 곡은 삭제하지 않음
+        if index == currentIndex {
+            Task {
+                await Toast.shared.showToast(message: "현재 재생 중인 곡은 삭제할 수 없습니다.")
+            }
+            return
+        }
+
         DataManager.shared.deleteSongData(to: playlist[index])
         playlist.remove(at: index)
 
