@@ -37,5 +37,22 @@ enum Genre: String, CaseIterable, Codable {
             return .red
         }
     }
+
+    var image: UIImage? {
+        switch self {
+        case .jazz:
+            return UIImage(named: "homeJazz")
+        case .pop:
+            return UIImage(named: "homePop")
+        case .rock:
+            return UIImage(named: "homeRock")
+        case .classic:
+            return UIImage(named: "homeClassic")
+        case .rnb:
+            return UIImage(named: "homeRnB")
+        case .hiphop:
+            return UIImage(named: "homeHiphop")
+        }
+    }
 }
 
