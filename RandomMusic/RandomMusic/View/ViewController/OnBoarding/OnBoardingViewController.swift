@@ -1,5 +1,8 @@
 import UIKit
 
+// 음악 재생 전 장르 선택을 위한 온보딩 화면
+// 한 번 선택 후에는 초기화하지 않는다면 생기지 않는 화면
+
 
 class OnBoardingViewController: UIViewController {
     
@@ -29,17 +32,17 @@ class OnBoardingViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
     }
-    
+
+    // 음악 장르 선택 갯수 제한: 0개 ~ 3개 (4번째부터는 선택 불가능)
     private func setupTitleLabel() {
         let fullText = "선호하는 장르를 선택해주세요 (최대 3개 선택 가능)"
         let targetText = "(최대 3개 선택 가능)"
         
         let attributedString = NSMutableAttributedString(string: fullText)
-        
         let titleFont = UIFont.systemFont(ofSize: 19)
         attributedString.addAttribute(.font, value: titleFont, range: (fullText as NSString).range(of: "선호하는 장르를 선택해주세요"))
         
-        // 폰트 부분변경
+        // 괄호 부분만 폰트 작은 크기로 변경
         let subFont = UIFont.systemFont(ofSize: 13)
         attributedString.addAttribute(.font, value: subFont, range: (fullText as NSString).range(of: targetText))
         
@@ -64,7 +67,7 @@ class OnBoardingViewController: UIViewController {
         }
     }
 
-    // 장르 선택 제한: 3개 이하
+    // 장르 선택 버튼
     @objc func genreButtonTapped(_ sender: UIButton) {
         let genre = genres[sender.tag]
         if selectedGenres.contains(genre) {
@@ -75,22 +78,23 @@ class OnBoardingViewController: UIViewController {
         collectionView.reloadItems(at: [IndexPath(item: sender.tag, section: 0)])
     }
     
-    
+
+    // 건너뛰기 버튼: 전체 장르에 동일하게 기본 선호도 점수 부여
     @IBAction func skipButtonTapped(_ sender: UIButton) {
-        // 건너뛰기: 전체 장르에 기본 점수 부여
         preferenceManager.initializePreferences(initialPreferredGenres: Genre.allCases)
         
         toMainVC()
     }
-    
+
+
+    // 확인 버튼: 선택된 장르만 저장 - 선택된 장르에만 선호도 점수 부여
     @IBAction func confirmButtonTapped(_ sender: UIButton) {
-        // 확인: 선택된 장르만 저장
-        
         preferenceManager.initializePreferences(initialPreferredGenres: Array(selectedGenres))
         
         toMainVC()
     }
-    
+
+    // 메인 화면으로 이동
     private func toMainVC() {
         let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
         if let mainVC = mainStoryboard.instantiateInitialViewController() {
@@ -150,7 +154,6 @@ extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
             let totalHorizontalSpacing = spacing * (numberOfColumns + 1)
             let width = (collectionView.bounds.width - totalHorizontalSpacing) / numberOfColumns
 
-            // ⚠️ CollectionView 높이도 2줄에 맞게 고정해줘야 함!
             let totalVerticalSpacing = spacing * (numberOfRows + 1)
             let height = (collectionView.bounds.height - totalVerticalSpacing) / numberOfRows
 
