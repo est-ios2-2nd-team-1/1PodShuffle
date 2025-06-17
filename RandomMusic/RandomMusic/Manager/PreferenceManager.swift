@@ -196,6 +196,25 @@ class PreferenceManager {
         return .pop
     }
 
+    /// 현재 장르별 추천 확률을 계산해서 리턴
+    func getGenrePercentage() -> [Genre: Double] {
+        var weights: [Genre: Double] = [:]
+
+        for genre in Genre.allCases {
+            weights[genre] = calculateScore(for: genre)
+        }
+
+        let totalWeight = weights.values.reduce(0, +)
+
+        var percentages: [Genre: Double] = [:]
+        for (genre, weight) in weights {
+            let percentage = totalWeight > 0 ? (weight / totalWeight) * 100 : 0
+            percentages[genre] = Double(String(format: "%.2f", percentage)) ?? percentage // 반올림해서 소숫점 2번째 자리까지 표시
+        }
+
+        return percentages
+    }
+
     /// 컨텍스트에 실제 저장
     private func saveContext() {
         try? context.save()
