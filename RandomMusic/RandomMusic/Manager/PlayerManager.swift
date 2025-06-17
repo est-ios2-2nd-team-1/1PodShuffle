@@ -1,7 +1,6 @@
 import AVFoundation
 
 /// AVPlayer 기반의 오디오 재생을 관리하는 클래스입니다.
-///
 final class PlayerManager {
     static let shared = PlayerManager()
 
@@ -27,6 +26,7 @@ final class PlayerManager {
     }
 
     // MARK: - Callbacks
+
     var onTimeUpdateToPlaylistView: ((Double) -> Void)? {
         didSet { onTimeUpdateToPlaylistView?(currentPlaybackTime ?? 0.0) }
     }
@@ -50,12 +50,12 @@ final class PlayerManager {
         if playlist.isEmpty {
             print("플레이리스트가 비어있어서 랜덤곡을 추가합니다.")
             await addRandomSong()
-            onSongChangedToMainView?()
-            onSongChangedToPlaylistView?()
+            notifySongChanged()
         }
     }
 
     // MARK: - Playback Controls
+
     func play() {
         guard let currentSong = currentSong else {
             print("No current song available")
@@ -71,7 +71,7 @@ final class PlayerManager {
         player?.play()
         player?.rate = currentPlaybackSpeed
         updatePlayingState(true)
-        UserDefaults.standard.set(currentIndex, forKey: "heardLastSong")
+        saveLastPlayedSong()
     }
 
     /// 현재 오디오 재생을 일시정지합니다.
@@ -88,7 +88,13 @@ final class PlayerManager {
     }
 
     func togglePlayPause() {
-        isPlaying ? pause() : player != nil ? resume() : play()
+        if isPlaying {
+            pause()
+        } else if player != nil {
+            resume()
+        } else {
+            play()
+        }
     }
 
     func toggleRepeat() {
@@ -96,14 +102,10 @@ final class PlayerManager {
     }
 
     func moveBackward() -> Bool {
-        if currentPlaybackTime ?? 0 < 3.0 {
-            if currentIndex == 0 {
-                return false
-            } else {
-                setCurrentIndex(currentIndex - 1)
-            	play()
-            	return true
-        	}
+        let currentTime = currentPlaybackTime ?? 0
+
+        if currentTime < 3.0 {
+            return moveToPreviousSong()
     	} else {
         	seek(to: 0)
             play()
@@ -112,8 +114,15 @@ final class PlayerManager {
     }
 
     func moveForward() async {
-        currentIndex < playlist.count - 1 ? setCurrentIndex(currentIndex + 1) : await addRandomSong()
-        Task { @MainActor in play() }
+        if currentIndex < playlist.count - 1 {
+            setCurrentIndex(currentIndex + 1)
+        } else {
+            await addRandomSong()
+        }
+
+        await MainActor.run {
+            play()
+        }
     }
 
     /// 재생 위치를 지정한 시간으로 이동합니다.
@@ -130,18 +139,21 @@ final class PlayerManager {
 
     func setCurrentIndex(_ value: Int) {
         currentIndex = max(0, value)
-        onSongChangedToMainView?()
-        onSongChangedToPlaylistView?()
+        notifySongChanged()
     }
 
     /// 장르별로 10곡을 추가합니다.
     /// - Parameter genre: 장르를 받습니다.
     func addSongs(from genre: Genre) {
         Task {
-            let songs = try await songService.getMusics(genre: genre)
-            songs.forEach { DataManager.shared.insertSongData(from: $0) }
-            playlist.append(contentsOf: songs)
-            await Toast.shared.showToast(message: "\(genre.rawValue) \(songs.count)곡이 추가되었습니다.")
+            do {
+                let songs = try await songService.getMusics(genre: genre)
+                songs.forEach { DataManager.shared.insertSongData(from: $0) }
+                playlist.append(contentsOf: songs)
+                await Toast.shared.showToast(message: "\(genre.rawValue) \(songs.count)곡이 추가되었습니다.")
+            } catch {
+                print("장르별 곡 추가 실패: \(error)")
+            }
         }
     }
 
@@ -163,8 +175,8 @@ final class PlayerManager {
 
     /// 플레이리스트에서 곡을 제거합니다.
     func removeSong(at index: Int) {
-        guard index >= 0 && index < playlist.count else { return }
-        
+        guard isValidIndex(index) else { return }
+
         DataManager.shared.deleteSongData(to: playlist[index])
         playlist.remove(at: index)
 
@@ -177,10 +189,8 @@ final class PlayerManager {
     
     /// 플레이리스트 순서를 업데이트합니다
     func updateOrder(from sourceIndex: Int, to destinationIndex: Int) {
-        guard sourceIndex != destinationIndex,
-              sourceIndex >= 0, sourceIndex < playlist.count,
-              destinationIndex >= 0, destinationIndex <= playlist.count else { return }
-        
+        guard isValidOrderUpdate(sourceIndex: sourceIndex, destinationIndex: destinationIndex) else { return }
+
         var newList = playlist
         let movedSong = newList.remove(at: sourceIndex)
         newList.insert(movedSong, at: destinationIndex)
@@ -190,16 +200,7 @@ final class PlayerManager {
         DataManager.shared.updateOrder(for: playlist)
         
         /// 현재 재생 중인 곡 인덱스 보정
-        if currentIndex == sourceIndex {
-            // 이동된 곡이 현재 재생 중인 곡인 경우
-            setCurrentIndex(destinationIndex > sourceIndex ? destinationIndex - 1 : destinationIndex)
-        } else if sourceIndex < currentIndex && destinationIndex >= currentIndex {
-            // 현재 곡보다 앞에서 뒤로 이동한 경우
-            setCurrentIndex(currentIndex - 1)
-        } else if sourceIndex > currentIndex && destinationIndex <= currentIndex {
-            // 현재 곡보다 뒤에서 앞으로 이동한 경우
-            setCurrentIndex(currentIndex + 1)
-        }
+        updateCurrentIndexAfterReorder(sourceIndex: sourceIndex, destinationIndex: destinationIndex)
     }
 
     /// 플레이리스트를 초기화합니다.
@@ -207,15 +208,14 @@ final class PlayerManager {
         pause()
         cleanupPlayer()
 
-        for song in playlist {
-            DataManager.shared.deleteSongData(to: song)
-        }
+        playlist.forEach { DataManager.shared.deleteSongData(to: $0) }
         playlist.removeAll()
         UserDefaults.standard.set(0, forKey: "heardLastSong")
         currentIndex = 0
     }
 
     // MARK: - Feedback Management
+
     /// 현재 곡의 피드백 상태를 가져옵니다.
     func getCurrentSongFeedback() -> FeedbackType {
         guard let currentSong = currentSong else { return .none }
@@ -235,8 +235,7 @@ final class PlayerManager {
     /// 노래의 전체 시간을 반환합니다.
     /// - Parameter completion: Completion 콜백 메소드입니다. 원하시는 작업을 입력해주세요.
     func loadDuration() async -> Double? {
-        print(#function)
-        guard let currentSong = currentSong else { return nil }
+        guard let currentSong else { return nil }
 
         guard let asset = try? songService.createAssetWithHeaders(url: currentSong.streamUrl) else {
             return nil
@@ -258,12 +257,40 @@ final class PlayerManager {
 }
 
 // MARK: - Private Methods
+
 private extension PlayerManager {
+    private enum Constants {
+        static let backwardThreshold = 3.0
+        static let lastSongKey = "heardLastSong"
+    }
+
     /// 앱 시작 시 DataManager에서 playlist를 로드합니다.
     private func loadPlaylistFromDB() {
         let savedSongs = DataManager.shared.fetchSongData()
         playlist = savedSongs
-        currentIndex = UserDefaults.standard.integer(forKey: "heardLastSong")
+        currentIndex = UserDefaults.standard.integer(forKey: Constants.lastSongKey)
+    }
+
+    private func moveToPreviousSong() -> Bool {
+        guard currentIndex > 0 else { return false }
+
+        setCurrentIndex(currentIndex - 1)
+        play()
+        return true
+    }
+
+    private func saveLastPlayedSong() {
+        UserDefaults.standard.set(currentIndex, forKey: Constants.lastSongKey)
+    }
+
+    private func isValidIndex(_ index: Int) -> Bool {
+        return index >= 0 && index < playlist.count
+    }
+
+    private func isValidOrderUpdate(sourceIndex: Int, destinationIndex: Int) -> Bool {
+        return sourceIndex != destinationIndex &&
+               isValidIndex(sourceIndex) &&
+               destinationIndex >= 0 && destinationIndex <= playlist.count
     }
 
     private func handleEmptyPlaylist() {
@@ -286,23 +313,34 @@ private extension PlayerManager {
     }
 
     private func handleCurrentSongRemoval(at index: Int) {
-        if playlist.count > 1 {
-            // 다음 곡으로 이동 (마지막 곡이면 이전 곡으로)
-            if index == playlist.count {
-                currentIndex = max(0, playlist.count - 1)
-            } else {
-                currentIndex = index
-            }
-        } else {
-            currentIndex = 0
-        }
-
+        updateCurrentIndexAfterRemoval(at: index)
         notifySongChanged()
 
         if isPlaying {
             play()
         } else {
             player = nil
+        }
+    }
+
+    private func updateCurrentIndexAfterRemoval(at index: Int) {
+        if playlist.count > 1 {
+            currentIndex = (index == playlist.count) ? max(0, playlist.count - 1) : index
+        } else {
+            currentIndex = 0
+        }
+    }
+
+    private func updateCurrentIndexAfterReorder(sourceIndex: Int, destinationIndex: Int) {
+        if currentIndex == sourceIndex {
+            // 이동된 곡이 현재 재생 중인 곡인 경우
+            setCurrentIndex(destinationIndex > sourceIndex ? destinationIndex - 1 : destinationIndex)
+        } else if sourceIndex < currentIndex && destinationIndex >= currentIndex {
+            // 현재 곡보다 앞에서 뒤로 이동한 경우
+            setCurrentIndex(currentIndex - 1)
+        } else if sourceIndex > currentIndex && destinationIndex <= currentIndex {
+            // 현재 곡보다 뒤에서 앞으로 이동한 경우
+            setCurrentIndex(currentIndex + 1)
         }
     }
 
@@ -370,13 +408,13 @@ private extension PlayerManager {
     }
 
     func handlePlaybackEnd() {
-        if self.isRepeatEnabled {
-            self.seek(to: 0)
-            self.player?.play()
+        if isRepeatEnabled {
+            seek(to: 0)
+            player?.play()
         } else {
-            self.updatePlayingState(false)
+            updatePlayingState(false)
             Task { @MainActor in
-                await self.moveForward()
+                await moveForward()
             }
         }
     }
@@ -394,6 +432,7 @@ private extension PlayerManager {
             queue: .main
         ) { [weak self] time in
             guard let self = self else { return }
+
             let seconds = CMTimeGetSeconds(time)
             currentPlaybackTime = Double(seconds)
             onTimeUpdateToMainView?(seconds)
