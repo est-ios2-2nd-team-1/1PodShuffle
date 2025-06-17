@@ -12,6 +12,8 @@ class PlayListViewController: UIViewController {
     /// Throttle 객체
     private let throttle = Throttle()
 
+    private var playStateObserver: NSObjectProtocol?
+
     /// 재생, 이전곡, 다음곡 버튼 UIImage Symbol size
     private let playConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .regular, scale: .large)
     private let backforConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .regular, scale: .large)
@@ -19,6 +21,7 @@ class PlayListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setConfigureUI()
+        setupNotificationObservers()
         bindPlayerCallbacks()
         setDismissImageButton()
     }
@@ -36,7 +39,7 @@ class PlayListViewController: UIViewController {
         backButton.setImage(backImage, for: .normal)
         forButton.setImage(forImage, for: .normal)
 
-        setPlayPauseButton()
+        setPlayPauseButton(PlayerManager.shared.isPlaying)
 
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
@@ -46,19 +49,26 @@ class PlayListViewController: UIViewController {
     }
 
     /// 재생/일시정지 버튼 UI
-    private func setPlayPauseButton() {
-        let playImage = PlayerManager.shared.isPlaying ?
-        UIImage(systemName: "pause.circle", withConfiguration: playConfig) :
-        UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
+    private func setPlayPauseButton(_ isPlaying: Bool) {
+        let playImage = isPlaying
+        ? UIImage(systemName: "pause.circle", withConfiguration: playConfig)
+        : UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
         playButton.setImage(playImage, for: .normal)
+    }
+
+    private func setupNotificationObservers() {
+        playStateObserver = NotificationCenter.default.addObserver(
+            forName: .playerStateChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let isPlaying = notification.object as? Bool else { return }
+            self?.setPlayPauseButton(isPlaying)
+        }
     }
 
     /// 바인딩 메소드
     private func bindPlayerCallbacks() {
-        PlayerManager.shared.onPlayStateChangedToPlaylistView = { [weak self] isPlaying in
-            self?.setPlayPauseButton()
-        }
-
         PlayerManager.shared.onTimeUpdateToPlaylistView = { [weak self] seconds in
             guard let duration = PlayerManager.shared.player?.currentItem?.duration.seconds, !duration.isNaN else { return }
             self?.playProgressView.progress = Float(seconds / duration)
@@ -178,7 +188,6 @@ class PlayListViewController: UIViewController {
     
     deinit {
         PlayerManager.shared.onTimeUpdateToPlaylistView = nil
-        PlayerManager.shared.onPlayStateChangedToPlaylistView = nil
         PlayerManager.shared.onPlayListChanged = nil
         PlayerManager.shared.onSongChangedToPlaylistView = nil
     }
