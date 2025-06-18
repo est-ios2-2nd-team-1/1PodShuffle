@@ -1,7 +1,8 @@
 import UIKit
 
-// 음악 재생 전 장르 선택을 위한 온보딩 화면
-// 한 번 선택 후에는 초기화하지 않는다면 생기지 않는 화면
+/// 음악 재생 전 장르 선택을 위한 온보딩 화면입니다.
+/// 한 번 선택 후에는 초기화하지 않는 한 다시 나타나지 않습니다.
+/// 최대 3개의 장르를 선택할 수 있습니다.
 
 
 class OnBoardingViewController: UIViewController {
@@ -10,10 +11,13 @@ class OnBoardingViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var confirmButton: UIButton!
     @IBOutlet weak var collectionView: UICollectionView!
-    
+
+    /// 선택 가능한 장르 목록
     var genres: [Genre] = Genre.allCases
-    
+    /// 현재 선택된 장르 집합
     var selectedGenres: Set<Genre> = []
+
+    /// 사용자 선호도 데이터 관리 객체
     private let preferenceManager = PreferenceManager()
     
     override func viewDidLoad() {
@@ -27,28 +31,29 @@ class OnBoardingViewController: UIViewController {
                 collectionView.heightAnchor.constraint(equalToConstant: 300).isActive = true
             }
     }
-    
+
+    /// 컬렉션 뷰 데이터소스/델리게이트 설정
     private func setupCollectionView() {
         collectionView.dataSource = self
         collectionView.delegate = self
     }
 
-    // 음악 장르 선택 갯수 제한: 0개 ~ 3개 (4번째부터는 선택 불가능)
+    /// 온보딩 타이틀 라벨 스타일 설정
     private func setupTitleLabel() {
         let fullText = "선호하는 장르를 선택해주세요 (최대 3개 선택 가능)"
         let targetText = "(최대 3개 선택 가능)"
-        
         let attributedString = NSMutableAttributedString(string: fullText)
         let titleFont = UIFont.systemFont(ofSize: 19)
         attributedString.addAttribute(.font, value: titleFont, range: (fullText as NSString).range(of: "선호하는 장르를 선택해주세요"))
         
-        // 괄호 부분만 폰트 작은 크기로 변경
+        /// 괄호 부분만 폰트 작은 크기로 변경
         let subFont = UIFont.systemFont(ofSize: 13)
         attributedString.addAttribute(.font, value: subFont, range: (fullText as NSString).range(of: targetText))
         
         titleLabel.attributedText = attributedString
     }
-    
+
+    /// 작은 화면(iPhone SE 등) 대응 레이아웃 조정
     private func adjustLayoutForDevice() {
         let screenHeight = UIScreen.main.bounds.height
         if screenHeight <= 568 {
@@ -67,7 +72,8 @@ class OnBoardingViewController: UIViewController {
         }
     }
 
-    // 장르 선택 버튼
+    /// 장르 선택 버튼 액션
+    /// Parameter sender: 선택된 장르 버튼
     @objc func genreButtonTapped(_ sender: UIButton) {
         let genre = genres[sender.tag]
         if selectedGenres.contains(genre) {
@@ -79,7 +85,8 @@ class OnBoardingViewController: UIViewController {
     }
     
 
-    // 건너뛰기 버튼: 전체 장르에 동일하게 기본 선호도 점수 부여
+    /// 건너뛰기 버튼 액션: 전체 장르에 동일하게 기본 선호도 점수 부여
+    /// Parameter sender: 버튼
     @IBAction func skipButtonTapped(_ sender: UIButton) {
         preferenceManager.initializePreferences(initialPreferredGenres: Genre.allCases)
         
@@ -87,14 +94,15 @@ class OnBoardingViewController: UIViewController {
     }
 
 
-    // 확인 버튼: 선택된 장르만 저장 - 선택된 장르에만 선호도 점수 부여
+    /// 확인 버튼 액션: 선택된 장르만 저장 - 선택된 장르에만 선호도 점수 부여
+    /// Parameter sender: 버튼
     @IBAction func confirmButtonTapped(_ sender: UIButton) {
         preferenceManager.initializePreferences(initialPreferredGenres: Array(selectedGenres))
         
         toMainVC()
     }
 
-    // 메인 화면으로 이동
+    /// 메인 화면으로 이동
     private func toMainVC() {
         let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
         if let mainVC = mainStoryboard.instantiateInitialViewController() {
@@ -111,6 +119,7 @@ class OnBoardingViewController: UIViewController {
     }
 }
 
+// MARK: UICollectionViewDataSource
 extension OnBoardingViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return genres.count
@@ -127,18 +136,19 @@ extension OnBoardingViewController: UICollectionViewDataSource {
     }
 }
 
+// MARK: UICollectionViewDelegate
 extension OnBoardingViewController: UICollectionViewDelegate {}
 
+// MARK: UICollectionViewDelegateFlowLayout
 extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenHeight = UIScreen.main.bounds.height
         let screenWidth = UIScreen.main.bounds.width
         let isPad = UIDevice.current.userInterfaceIdiom == .pad
-
         let spacing: CGFloat = 8
 
         if isPad {
-            // iPad에서는 가로 셀 수를 해상도에 따라 유동적으로 결정
+            /// iPad에서는 가로 셀 수를 해상도에 따라 유동적으로 결정
             let isLandscape = view.frame.width > view.frame.height
             let numberOfColumns: CGFloat = isLandscape ? 5 : 4
             let totalSpacing = spacing * (numberOfColumns + 1)
@@ -147,7 +157,7 @@ extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
             return CGSize(width: width, height: cellHeight)
 
         } else {
-            // iPhone은 무조건 3 x 2 고정
+            /// iPhone은 무조건 3 x 2 고정
             let numberOfColumns: CGFloat = 3
             let numberOfRows: CGFloat = 2
 
