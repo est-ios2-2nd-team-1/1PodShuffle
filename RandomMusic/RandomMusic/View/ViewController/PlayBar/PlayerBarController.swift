@@ -99,6 +99,9 @@ final class PlayerBarController: UITabBarController {
     /// 재생 상태 변경 옵저버
     private var playStateObserver: NSObjectProtocol?
 
+    /// 쓰로틀 객체
+    let throttle = Throttle()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
@@ -245,7 +248,6 @@ final class PlayerBarController: UITabBarController {
     /// 재생목록에서 다음 곡으로 이동합니다.
     /// 마지막 곡인 경우 새로운 곡을 비동기적으로 로드합니다.
     @objc private func forwardTapped() {
-        let throttle = Throttle()
         throttle.run {
             Task { await PlayerManager.shared.moveForward() }
         }
@@ -256,7 +258,6 @@ final class PlayerBarController: UITabBarController {
     /// 재생목록에서 이전 곡으로 이동합니다.
     /// 현재 곡이 첫 번째 곡인 경우 토스트 메시지로 사용자에게 알립니다.
     @objc private func backwardTapped() {
-        let throttle = Throttle()
         throttle.run {
             let canMoveToPrevious = PlayerManager.shared.moveBackward()
 

@@ -33,8 +33,8 @@ class SettingViewController: UIViewController {
 
     /// 초기 테마 상태 설정
     private func configureInitialTheme() {
-        if #available(iOS 16.0, *) {
-            themeSwitch.isOn = UITraitCollection.current.userInterfaceStyle == .dark
+        if UserDefaults.standard.string(forKey: "colorScheme") == "dark" {
+            themeSwitch.isOn = true
         } else {
             themeSwitch.isOn = false
         }
@@ -87,7 +87,8 @@ class SettingViewController: UIViewController {
         if let windowScene = UIApplication.shared.connectedScenes
             .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
             windowScene.windows.forEach { window in
-                window.overrideUserInterfaceStyle = sender.isOn ? .dark :  .light
+                window.overrideUserInterfaceStyle = sender.isOn ? .dark : .light
+                UserDefaults.standard.set(sender.isOn ? "dark" : "light", forKey: "colorScheme")
             }
         }
     }

@@ -8,6 +8,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let isFirstLaunch = !UserDefaults.standard.bool(forKey: "isOnboardingCompleted")
         isFirstLaunch ? showScreen(to: "Onboarding") : showScreen(to: "Main")
+
+        let colorScheme = UserDefaults.standard.string(forKey: "colorScheme")
+
+        switch colorScheme {
+            case "light":
+                window?.overrideUserInterfaceStyle = .light
+            case "dark":
+                window?.overrideUserInterfaceStyle = .dark
+        	default:
+            	window?.overrideUserInterfaceStyle = .light
+        }
     }
     
     /// 초기 화면을 정하는 메소드입니다.
