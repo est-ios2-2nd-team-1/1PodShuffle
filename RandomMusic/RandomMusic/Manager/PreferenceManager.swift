@@ -60,10 +60,6 @@ class PreferenceManager {
     func selectRandomGenre() -> Genre {
         var weights: [Genre: Double] = [:]
 
-        print("")
-        print("=============")
-        print("장르별 현재 점수")
-        print("=============")
         for genre in Genre.allCases {
             weights[genre] = calculateScore(for: genre)
         }
@@ -81,7 +77,7 @@ class PreferenceManager {
         request.fetchLimit = 1
 
         guard let latestFeedback = try? context.fetch(request).first else {
-            return .none  // 기록 없음
+            return .none
         }
 
         return latestFeedback.score > 0 ? .like : .dislike
@@ -150,15 +146,12 @@ private extension PreferenceManager {
         let now = Date()
 
         for data in allData {
-            let daysPassed = Calendar.current.dateComponents([.day],
-                                                             from: data.insertDate ?? now, to: now).day ?? 0
-
+            let daysPassed = Calendar.current.dateComponents([.day], from: data.insertDate ?? now, to: now).day ?? 0
             let timeDecay = getTimeDecay(daysPassed: daysPassed)
             totalScore += data.score * timeDecay
         }
 
         let finalScore = max(1.0, min(totalScore, 50.0))
-        print("\(genre.rawValue): \(String(format: "%.2f", finalScore)) (데이터 \(allData.count)개)")
 
         return finalScore
     }
