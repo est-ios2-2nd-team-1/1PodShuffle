@@ -1,5 +1,6 @@
 import UIKit
 
+/// 플레이리스트 역할의 뷰 컨트롤러입니다.
 class PlayListViewController: UIViewController {
     @IBOutlet weak var playListTableView: UITableView!
     @IBOutlet weak var collectionView: UICollectionView!

@@ -3,19 +3,16 @@ import UIKit
 /// 음악 재생 전 장르 선택을 위한 온보딩 화면입니다.
 /// 한 번 선택 후에는 초기화하지 않는 한 다시 나타나지 않습니다.
 /// 최대 3개의 장르를 선택할 수 있습니다.
-
-
 class OnBoardingViewController: UIViewController {
-    
     @IBOutlet weak var skipButton: UIButton!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var confirmButton: UIButton!
     @IBOutlet weak var collectionView: UICollectionView!
 
     /// 선택 가능한 장르 목록
-    var genres: [Genre] = Genre.allCases
+    private var genres: [Genre] = Genre.allCases
     /// 현재 선택된 장르 집합
-    var selectedGenres: Set<Genre> = []
+    private var selectedGenres: Set<Genre> = []
 
     /// 사용자 선호도 데이터 관리 객체
     private let preferenceManager = PreferenceManager()
@@ -27,9 +24,9 @@ class OnBoardingViewController: UIViewController {
         adjustLayoutForDevice()
 
         if UIDevice.current.userInterfaceIdiom != .pad {
-                // iPhone일 때만 높이 고정
-                collectionView.heightAnchor.constraint(equalToConstant: 300).isActive = true
-            }
+            // iPhone일 때만 높이 고정
+            collectionView.heightAnchor.constraint(equalToConstant: 300).isActive = true
+        }
     }
 
     /// 컬렉션 뷰 데이터소스/델리게이트 설정
@@ -59,11 +56,13 @@ class OnBoardingViewController: UIViewController {
         if screenHeight <= 568 {
             let fullText = "선호하는 장르를 선택해주세요 (최대 3개 선택 가능)"
             let targetText = "(최대 3개 선택 가능)"
+
             let attributedString = NSMutableAttributedString(string: fullText)
             let titleFont = UIFont.systemFont(ofSize: 14)
             attributedString.addAttribute(.font, value: titleFont, range: (fullText as NSString).range(of: "선호하는 장르를 선택해주세요"))
             let subFont = UIFont.systemFont(ofSize: 11)
             attributedString.addAttribute(.font, value: subFont, range: (fullText as NSString).range(of: targetText))
+
             titleLabel.attributedText = attributedString
             skipButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
             confirmButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
@@ -83,7 +82,6 @@ class OnBoardingViewController: UIViewController {
         }
         collectionView.reloadItems(at: [IndexPath(item: sender.tag, section: 0)])
     }
-    
 
     /// 건너뛰기 버튼 액션: 전체 장르에 동일하게 기본 선호도 점수 부여
     /// Parameter sender: 버튼
@@ -127,9 +125,12 @@ extension OnBoardingViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GenreCell", for: indexPath) as! GenreCell
         let genre = genres[indexPath.item]
         let isSelected = selectedGenres.contains(genre)
+
         cell.configure(with: genre, selected: isSelected)
+
         cell.genreButton.tag = indexPath.item
         cell.genreButton.addTarget(self, action: #selector(genreButtonTapped(_:)), for: .touchUpInside)
+
         return cell
     }
 }
@@ -145,7 +146,7 @@ extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
         let spacing: CGFloat = 8
 
         if isPad {
-            /// iPad에서는 가로 셀 수를 해상도에 따라 유동적으로 결정
+            // iPad에서는 가로 셀 수를 해상도에 따라 유동적으로 결정
             let isLandscape = view.frame.width > view.frame.height
             let numberOfColumns: CGFloat = isLandscape ? 5 : 4
             let totalSpacing = spacing * (numberOfColumns + 1)
@@ -154,7 +155,7 @@ extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
             return CGSize(width: width, height: cellHeight)
 
         } else {
-            /// iPhone은 무조건 3 x 2 고정
+            // iPhone은 무조건 3 x 2 고정
             let numberOfColumns: CGFloat = 3
             let numberOfRows: CGFloat = 2
 
