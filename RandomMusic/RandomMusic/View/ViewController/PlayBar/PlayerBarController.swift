@@ -101,6 +101,7 @@ final class PlayerBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        delegate = self
         configureUI()
         updatePlayerBar()
         setupTapGestureForPlaylist()
@@ -122,9 +123,10 @@ final class PlayerBarController: UITabBarController {
 
     /// UI를 구성합니다.
     private func configureUI() {
-        self.delegate = self
         tabBar.tintColor = .player
         buttonStackView.isHidden = true
+        buttonStackView.alpha = 0
+
         playerBar.layer.cornerRadius = 10
         mainImageView.layer.cornerRadius = 10
 
@@ -275,8 +277,6 @@ extension PlayerBarController: UITabBarControllerDelegate {
             }
         } else {
             buttonStackView.isHidden = false
-            buttonStackView.alpha = 0
-
             UIView.animate(withDuration: 0.3) { [weak self] in
                 self?.buttonStackView.alpha = 1
             }
