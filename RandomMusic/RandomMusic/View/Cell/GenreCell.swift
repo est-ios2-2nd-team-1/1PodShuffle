@@ -1,17 +1,10 @@
-// 온보딩 화면에서 선택하는 장르
-// 셀 사이즈 유동적이게 조절 가능하도록 설정
+/// 온보딩 화면에서 선택하는 장르 셀입니다.
+///
+/// 셀 크기는 컬렉션 뷰의 레이아웃에 따라 유동적으로 조절됩니다.
+/// 셀은 사용자가 탭하면 선택/해제 상태가 바뀌며,
+/// 선택시 체크마크 아이콘과 배경색이 변경됩니다.
 
 import UIKit
-
-extension UIImage {
-    func resize(to size: CGSize) -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
-        self.draw(in: CGRect(origin: .zero, size: size))
-        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return resizedImage
-    }
-}
 
 class GenreCell: UICollectionViewCell {
     @IBOutlet weak var genreButton: UIButton!
@@ -30,6 +23,10 @@ class GenreCell: UICollectionViewCell {
         genreButton.layer.cornerRadius = genreButton.bounds.height / 2
     }
 
+    /// 셀을 장르와 선택 상태애 맞게 설정합니다.
+    /// Parameter:
+    /// - genre: 장르 정보
+    /// - selected: 선택 여부. true면 체크마크와 선택 색상이 나타납니다.
     func configure(with genre: Genre, selected: Bool) {
 
         let imageSize = CGSize(width: genreButton.bounds.width - 24, height: genreButton.bounds.height - 24)
@@ -43,5 +40,18 @@ class GenreCell: UICollectionViewCell {
         genreButton.backgroundColor = selected ? UIColor(named: "SelectedColor") : UIColor(named: "MainColor")
 
         genreLabel.text = genre.rawValue
+    }
+}
+
+/// 이미지를 지정한 크기로 리사이즈합니다.
+/// Parameter size: 리사이즈할 크기
+/// Returns: 리사이즈된 UIImage
+extension UIImage {
+    func resize(to size: CGSize) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+        self.draw(in: CGRect(origin: .zero, size: size))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return resizedImage
     }
 }
