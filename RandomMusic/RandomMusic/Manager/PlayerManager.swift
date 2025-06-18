@@ -280,7 +280,6 @@ final class PlayerManager {
         newList.insert(movedSong, at: destinationIndex)
         setPlaylist(newList)
 
-        // CoreData 반영 (DataManager가 영구저장 책임)
         DataManager.shared.updateOrder(for: playlist)
 
         /// 현재 재생 중인 곡 인덱스 보정
@@ -365,7 +364,7 @@ private extension PlayerManager {
     private enum Constants {
         // 이전곡으로 이동하는 기준 시간 (초)
         static let backwardThreshold = 3.0
-        /// 마지막 재생 곡을 저장하는 UserDefaults 키
+        // 마지막 재생 곡을 저장하는 UserDefaults 키
         static let lastSongKey = "heardLastSong"
     }
 
