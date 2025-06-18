@@ -24,12 +24,13 @@ class SongTableViewCell: UITableViewCell {
         setCellBgColor()
     }
     
-    /// cell setting
+    /// 셀의 초기 값을 세팅합니다.
     ///
-    /// - Parameter model: SongMel을 파라미터로 받아 lebel, image를 세팅하기 위한 파라미터
-    /// - Parameter isPlaing: 재생 상태를 파라미터로 받아 cell의 backgrounColor를 세팅하기 위한 파라미터
+    /// PlayListVC로 부터 SongMedel(곡 정보), 재생상태를 전달 받아 cell을 세탕합니다
     ///
-    /// PlayListVC로 부터 전달 값 전달 받아 cell을 세탕합니다
+    /// - Parameters:
+    ///   - model: SongMel을 파라미터로 받습니다.
+    ///   - isPlaing: 재생 상태를 파라미터로 받습니다.
     func configureCell(model: SongModel, isPlaying: Bool) {
         thumbnailImageView.clipsToBounds = true
         thumbnailImageView.layer.cornerRadius = thumbnailImageView.bounds.width / 3
@@ -45,7 +46,9 @@ class SongTableViewCell: UITableViewCell {
         setCellBgColor()
     }
     
-    /// select cell backgroundColor setting
+    /// 셀의 backgroundColor를 세팅합니다.
+    ///
+    /// 재생중인 곡의 backgroundColor를 .main으로 세팅합니다.
     private func setCellBgColor() {
         UIView.animate(withDuration: 0.4) {
             self.backgroundColor = self.isPlaying ? .main : .clear
