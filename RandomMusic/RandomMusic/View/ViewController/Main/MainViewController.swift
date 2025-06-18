@@ -4,8 +4,7 @@ import UIKit
 
 /// 음악 재생을 위한 메인 뷰 컨트롤러
 ///
-/// `MainViewController`는 음악 재생, 일시정지, 곡 변경, 피드백 등의
-/// 핵심 음악 재생 기능을 제공하는 메인 화면입니다.
+/// 음악 재생, 일시정지, 곡 변경, 피드백 등의 핵심 음악 재생 기능을 제공하는 메인 화면입니다.
 class MainViewController: UIViewController {
 
     // MARK: - IBOutlets
