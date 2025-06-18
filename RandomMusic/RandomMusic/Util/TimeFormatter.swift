@@ -1,6 +1,6 @@
 import Foundation
 
-/// 시간 형식 변환을 담당하는 유틸리티 클래스입니다.
+/// 시간 형식 변환을 담당하는 유틸리티 구조체입니다.
 struct TimeFormatter {
     /// 시간을 "MM:SS" 형식의 문자열로 변환합니다.
     /// - Parameter time: 초 단위 시간입니다.
