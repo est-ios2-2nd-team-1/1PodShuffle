@@ -93,7 +93,6 @@ class OnBoardingViewController: UIViewController {
         toMainVC()
     }
 
-
     /// 확인 버튼 액션: 선택된 장르만 저장 - 선택된 장르에만 선호도 점수 부여
     /// Parameter sender: 버튼
     @IBAction func confirmButtonTapped(_ sender: UIButton) {
@@ -114,7 +113,6 @@ class OnBoardingViewController: UIViewController {
                 UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: nil)
             }
         }
-        
         UserDefaults.standard.set(true, forKey: "isOnboardingCompleted")
     }
 }
@@ -143,7 +141,6 @@ extension OnBoardingViewController: UICollectionViewDelegate {}
 extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenHeight = UIScreen.main.bounds.height
-        let screenWidth = UIScreen.main.bounds.width
         let isPad = UIDevice.current.userInterfaceIdiom == .pad
         let spacing: CGFloat = 8
 
