@@ -29,5 +29,7 @@
 	<array>
 		<string>audio</string>
 	</array>
+    <key>CFBundleDisplayName</key>
+    <string>1PodShuffle</string>
 </dict>
 </plist>
