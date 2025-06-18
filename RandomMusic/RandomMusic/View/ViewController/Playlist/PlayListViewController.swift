@@ -39,8 +39,25 @@ class PlayListViewController: UIViewController {
         super.viewDidAppear(animated)
         scrollSelectPlaySong()
     }
+    
+    deinit {
+        if let observer = currentSongObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = playStateObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = playbackTimeObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = playlistObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
 
     /// UI Setting
+    ///
+    /// 이전, 다음, 재생/일시정지, 장르별 곡추가 collectionView에 대한 ui 세팅입니다
     private func setConfigureUI() {
         let backImage = UIImage(systemName: "backward.frame.fill", withConfiguration: backforConfig)
         let forImage = UIImage(systemName: "forward.frame.fill", withConfiguration: backforConfig)
@@ -66,8 +83,10 @@ class PlayListViewController: UIViewController {
         : UIImage(systemName: "play.circle.fill", withConfiguration: playConfig)
         playButton.setImage(playImage, for: .normal)
     }
-
-    /// Notification Observer Set Method
+    
+    /// Notification Observer 생성
+    ///
+    /// PlayerManager와 관련한 상태 변경을 받아 UI를 업데이트 합니다.
     private func setupNotificationObservers() {
         currentSongObserver = NotificationCenter.default.addObserver(
             forName: .currentSongChanged,
@@ -130,7 +149,7 @@ class PlayListViewController: UIViewController {
     
     /// Dismiss Image Button 이미지 세팅
     ///
-    /// 화면 우측 하단 이미지로 현재 재생중인 곡의 썸네일로 표시하며 터치시 dismiss됩니다
+    /// 화면 우측 하단 이미지로 현재 재생중인 곡의 썸네일로 세팅합니다.
     private func setDismissImageButton() {
         guard let song = PlayerManager.shared.currentSong,
               let thumbnailData = song.thumbnailData,
@@ -144,10 +163,13 @@ class PlayListViewController: UIViewController {
         dismissImageButton.setImage(resizedImage, for: .normal)
     }
     
-    /// image resize
+    /// image resize 메서드
     ///
-    /// - Parameter image: 사이즈를 변경할 이미지
-    /// - Parameter targetSize: 변경하려는 사이즈
+    /// 이미지를 원하는 사이즈로 재조정합니다.
+    ///
+    /// - Parameters:
+    ///   - image: 사이즈를 변경할 이미지
+    ///   - targetSize: 변경하려는 사이즈
     private func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage? {
         let size = image.size
         
@@ -173,7 +195,11 @@ class PlayListViewController: UIViewController {
         return newImage
     }
     
-    /// 이전곡 버튼 터치
+    
+    /// 이전 버튼이 탭 되었을 때 호출됩니다.
+    ///
+    /// 재생목록에서 재생중인 곡의 이전 곡이 재생됩니다
+    /// 만약 재생목록에서 첫번째 곡인 경우 Toast message로 사용자에게 알려줍니다.
     @IBAction func backwardButton(_ sender: UIButton) {
         throttle.run {
             let canMoveToPrevious = PlayerManager.shared.moveBackward()
@@ -184,48 +210,38 @@ class PlayListViewController: UIViewController {
         }
     }
     
-    /// 재생 버튼 터치
+    /// 재생/일시정지 버튼이 탭 되었을 때 호출됩니다
+    ///
+    /// 재생 상태를 토글하여 재생 중이라면 일시정지, 일시정지면 재생으로 상태가 변경됩니다.
     @IBAction func playButton(_ sender: UIButton) {
         PlayerManager.shared.togglePlayPause()
     }
     
-    /// 다음곡 버튼 터치
+    
+    /// 이전 버튼이 탭 되었을 때 호출됩니다.
+    ///
+    /// 재생목록에서 재생중인 곡의 다음 곡이 재생됩니다
     @IBAction func forwardButton(_ sender: UIButton) {
         throttle.run {
             Task { await PlayerManager.shared.moveForward() }
         }
     }
     
-    /// edit 버튼 터치
-    /// Edit Mode로 전환되어 삭제 맟 플레이리스트 순서 변경이 가능합니다
+    /// edit 버튼이 탭 되었을 때 호출됩니다.
+    ///
+    /// tableView(재생목록)가 edit mode로 전환되어 삭제 및 재생 순서를 변경할 수 있습니다.
     @IBAction func editButton(_ sender: UIBarButtonItem) {
         playListTableView.setEditing(!playListTableView.isEditing, animated: true)
         sender.image = playListTableView.isEditing ? UIImage(systemName: "checkmark") : UIImage(systemName: "slider.horizontal.3")
     }
     
-    /// dismiss 버튼, 이미지 버튼 터치
+    /// dismiss 버튼, 이미지 버튼이 탭 되었을 때 호출됩니다.
     ///
-    /// 플레이리스트 화면은 dismiss되고 재생화면으로 돌아갑니다
-    ///
-    /// - dismiss 버튼: 화면 좌측 상단
-    /// - 이미지 버튼: 화면 우측 하단의 이미지로 현재 재생중인 곡의 thumailImage가 표시됩니다
+    /// 플레이리스트 화면은 dismiss 되고 이전 화면으로 돌아갑니다
+    /// - dismiss 버튼: 화면 좌측 상단 "chevron.down" 버튼
+    /// - 이미지 버튼: 화면 우측 하단의 이미지로 현재 재생 중인 곡의 thumailImage가 표시됩니다
     @IBAction func dismissButton(_ sender: Any) {
         dismiss(animated: true)
-    }
-    
-    deinit {
-        if let observer = currentSongObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-        if let observer = playStateObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-        if let observer = playbackTimeObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-        if let observer = playlistObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
     }
 }
 
