@@ -46,16 +46,15 @@ AVFoundation 프레임워크를 활용하여 음악을 재생 및 제어했습�
 
 ---
 ### 📱주요 화면
-
-<img src="https://github.com/user-attachments/assets/31208bae-dfb2-465a-84c8-b23323a17541" width="100" height="200"/>
-
-<img src="https://github.com/user-attachments/assets/7631e32d-6872-43f3-914b-8e086c981c09" width="100" height="200"/>
-
-<img src="https://github.com/user-attachments/assets/926c254c-84d7-4bc1-a018-3a55b74d40fa" width="100" height="200"/>
-
-<img src="https://github.com/user-attachments/assets/5033b96f-2299-4813-809d-e48c2b9dbbd7" width="100" height="200"/>
-
-<img src="https://github.com/user-attachments/assets/5cec3118-d53d-4e99-abc6-535f86204b8e" width="100" height="200"/>
+<table>
+  <tr>
+    <td align="center"><img src="https://github.com/user-attachments/assets/31208bae-dfb2-465a-84c8-b23323a17541"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/7631e32d-6872-43f3-914b-8e086c981c09"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/926c254c-84d7-4bc1-a018-3a55b74d40fa"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/5033b96f-2299-4813-809d-e48c2b9dbbd7"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/5cec3118-d53d-4e99-abc6-535f86204b8e"></td>
+  </tr>
+</table>
 
 ---
 
