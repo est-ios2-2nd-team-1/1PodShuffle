@@ -38,6 +38,23 @@ enum Genre: String, CaseIterable, Codable {
         }
     }
 
+    var iconString: String {
+        switch self {
+        case .jazz:
+            return "🎷"
+        case .pop:
+            return "🎤"
+        case .rock:
+            return "🎸"
+        case .classic:
+            return "🎻"
+        case .rnb:
+            return "🎶"
+        case .hiphop:
+            return "🎧"
+        }
+    }
+
     var image: UIImage? {
         switch self {
         case .jazz:
