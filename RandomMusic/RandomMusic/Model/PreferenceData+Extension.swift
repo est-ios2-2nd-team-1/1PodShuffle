@@ -1,10 +1,3 @@
-//
-//  PreferenceData+Extension.swift
-//  RandomMusic
-//
-//  Created by drfranken on 6/10/25.
-//
-
 import CoreData
 import Foundation
 
