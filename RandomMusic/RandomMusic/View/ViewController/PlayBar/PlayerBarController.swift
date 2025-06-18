@@ -99,9 +99,6 @@ final class PlayerBarController: UITabBarController {
     /// 재생 상태 변경 옵저버
     private var playStateObserver: NSObjectProtocol?
 
-    /// Throttle 객체
-    private let throttle = Throttle()
-
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -125,7 +122,9 @@ final class PlayerBarController: UITabBarController {
 
     /// UI를 구성합니다.
     private func configureUI() {
+        self.delegate = self
         tabBar.tintColor = .player
+        buttonStackView.isHidden = true
         playerBar.layer.cornerRadius = 10
         mainImageView.layer.cornerRadius = 10
 
@@ -244,6 +243,7 @@ final class PlayerBarController: UITabBarController {
     /// 재생목록에서 다음 곡으로 이동합니다.
     /// 마지막 곡인 경우 새로운 곡을 비동기적으로 로드합니다.
     @objc private func forwardTapped() {
+        let throttle = Throttle()
         throttle.run {
             Task { await PlayerManager.shared.moveForward() }
         }
@@ -254,11 +254,31 @@ final class PlayerBarController: UITabBarController {
     /// 재생목록에서 이전 곡으로 이동합니다.
     /// 현재 곡이 첫 번째 곡인 경우 토스트 메시지로 사용자에게 알립니다.
     @objc private func backwardTapped() {
+        let throttle = Throttle()
         throttle.run {
             let canMoveToPrevious = PlayerManager.shared.moveBackward()
 
             if !canMoveToPrevious {
                 Toast.shared.showToast(message: "가장 최신 곡입니다.")
+            }
+        }
+    }
+}
+
+extension PlayerBarController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        if let _ = viewController as? MainViewController {
+            UIView.animate(withDuration: 0.3) { [weak self] in
+                self?.buttonStackView.alpha = 0
+            } completion: { [weak self] _ in
+                self?.buttonStackView.isHidden = true
+            }
+        } else {
+            buttonStackView.isHidden = false
+            buttonStackView.alpha = 0
+
+            UIView.animate(withDuration: 0.3) { [weak self] in
+                self?.buttonStackView.alpha = 1
             }
         }
     }
