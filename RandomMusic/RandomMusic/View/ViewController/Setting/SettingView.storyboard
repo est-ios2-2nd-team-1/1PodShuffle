@@ -167,7 +167,9 @@
                             </constraint>
                             <constraint firstItem="2KC-KK-lrY" firstAttribute="leading" secondItem="IvZ-g2-JSS" secondAttribute="leading" id="QRD-yR-vbr"/>
                             <constraint firstItem="kbq-kk-9sZ" firstAttribute="top" secondItem="2KC-KK-lrY" secondAttribute="bottom" constant="5" id="SKt-Iq-OO6"/>
-                            <constraint firstItem="IvZ-g2-JSS" firstAttribute="top" secondItem="qBB-yJ-siF" secondAttribute="top" constant="10" id="SWA-Mw-alU"/>
+                            <constraint firstItem="IvZ-g2-JSS" firstAttribute="top" secondItem="qBB-yJ-siF" secondAttribute="top" constant="10" id="SWA-Mw-alU">
+                                <variation key="heightClass=regular-widthClass=regular" constant="100"/>
+                            </constraint>
                             <constraint firstItem="qBB-yJ-siF" firstAttribute="trailing" secondItem="kbq-kk-9sZ" secondAttribute="trailing" constant="16" id="ZDg-rp-IFg">
                                 <variation key="heightClass=regular-widthClass=regular" constant="80"/>
                             </constraint>
