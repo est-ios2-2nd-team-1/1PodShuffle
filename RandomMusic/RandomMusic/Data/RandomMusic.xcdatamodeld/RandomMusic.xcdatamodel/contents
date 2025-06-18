@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24D70" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="Recommendation" representedClassName="Recommendation" syncable="YES" codeGenerationType="class">
-        <attribute name="count" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="genre" attributeType="String"/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24E248" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="PreferenceCache" representedClassName="PreferenceCache" syncable="YES" codeGenerationType="class">
+        <attribute name="calculatedScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="genre" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="insertDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="PreferenceData" representedClassName="PreferenceData" syncable="YES" codeGenerationType="class">
+        <attribute name="genre" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="insertDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isImmutable" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="score" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="songId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="Song" representedClassName="Song" syncable="YES" codeGenerationType="class">
-        <attribute name="album" attributeType="String"/>
-        <attribute name="artist" attributeType="String"/>
-        <attribute name="genre" attributeType="String"/>
+        <attribute name="album" attributeType="String" defaultValueString="&quot;&quot;"/>
+        <attribute name="artist" attributeType="String" defaultValueString="&quot;&quot;"/>
+        <attribute name="genre" attributeType="String" defaultValueString="&quot;&quot;"/>
         <attribute name="id" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="insertDate" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="streamUrl" attributeType="String"/>
+        <attribute name="order" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="streamUrl" optional="YES" attributeType="String"/>
         <attribute name="thumbnail" optional="YES" attributeType="String"/>
-        <attribute name="title" attributeType="String"/>
+        <attribute name="title" attributeType="String" defaultValueString="&quot;&quot;"/>
     </entity>
 </model>

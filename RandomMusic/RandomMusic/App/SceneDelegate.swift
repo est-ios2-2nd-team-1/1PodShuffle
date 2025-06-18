@@ -1,14 +1,37 @@
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
+        RemoteManager.shared.configure()
+
+        let isFirstLaunch = !UserDefaults.standard.bool(forKey: "isOnboardingCompleted")
+        isFirstLaunch ? showScreen(to: "Onboarding") : showScreen(to: "Main")
+
+        let colorScheme = UserDefaults.standard.string(forKey: "colorScheme")
+
+        switch colorScheme {
+            case "light":
+                window?.overrideUserInterfaceStyle = .light
+            case "dark":
+                window?.overrideUserInterfaceStyle = .dark
+        	default:
+            	window?.overrideUserInterfaceStyle = .light
+        }
+    }
+    
+    /// 초기 화면을 정하는 메소드입니다.
+    /// - Parameter name: Entry Point로 들어갈 스토리보드 파일 이름을 받습니다.
+    private func showScreen(to name: String) {
+        let storyboard = UIStoryboard(name: name, bundle: nil)
+
+        guard let vc = storyboard.instantiateInitialViewController() else {
+            return
+        }
+
+        window?.rootViewController = vc
+        window?.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -40,7 +63,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Save changes in the application's managed object context when the application transitions to the background.
     }
-
-
 }
 
