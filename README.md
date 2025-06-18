@@ -1,4 +1,4 @@
-# RandomMusic
+# 1PodShuffle
 사용자의 취향 장르를 기반으로 랜덤 음악이 재생되는 어플리케이션
 
 
