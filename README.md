@@ -9,7 +9,7 @@
 
 ### 🙂 실행하는 방법
 
-[실행 방법](https://maize-erica-237.notion.site/1PodShuffle-216a1c6f6ce08070a224ea3552015b0f) 을 반드시 참고해주세요!
+[실행 방법](https://www.notion.so/1PodShuffle-216a1c6f6ce08070a224ea3552015b0f) 을 반드시 참고해주세요!
 
 ---
 
