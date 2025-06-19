@@ -5,16 +5,15 @@
 
 <img src="https://github.com/user-attachments/assets/6fd48210-6d6d-4b07-9a25-c9ca7e9378a6" width="300" height="300"/>
 
----
+<br />
 
-### 🙂 실행하는 방법
+## 🙂 실행 방법
 
 [실행 방법](https://www.notion.so/1PodShuffle-216a1c6f6ce08070a224ea3552015b0f) 을 반드시 참고해주세요!
 
----
+<br />
 
-
-### ⭐️ 주요 기능
+## ⭐️ 주요 기능
 - **Core Data 기반 음악 및 취향 데이터 관리** : 
 사용자 음악 및 선호도 정보를 CoreData를 활용하여 CRUD를 작업했습니다.
 
@@ -32,9 +31,10 @@ MPRemoteCommandCenter와 MPNowPlayingInfoCenter를 연동하여 백그라운드�
 
 - **싱글톤 패턴 사용** :
 하나의 인스턴스로 상태를 일관되게 관리하고, 메모리 사용을 최소화했습니다.
----
 
-### ⭐️ 아키텍쳐 및 라이브러리
+<br />
+
+## ⭐️ 아키텍쳐 및 라이브러리
 - **MVC 아키텍처 기반 구조화** :
 코드의 모듈화와 역할 분리를 위해 MVC 아키텍처를 적용했습니다.
 
@@ -44,8 +44,9 @@ AVFoundation 프레임워크를 활용하여 음악을 재생 및 제어했습�
 - **MarqueeLabel 라이브러리 적용을 통한 가사/제목 스크롤 처리** : 
 긴 텍스트를 자연스럽게 수평 스크롤 처리하기 위해 MarqueeLabel을 도입하여 사용자 UI 가독성을 개선하였습니다.
 
----
-### 📱주요 화면
+<br />
+
+## 📱주요 화면
 <table>
   <tr>
     <td align="center"><img src="https://github.com/user-attachments/assets/31208bae-dfb2-465a-84c8-b23323a17541"></td>
@@ -56,9 +57,9 @@ AVFoundation 프레임워크를 활용하여 음악을 재생 및 제어했습�
   </tr>
 </table>
 
----
+<br />
 
-### 📁 파일 구조
+## 📁 파일 구조
 ```
 ├── RandomMusic
 │   ├── App // 앱 생명주기 관련
@@ -96,8 +97,9 @@ AVFoundation 프레임워크를 활용하여 음악을 재생 및 제어했습�
 │       └── ViewController
 ```
 
----
-### 📚 커밋 컨벤션
+<br />
+
+## 📚 커밋 컨벤션
 | 타입(Type) | 설명(Description)            | 예시(Example)                                 |
 | ---------- | ---------------------------- | --------------------------------------------- |
 | feat       | 새로운 기능 추가              | feat: 사용자 음악 추천 기능 추가              |
@@ -109,8 +111,9 @@ AVFoundation 프레임워크를 활용하여 음악을 재생 및 제어했습�
 | chore      | 빌드, 설정 등 기타 변경사항      | chore: 패키지 매니저 버전 업데이트            |
 | ui         | UI 추가/수정                  | ui: 메인 화면 UI 레이아웃 변경                |
 
----
-### 🙇 구성원
+<br />
+
+## 🙇 구성원
 
 <table>
   <tr>
@@ -141,3 +144,8 @@ AVFoundation 프레임워크를 활용하여 음악을 재생 및 제어했습�
     </td>
   </tr>
 </table>
+
+<br />
+
+## 🏆 성과
+<img src="https://github.com/user-attachments/assets/df3d2d5d-82f1-436b-96ad-07a58f985c7c" width="500"/>
